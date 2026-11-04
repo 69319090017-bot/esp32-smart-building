@@ -18,7 +18,8 @@ import socketserver
 from pathlib import Path
 
 PORT = 5000
-DIST_DIR = Path(__file__).parent / "web-dashboard" / "dist"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DIST_DIR = PROJECT_ROOT / "web-dashboard" / "dist"
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -32,7 +33,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 def main():
     if not DIST_DIR.exists() or not (DIST_DIR / "index.html").exists():
         print("[INFO] Building web-dashboard dist...")
-        os.system('cmd.exe /c "cd web-dashboard && npm run build"')
+        os.system(f'cmd.exe /c "cd /d \"{PROJECT_ROOT}\\web-dashboard\" && npm run build"')
 
     print("\n" + "=" * 65)
     print("  🏢 SMART BUILDING COMMAND CENTER (2026 EDITION)")

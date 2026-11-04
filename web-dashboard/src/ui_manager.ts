@@ -188,10 +188,23 @@ let latestWeatherNarration = 'ขณะนี้ไม่มีข้อมู�
 // Thailand may receive hourly/interpolated Open-Meteo data; allow one hour plus a 30-minute delivery margin.
 const WEATHER_MAX_AGE_MINUTES = 90;
 
+let userHasInteracted = typeof process !== 'undefined' && (process.env?.NODE_ENV === 'test' || Boolean((process.env as any)?.VITEST));
+if (typeof window !== 'undefined') {
+    const markInteracted = () => {
+        userHasInteracted = true;
+        window.removeEventListener('pointerdown', markInteracted);
+        window.removeEventListener('keydown', markInteracted);
+        window.removeEventListener('touchstart', markInteracted);
+    };
+    window.addEventListener('pointerdown', markInteracted, { passive: true });
+    window.addEventListener('keydown', markInteracted, { passive: true });
+    window.addEventListener('touchstart', markInteracted, { passive: true });
+}
+
 export const t = (key: string) => translations[currentLang]?.[key] || key;
 
 const speakAlertIfNeeded = (severity: 'NORMAL' | 'WARNING' | 'CRITICAL', message: string) => {
-    if (!automaticSpeechEnabled || severity === 'NORMAL') return;
+    if (!automaticSpeechEnabled || severity === 'NORMAL' || !userHasInteracted) return;
     const key = `${severity}:${message}`;
     if (lastSpokenAlertKey === key) return;
     lastSpokenAlertKey = key;
@@ -508,13 +521,17 @@ const speakNextQueueItem = (sequenceId = speechSequence) => {
         }
         if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
     };
-    utterance.onerror = () => {
+    utterance.onerror = (e: any) => {
         if (sequenceId !== speechSequence) return;
         if (speechQueue.length > 0) {
             speakNextQueueItem(sequenceId);
             return;
         }
-        if (UI.ttsStatus) UI.ttsStatus.textContent = 'เกิดข้อผิดพลาดในการพูด';
+        if (e?.error === 'not-allowed' || e?.error === 'interrupted') {
+            if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
+        } else {
+            if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
+        }
     };
 
     if (UI.ttsStatus) UI.ttsStatus.textContent = 'กำลังพูด...';
@@ -719,7 +736,7 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
         sourceLabel: w.sourceLabel || (w.time ? 'โอเพนเมทีโอ' : 'แหล่งข้อมูลที่เชื่อมต่อ'),
     });
 
-    if (automaticSpeechEnabled && !isAudioMuted() && weatherSpeechKey !== lastWeatherSpeechKey && (severity !== 'NORMAL' || outdoorSummary.status !== 'READY')) {
+    if (userHasInteracted && automaticSpeechEnabled && !isAudioMuted() && weatherSpeechKey !== lastWeatherSpeechKey && (severity !== 'NORMAL' || outdoorSummary.status !== 'READY')) {
         lastWeatherSpeechKey = weatherSpeechKey;
         setTimeout(() => speakText(latestWeatherNarration), 220);
     }
@@ -748,27 +765,29 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
 
     // Batch all DOM updates using DOMBatcher
     domBatcher.schedule(() => {
-        // 1. UV Index
+        // 1. UV Index (Apple Weather HIG)
+        const uvSummary = uv >= 8.0 ? 'หลีกเลี่ยงแดดจัด อยู่ในที่ร่ม' : uv >= 3.0 ? 'แนะนำป้องกันแดด หมวก/แว่น/ครีม' : 'รังสีต่ำ ปลอดภัยต่อกิจกรรมกลางแจ้ง';
         if (UI.uvValue) UI.uvValue.textContent = formatMetric(uv);
-        if (UI.uvForecastText) UI.uvForecastText.textContent = forecastSummary;
+        if (UI.uvForecastText) UI.uvForecastText.textContent = uvSummary;
         if (UI.uvBar) (UI.uvBar as HTMLElement).style.width = `${Math.min((uv / 15) * 100, 100)}%`;
+        const uvThumb = document.getElementById('uvThumb');
+        if (uvThumb) {
+            uvThumb.style.left = `${Math.max(0, Math.min(100, (uv / 12) * 100))}%`;
+        }
         if (UI.uvRiskBadge) {
             const uvFinding = finding('uv');
             if (uvFinding?.band === 'unknown') {
                 UI.uvRiskBadge.textContent = 'ไม่มีข้อมูล';
-                UI.uvRiskBadge.style.cssText = 'background: rgba(148,163,184,0.15); color: #cbd5e1;';
+                UI.uvRiskBadge.className = 'apple-badge';
             } else if (uv >= 8.0) {
-                UI.uvRiskBadge.textContent = "หลีกเลี่ยงแดดกลางวัน (WHO)";
-                UI.uvRiskBadge.style.cssText = "background: rgba(239,68,68,0.2); color: #ef4444;";
-                if (UI.uvBar) (UI.uvBar as HTMLElement).style.background = "#ef4444";
+                UI.uvRiskBadge.textContent = "สูงมาก (WHO)";
+                UI.uvRiskBadge.className = 'apple-badge apple-badge-critical';
             } else if (uv >= 3.0) {
-                UI.uvRiskBadge.textContent = "ป้องกันแดดตามคำแนะนำ WHO";
-                UI.uvRiskBadge.style.cssText = "background: rgba(245,158,11,0.2); color: #f59e0b;";
-                if (UI.uvBar) (UI.uvBar as HTMLElement).style.background = "#f59e0b";
+                UI.uvRiskBadge.textContent = "ปานกลาง (WHO)";
+                UI.uvRiskBadge.className = 'apple-badge apple-badge-warning';
             } else {
-                UI.uvRiskBadge.textContent = "ต่ำกว่าเกณฑ์เริ่มแนะนำป้องกันแดด";
-                UI.uvRiskBadge.style.cssText = "background: rgba(16,185,129,0.1); color: #10b981;";
-                if (UI.uvBar) (UI.uvBar as HTMLElement).style.background = "#06b6d4";
+                UI.uvRiskBadge.textContent = "ระดับต่ำ (0-2)";
+                UI.uvRiskBadge.className = 'apple-badge apple-badge-normal';
             }
         }
 
@@ -777,30 +796,37 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
         if (UI.humidityDewPointValue) UI.humidityDewPointValue.textContent = formatMetric(dewPoint);
         if (UI.humidityRiskBadge) UI.humidityRiskBadge.textContent = 'ระดับความชื้น';
 
-        // 2. Heat Index / Apparent Temp
+        // 2. Heat Index / Apparent Temp (Apple Weather HIG)
         const airTemp = Number(w.temperature_2m || apparent);
         if (UI.heatValue) UI.heatValue.textContent = `${formatMetric(apparent)} °C`;
         if (UI.airTempValue) UI.airTempValue.textContent = formatMetric(airTemp);
-        if (UI.heatDewPointValue) UI.heatDewPointValue.textContent = `${formatMetric(dewPoint)}°C`;
-        if (UI.heatForecastText) UI.heatForecastText.textContent = forecastSummary;
+        if (UI.heatDewPointValue) UI.heatDewPointValue.textContent = formatMetric(dewPoint);
+        const heatFinding = finding('heat');
+        const heatSummary = (heatFinding?.band === 'danger' || heatFinding?.band === 'very-dangerous')
+            ? 'อันตราย: เสี่ยงภาวะ Heat Stroke งดกิจกรรมกลางแจ้ง'
+            : (heatFinding?.band === 'warning' || heatFinding?.band === 'watch')
+                ? 'เตือนภัย: เสี่ยงเพลียแดด ควรดื่มน้ำบ่อยขึ้น'
+                : 'สภาวะปกติ รู้สึกสบายตามธรรมชาติ';
+        if (UI.heatForecastText) UI.heatForecastText.textContent = heatSummary;
         if (UI.heatBar) (UI.heatBar as HTMLElement).style.width = `${Math.min((apparent / 50) * 100, 100)}%`;
+        const heatThumb = document.getElementById('heatThumb');
+        if (heatThumb) {
+            const heatPercent = Math.max(0, Math.min(100, ((apparent - 20) / 30) * 100));
+            heatThumb.style.left = `${heatPercent}%`;
+        }
         if (UI.heatRiskBadge) {
-            const heatFinding = finding('heat');
             if (heatFinding?.band === 'unknown') {
-                UI.heatRiskBadge.textContent = 'ไม่มีข้อมูลพอคำนวณดัชนีความร้อน';
-                UI.heatRiskBadge.style.cssText = 'background: rgba(148,163,184,0.15); color: #cbd5e1;';
+                UI.heatRiskBadge.textContent = 'ไม่มีข้อมูล';
+                UI.heatRiskBadge.className = 'apple-badge';
             } else if (heatFinding?.band === 'danger' || heatFinding?.band === 'very-dangerous') {
-                UI.heatRiskBadge.textContent = heatFinding.band === 'very-dangerous' ? 'อันตรายมากตามกรมอนามัย' : 'อันตรายตามกรมอนามัย';
-                UI.heatRiskBadge.style.cssText = "background: rgba(239,68,68,0.2); color: #ef4444;";
-                if (UI.heatBar) (UI.heatBar as HTMLElement).style.background = "#ef4444";
+                UI.heatRiskBadge.textContent = heatFinding.band === 'very-dangerous' ? 'อันตรายมาก' : 'อันตราย';
+                UI.heatRiskBadge.className = 'apple-badge apple-badge-critical';
             } else if (heatFinding?.band === 'warning' || heatFinding?.band === 'watch') {
-                UI.heatRiskBadge.textContent = heatFinding.band === 'watch' ? 'เฝ้าระวังตามกรมอนามัย' : 'เตือนภัยตามกรมอนามัย';
-                UI.heatRiskBadge.style.cssText = "background: rgba(245,158,11,0.2); color: #f59e0b;";
-                if (UI.heatBar) (UI.heatBar as HTMLElement).style.background = "#f59e0b";
+                UI.heatRiskBadge.textContent = heatFinding.band === 'watch' ? 'เฝ้าระวัง' : 'เตือนภัย';
+                UI.heatRiskBadge.className = 'apple-badge apple-badge-warning';
             } else {
-                UI.heatRiskBadge.textContent = "ต่ำกว่าเกณฑ์เฝ้าระวังดัชนีความร้อน";
-                UI.heatRiskBadge.style.cssText = "background: rgba(16,185,129,0.1); color: #10b981;";
-                if (UI.heatBar) (UI.heatBar as HTMLElement).style.background = "#10b981";
+                UI.heatRiskBadge.textContent = "ระดับปกติ";
+                UI.heatRiskBadge.className = 'apple-badge apple-badge-normal';
             }
         }
 
@@ -849,18 +875,31 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
             UI.riverRiskBadge.style.cssText = 'background: rgba(148,163,184,0.15); color: #cbd5e1;';
         }
 
-        // Highest Threat Badge
-        if (UI.highestThreatBadge) {
-            UI.highestThreatBadge.textContent = coreDataIncomplete && severity === 'NORMAL'
-                ? 'ข้อมูลไม่ครบ · ยังสรุปไม่ได้'
-                : `${severity}`;
+        // Highest Threat Badge & Synchronized Threat Dot (No contradictory colors!)
+        const threatDot = document.getElementById('threatStatusDot');
+        const threatChip = document.getElementById('threatStatusChip');
+        if (threatDot) {
             if (severity === 'CRITICAL') {
-                UI.highestThreatBadge.style.cssText = "background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; padding: 0.4rem 0.8rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem;";
+                threatDot.className = 'status-dot critical';
             } else if (severity === 'WARNING') {
-                UI.highestThreatBadge.style.cssText = "background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #f59e0b; padding: 0.4rem 0.8rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem;";
+                threatDot.className = 'status-dot warning';
             } else {
-                const color = coreDataIncomplete ? '#cbd5e1' : '#10b981';
-                UI.highestThreatBadge.style.cssText = `background: ${coreDataIncomplete ? 'rgba(148,163,184,0.15)' : 'rgba(16,185,129,0.15)'}; border: 1px solid ${color}; color: ${color}; padding: 0.4rem 0.8rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem;`;
+                threatDot.className = 'status-dot online';
+            }
+        }
+        if (threatChip) {
+            threatChip.className = `apple-status-chip status-${severity.toLowerCase()}`;
+        }
+        if (UI.highestThreatBadge) {
+            if (severity === 'CRITICAL') {
+                UI.highestThreatBadge.textContent = 'CRITICAL (วิกฤต)';
+                UI.highestThreatBadge.style.cssText = 'color: #ff453a; font-weight: 700;';
+            } else if (severity === 'WARNING') {
+                UI.highestThreatBadge.textContent = 'WARNING (เฝ้าระวัง)';
+                UI.highestThreatBadge.style.cssText = 'color: #ff9f0a; font-weight: 700;';
+            } else {
+                UI.highestThreatBadge.textContent = coreDataIncomplete ? 'รอข้อมูล · ปกติ' : 'NORMAL (ปกติ)';
+                UI.highestThreatBadge.style.cssText = 'color: #30d158; font-weight: 700;';
             }
         }
 

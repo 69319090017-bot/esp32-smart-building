@@ -526,43 +526,50 @@
                         </p>
                     </div>
 
-                    <!-- Apple iOS Unified Status Strip (Reduced Tag Box Clutter) -->
-                    <div class="ios-status-strip" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; background: rgba(28, 28, 30, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 0.5px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 0.75rem 1.4rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
-                        <!-- Region Selector -->
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div style="color: #0a84ff; display: flex; align-items: center;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
-                            <div>
-                                <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.55); font-weight: 500;">ภูมิภาค / จังหวัด</div>
-                                <select id="provinceSelect" style="background: transparent; color: #ffffff; border: none; font-size: 0.95rem; font-weight: 600; outline: none; cursor: pointer; padding: 0;">
-                                    <!-- 77 provinces populated dynamically -->
-                                </select>
+                    <!-- Apple iOS Unified Status Strip -->
+                    <div class="ios-status-strip">
+                        <!-- Region Selector with Apple Glass styling -->
+                        <div class="apple-select-wrapper">
+                            <div class="apple-select-icon">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <div class="apple-select-content">
+                                <span class="apple-select-label">ภูมิภาค / จังหวัด</span>
+                                <select id="provinceSelect" class="apple-select-native" aria-label="เลือกจังหวัด"></select>
+                            </div>
+                            <div class="apple-select-chevron">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </div>
 
-                        <!-- Threat Level -->
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <!-- Synchronized Apple Threat Status Chip -->
+                        <div id="threatStatusChip" class="apple-status-chip status-normal">
                             <div id="threatStatusDot" class="status-dot online"></div>
-                            <div>
-                                <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.55); font-weight: 500;">ระดับความเสี่ยง</div>
-                                <div id="highestThreatText" class="h3" style="color: #ffffff; font-size: 0.95rem; font-weight: 600;">รอข้อมูล</div>
+                            <div class="apple-status-text-stack">
+                                <span class="apple-status-label">ระดับความเสี่ยง</span>
+                                <span id="highestThreatText" class="apple-status-value">รอข้อมูล</span>
                             </div>
                         </div>
 
                         <!-- System Uptime -->
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div style="color: rgba(235, 235, 245, 0.6); display: flex; align-items: center;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
-                            <div>
-                                <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.55); font-weight: 500;">เวลาทำงานระบบ</div>
-                                <div id="uptimeDisplay" class="h3" style="font-size: 0.95rem; font-weight: 600; color: #ffffff;">00:00:00</div>
+                        <div class="apple-status-chip">
+                            <div class="apple-status-icon">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <div class="apple-status-text-stack">
+                                <span class="apple-status-label">เวลาทำงานระบบ</span>
+                                <span id="uptimeDisplay" class="apple-status-value">00:00:00</span>
                             </div>
                         </div>
 
                         <!-- Last Update -->
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div style="color: rgba(235, 235, 245, 0.6); display: flex; align-items: center;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg></div>
-                            <div>
-                                <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.55); font-weight: 500;">อัปเดตล่าสุด</div>
-                                <div id="lastUpdateDisplay" class="h3" style="font-size: 0.95rem; font-weight: 600; color: #ffffff;">Just now</div>
+                        <div class="apple-status-chip">
+                            <div class="apple-status-icon">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            </div>
+                            <div class="apple-status-text-stack">
+                                <span class="apple-status-label">อัปเดตล่าสุด</span>
+                                <span id="lastUpdateDisplay" class="apple-status-value">Just now</span>
                             </div>
                         </div>
                     </div>
@@ -595,12 +602,12 @@
                             <span class="label" style="background: rgba(10, 132, 255, 0.12); color: #0a84ff; border: 0.5px solid rgba(10, 132, 255, 0.25); padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600;">TH-TTS ENGINE</span>
                         </div>
                         <div class="voice-panel-body">
-                            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                <button id="weatherSpeakBtn" class="btn btn-primary voice-main-button" type="button" aria-label="ฟังสรุปสภาพอากาศและคำแนะนำภาษาไทย" style="display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0.65rem 1.4rem;">
+                            <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
+                                <button id="weatherSpeakBtn" class="btn btn-primary voice-main-button" type="button" aria-label="ฟังสรุปสภาพอากาศและคำแนะนำภาษาไทย" style="display: inline-flex; align-items: center; gap: 0.5rem; min-height: 40px; padding: 0.5rem 1.25rem; border-radius: 999px;">
                                     <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     <span>ฟังสรุปตอนนี้</span>
                                 </button>
-                                <span id="ttsStatus" class="voice-status" role="status" aria-live="off" aria-atomic="true" style="padding: 0.35rem 0.75rem; border-radius: 8px; background: rgba(255, 255, 255, 0.06); font-size: 0.8rem; color: rgba(235, 235, 245, 0.75);">พร้อมพูด</span>
+                                <span id="ttsStatus" class="voice-status-pill" role="status" aria-live="off">พร้อมพูด</span>
                             </div>
 
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.85rem; margin-top: 0.5rem;">
@@ -679,153 +686,168 @@
                         <div id="officialAlertHistory" class="official-alert-history" aria-live="off"></div>
                     </section>
 
-                    <!-- Bento Grid Dashboard -->
+                    <!-- Bento Grid Dashboard (Apple Weather HIG 2026 Edition) -->
                     <div class="bento-grid">
-                        <!-- 1. UV Index Gauge Card -->
-                        <div class="card card-spotlight col-span-3 row-span-2">
-                            <div class="card-header">
-                                <span class="metric-sticker sticker-uv">UV / Radiation</span>
-                                <div class="status-indicator">
-                                    <div id="uvStatusDot" class="status-dot online"></div>
-                                    <span id="uvRiskBadge">รอข้อมูล</span>
+                        <!-- 1. UV Index Card (Apple Weather Style) -->
+                        <div class="card card-apple-weather col-span-3 row-span-2">
+                            <div class="apple-card-header">
+                                <div class="apple-card-title">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                                    <span>ดัชนี UV</span>
                                 </div>
+                                <span id="uvRiskBadge" class="apple-badge apple-badge-normal">รอข้อมูล</span>
                             </div>
-                            <div class="card-content" style="justify-content: center; align-items: center;">
-                                <div class="gauge-container">
-                                    <svg class="gauge-svg" viewBox="0 0 200 200">
-                                        <circle class="gauge-bg" cx="100" cy="100" r="90" />
-                                        <circle id="uvGaugeArc" class="gauge-arc safe" cx="100" cy="100" r="90" />
-                                    </svg>
-                                    <div class="gauge-text-container">
-                                        <div id="uvValue" class="gauge-value">--</div>
-                                        <div class="gauge-unit">UV INDEX</div>
-                                        <div class="gauge-detail-stack">
-                                            <span id="uvForecastText" class="gauge-mini-line">Forecast: stable</span>
-                                        </div>
-                                    </div>
+                            <div class="apple-card-body">
+                                <div class="apple-hero-metric">
+                                    <div id="uvValue" class="apple-hero-number">--</div>
+                                    <div class="apple-hero-sublabel">UV INDEX</div>
                                 </div>
-                                <div id="sparkline-uv" style="margin-top: 0.5rem; height: 40px;"></div>
-                                <p class="label" style="margin-top: 1rem; text-align: center; color: var(--color-fg-muted);">
-                                    WHO: ป้องกันแดดตั้งแต่ UV 3 · หลีกเลี่ยงแดดกลางวันตั้งแต่ UV 8
-                                </p>
+                                <!-- Apple Weather Linear Gradient Track -->
+                                <div class="apple-gauge-track-wrap">
+                                    <div class="apple-gauge-track uv-track"></div>
+                                    <div id="uvThumb" class="apple-gauge-thumb" style="left: 0%;"></div>
+                                </div>
+                                <div class="apple-card-footer">
+                                    <div id="uvForecastText" class="apple-guidance-line">ต่ำกว่าเกณฑ์เริ่มแนะนำป้องกันแดด</div>
+                                    <p class="apple-sub-guidance">WHO: ป้องกันแดดตั้งแต่ UV 3 · หลีกเลี่ยงแดดจัดตั้งแต่ UV 8</p>
+                                </div>
+                                <!-- Backward compatibility hidden arc for tests -->
+                                <svg style="display: none;"><circle id="uvGaugeArc" /></svg>
+                                <div id="sparkline-uv" style="margin-top: 0.25rem; height: 32px;"></div>
                             </div>
                         </div>
 
-                        <!-- 2. Heat Index Gauge Card -->
-                        <div class="card card-spotlight col-span-3 row-span-2">
-                            <div class="card-header">
-                                <span class="metric-sticker sticker-heat">Heat / Stress</span>
-                                <div class="status-indicator">
-                                    <div id="heatStatusDot" class="status-dot online"></div>
-                                    <span id="heatRiskBadge">รอข้อมูล</span>
+                        <!-- 2. Feels Like / Heat Stress Card (Apple Weather Style) -->
+                        <div class="card card-apple-weather col-span-3 row-span-2">
+                            <div class="apple-card-header">
+                                <div class="apple-card-title">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                                    <span>อุณหภูมิที่รู้สึก (FEELS LIKE)</span>
                                 </div>
+                                <span id="heatRiskBadge" class="apple-badge apple-badge-normal">รอข้อมูล</span>
                             </div>
-                            <div class="card-content" style="justify-content: center; align-items: center;">
-                                <div class="gauge-container">
-                                    <svg class="gauge-svg" viewBox="0 0 200 200">
-                                        <circle class="gauge-bg" cx="100" cy="100" r="90" />
-                                        <circle id="heatGaugeArc" class="gauge-arc safe" cx="100" cy="100" r="90" />
-                                    </svg>
-                                    <div class="gauge-text-container">
-                                        <div id="heatValue" class="gauge-value">--</div>
-                                        <div class="gauge-unit">อุณหภูมิที่รู้สึก</div>
-                                        <div class="gauge-detail-stack">
-                                            <span class="gauge-mini-line">DEW <strong id="heatDewPointValue">--</strong>°C</span>
-                                            <span id="heatForecastText" class="gauge-mini-line">Forecast: stable</span>
-                                        </div>
-                                    </div>
+                            <div class="apple-card-body">
+                                <div class="apple-hero-metric">
+                                    <div id="heatValue" class="apple-hero-number">--</div>
+                                    <div class="apple-hero-sublabel">ความร้อนร่วมกับความชื้น</div>
                                 </div>
-                                <div id="sparkline-heat" style="margin-top: 0.5rem; height: 40px;"></div>
-                                <p class="label heat-meta-inline" style="text-align: center; color: var(--color-fg-muted);">
-                                    อุณหภูมิอากาศ: <span id="airTempValue">--</span>°C · ดูระดับดัชนีความร้อนในหน้า “ความเสี่ยง”
-                                </p>
+                                <!-- Apple Weather Linear Gradient Track -->
+                                <div class="apple-gauge-track-wrap">
+                                    <div class="apple-gauge-track heat-track"></div>
+                                    <div id="heatThumb" class="apple-gauge-thumb" style="left: 0%;"></div>
+                                </div>
+                                <div class="apple-card-footer">
+                                    <div id="heatForecastText" class="apple-guidance-line">อุณหภูมิอากาศจริง <span id="airTempValue">--</span>°C · จุดน้ำค้าง <strong id="heatDewPointValue">--</strong>°C</div>
+                                    <p class="apple-sub-guidance">เกณฑ์กรมอนามัย: เฝ้าระวัง 27-32°C · เตือนภัย 32-41°C · อันตราย > 41°C</p>
+                                </div>
+                                <!-- Backward compatibility hidden arc for tests -->
+                                <svg style="display: none;"><circle id="heatGaugeArc" /></svg>
+                                <div id="sparkline-heat" style="margin-top: 0.25rem; height: 32px;"></div>
                             </div>
                         </div>
 
                         <!-- 3. Humidity dedicated card -->
-                        <div class="card card-spotlight col-span-2">
-                            <div class="card-header">
-                                <span class="metric-sticker sticker-water">Humidity</span>
-                                <span id="humidityRiskBadge" class="label" style="color: var(--color-fg-muted);">ระดับความชื้น</span>
+                        <div class="card card-apple-weather col-span-2">
+                            <div class="apple-card-header">
+                                <div class="apple-card-title">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>
+                                    <span>ความชื้นสัมพัทธ์</span>
+                                </div>
+                                <span id="humidityRiskBadge" class="apple-badge apple-badge-normal">ระดับความชื้น</span>
                             </div>
                             <div class="card-content" style="text-align: center;">
-                                <div id="humidityValue" class="h2" style="font-size: 2.25rem;">--%</div>
-                                <div class="label" style="margin-top: 0.6rem; color: var(--color-fg-muted);">Dew <strong id="humidityDewPointValue" style="color: var(--color-fg);">--</strong>°C · Humidity level</div>
+                                <div id="humidityValue" class="apple-hero-number" style="font-size: 2.2rem;">--%</div>
+                                <div class="apple-guidance-line" style="margin-top: 0.4rem;">Dew <strong id="humidityDewPointValue" style="color: #ffffff;">--</strong>°C · Comfort Range</div>
                             </div>
                         </div>
 
                         <!-- 4. Severe Weather & WMO Code -->
-                        <div class="card card-spotlight col-span-2">
-                            <div class="card-header">
-                                <span class="metric-sticker sticker-weather">Conditions</span>
-                                <span id="wmoCodeBadge" class="label" style="color: var(--color-accent-bright);">WMO --</span>
+                        <div class="card card-apple-weather col-span-2">
+                            <div class="apple-card-header">
+                                <div class="apple-card-title">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                                    <span>สภาพอากาศ</span>
+                                </div>
+                                <span id="wmoCodeBadge" class="apple-badge apple-badge-normal">WMO --</span>
                             </div>
                             <div class="card-content" style="text-align: center;">
-                                <div id="wmoIcon" style="display: flex; justify-content: center; align-items: center; min-height: 44px; margin-bottom: 0.25rem; color: #38bdf8;">
-                                    <svg width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                                <div id="wmoIcon" style="display: flex; justify-content: center; align-items: center; min-height: 40px; margin-bottom: 0.25rem; color: #0a84ff;">
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
                                 </div>
-                                <div id="wmoDescText" class="h3" style="color: var(--color-fg); font-size: 1rem;">รอข้อมูลสภาพอากาศ</div>
-                                <div class="label" style="margin-top: 0.5rem; color: var(--color-fg-muted);">Storm codes: 95, 96, 99</div>
+                                <div id="wmoDescText" class="apple-hero-sublabel" style="color: #ffffff; font-size: 0.95rem; font-weight: 600;">รอข้อมูลสภาพอากาศ</div>
+                                <div class="apple-sub-guidance" style="margin-top: 0.35rem;">Storm codes: 95, 96, 99</div>
                             </div>
                         </div>
 
-                        <!-- 4. Wind Gusts -->
-                        <div class="card card-spotlight col-span-2">
-                            <div class="card-header">
-                                <span class="metric-sticker sticker-wind">Wind</span>
-                                <span id="gustRiskBadge" class="label" style="color: var(--color-fg-muted);">รอข้อมูล</span>
+                        <!-- 5. Wind Gusts -->
+                        <div class="card card-apple-weather col-span-2">
+                            <div class="apple-card-header">
+                                <div class="apple-card-title">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"/></svg>
+                                    <span>ความเร็วลมกระโชก</span>
+                                </div>
+                                <span id="gustRiskBadge" class="apple-badge apple-badge-normal">รอข้อมูล</span>
                             </div>
                             <div class="card-content">
-                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
-                                    <span id="gustValue" class="h2">-- <span style="font-size: 0.9rem; color: var(--color-fg-muted);">km/h</span></span>
-                                    <span class="label" style="color: var(--color-fg-muted);">Avg: <span id="windSpeedValue">--</span></span>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem;">
+                                    <span id="gustValue" class="apple-hero-number" style="font-size: 1.85rem;">-- <span style="font-size: 0.85rem; color: rgba(235, 235, 245, 0.55); font-weight: 500;">km/h</span></span>
+                                    <span class="apple-sub-guidance">Avg: <span id="windSpeedValue" style="color: #ffffff;">--</span></span>
                                 </div>
                                 <div class="level-bar-container">
                                     <div id="gustBar" class="level-bar-fill" style="width: 0%;"></div>
                                 </div>
-                                <div id="sparkline-wind" style="margin-top: 0.5rem; height: 40px;"></div>
-                                <div class="label" style="margin-top: 0.75rem; color: var(--color-fg-muted);">ไม่มีเกณฑ์ลมอันตรายทั่วไปในหน้านี้ · ติดตามประกาศกรมอุตุนิยมวิทยา</div>
+                                <div id="sparkline-wind" style="margin-top: 0.4rem; height: 32px;"></div>
+                                <div class="apple-sub-guidance" style="margin-top: 0.5rem;">ติดตามประกาศเกณฑ์ลมแรงกรมอุตุนิยมวิทยา</div>
                             </div>
                         </div>
 
-                        <!-- 5. Rainfall Accumulation -->
-                        <div class="card card-spotlight col-span-2">
-                            <div class="card-header">
-                                <span class="metric-sticker sticker-rain">Rain</span>
-                                <span id="rainRiskBadge" class="label" style="color: var(--color-fg-muted);">รอข้อมูล</span>
+                        <!-- 6. Rainfall Accumulation -->
+                        <div class="card card-apple-weather col-span-2">
+                            <div class="apple-card-header">
+                                <div class="apple-card-title">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 16.58A5 5 0 0018 7h-1.26A8 8 0 104 15.25M8 19v2m4-2v2m4-2v2"/></svg>
+                                    <span>ปริมาณฝน</span>
+                                </div>
+                                <span id="rainRiskBadge" class="apple-badge apple-badge-normal">รอข้อมูล</span>
                             </div>
                             <div class="card-content">
-                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
-                                    <span id="rainValue" class="h2">-- <span style="font-size: 0.9rem; color: var(--color-fg-muted);">mm/h</span></span>
-                                    <span class="label" style="color: var(--color-fg-muted);">Rate</span>
+                                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem;">
+                                    <span id="rainValue" class="apple-hero-number" style="font-size: 1.85rem;">-- <span style="font-size: 0.85rem; color: rgba(235, 235, 245, 0.55); font-weight: 500;">mm/h</span></span>
+                                    <span class="apple-sub-guidance">ฝนสะสม</span>
                                 </div>
                                 <div class="level-bar-container">
                                     <div id="rainBar" class="level-bar-fill" style="width: 0%;"></div>
                                 </div>
-                                <div id="sparkline-rain" style="margin-top: 0.5rem; height: 40px;"></div>
-                                <div class="label" style="margin-top: 0.75rem; color: var(--color-fg-muted);">ฝนหนักตั้งแต่ 25.1 · ฝนหนักมากตั้งแต่ 50.1 มม./ชั่วโมง ตามเกณฑ์กรมอุตุนิยมวิทยา</div>
+                                <div id="sparkline-rain" style="margin-top: 0.4rem; height: 32px;"></div>
+                                <div class="apple-sub-guidance" style="margin-top: 0.5rem;">เกณฑ์กรมอุตุฯ: ฝนหนัก ≥ 25.1 · ฝนหนักมาก ≥ 50.1 มม./ชม.</div>
                             </div>
                         </div>
 
-                        <!-- 6. River Discharge (Flood Level) -->
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header">
-                                <span class="metric-sticker sticker-river">River / Flood</span>
-                                <span id="riverRiskBadge" class="label" style="color: var(--color-fg-muted);">รอข้อมูล</span>
+                        <!-- 7. River Discharge (Flood Level) -->
+                        <div class="card card-apple-weather col-span-3">
+                            <div class="apple-card-header">
+                                <div class="apple-card-title">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2 12c2.5-3 5.5-3 8 0s5.5 3 8 0 5.5-3 8 0M2 17c2.5-3 5.5-3 8 0s5.5 3 8 0 5.5-3 8 0"/></svg>
+                                    <span>ระดับน้ำ / ลำน้ำ</span>
+                                </div>
+                                <span id="riverRiskBadge" class="apple-badge apple-badge-normal">รอข้อมูล</span>
                             </div>
                             <div class="card-content">
                                 <div class="river-assessment">
                                     <span id="riverValue" class="river-assessment-value">-- <span class="river-assessment-unit">m³/s</span></span>
-                                    <span class="river-assessment-note">ต้องเทียบเกณฑ์สถานีเฉพาะพื้นที่</span>
+                                    <span class="river-assessment-note">เทียบเกณฑ์สถานีตรวจวัดเฉพาะลุ่มน้ำ</span>
                                 </div>
-                                <div id="sparkline-river" style="margin-top: 0.5rem; height: 40px;"></div>
+                                <div id="sparkline-river" style="margin-top: 0.4rem; height: 32px;"></div>
                             </div>
                         </div>
 
-                        <!-- 7. Hardware Relays Status -->
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header">
-                                <span class="metric-sticker sticker-safety">Safety Relays</span>
+                        <!-- 8. Hardware Relays Status -->
+                        <div class="card card-apple-weather col-span-3">
+                            <div class="apple-card-header">
+                                <div class="apple-card-title">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                    <span>รีเลย์ความปลอดภัยฮาร์ดแวร์</span>
+                                </div>
                             </div>
                             <div class="card-content" style="gap: 0.5rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">

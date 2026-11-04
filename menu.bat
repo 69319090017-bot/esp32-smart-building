@@ -26,44 +26,52 @@ if %errorlevel% equ 0 (
 :main_menu
 cls
 echo =======================================================================
-echo     SMART BUILDING COMMAND CENTER - CONTROL CENTER (2026 EDITION)
+echo     SMART BUILDING COMMAND CENTER - CONTROL CENTER (2026 HIG EDITION)
 echo =======================================================================
 echo.
-echo   [ WEB DASHBOARD ]
-echo     [1] Start Web Dashboard (Dev Mode on localhost:3000)
+echo   [ WEB DASHBOARD & CLOUD ]
+echo     [1] Start Web Dashboard (Vite Dev Mode on localhost:3000)
 echo     [2] Build Web Dashboard (Production dist)
-echo     [3] Deploy to Firebase Hosting
+echo     [3] Deploy to Vercel (Live Production https://web-dashboard-eta-rust.vercel.app)
+echo     [4] Run Web Test Suite (Vitest 161 Tests)
+echo     [5] Free Port 3000 / Kill Zombie Web Server Processes
 echo.
 echo   [ ESP32 HARDWARE FIRMWARE ]
-echo     [4] Build ESP32 Firmware (Compile test)
-echo     [5] Upload Firmware to ESP32 Board
-echo     [6] Upload Web Dashboard to ESP32 Flash (LittleFS uploadfs)
-echo     [7] Open ESP32 Serial Monitor (115200 baud)
+echo     [6] Build ESP32 Firmware (PlatformIO Compile)
+echo     [7] Upload Firmware to ESP32 Board
+echo     [8] Upload Web Dashboard to ESP32 Flash (LittleFS uploadfs)
+echo     [9] Open ESP32 Serial Monitor (115200 baud)
 echo.
-echo   [ BOT AND DISASTER SIMULATION ]
-echo     [8] Run 6-Hazard Disaster Simulator (Open-Meteo ^& Test Suite)
-echo     [9] Run Telegram Bot Notification Service
+echo   [ SIMULATORS & NOTIFICATION BOTS ]
+echo    [10] Run 6-Hazard Disaster Simulator (Open-Meteo & Weather Hazards)
+echo    [11] Run Telegram Bot Notification Service
+echo    [12] Run Discord Bot Alert Service (Live Webhooks)
+echo    [13] Run MCP Server (Stdio JSON-RPC for AI Agents)
 echo.
-echo   [ CONFIG AND MAINTENANCE ]
-echo    [10] Apply Secrets / Update Config (setup_secrets.py)
-echo    [11] Clean Cache and Temp Files
+echo   [ CONFIG & MAINTENANCE ]
+echo    [14] Apply Secrets / Update Config (setup_secrets.py)
+echo    [15] Clean Cache and Temp Files
 echo.
 echo     [0] Exit
 echo =======================================================================
 set "opt="
-set /p opt="Please select an option [0-11]: "
+set /p opt="Please select an option [0-15]: "
 
 if "%opt%"=="1" goto opt_dev
 if "%opt%"=="2" goto opt_build
-if "%opt%"=="3" goto opt_deploy
-if "%opt%"=="4" goto opt_esp_build
-if "%opt%"=="5" goto opt_esp_upload
-if "%opt%"=="6" goto opt_esp_uploadfs
-if "%opt%"=="7" goto opt_esp_monitor
-if "%opt%"=="8" goto opt_sim
-if "%opt%"=="9" goto opt_bot
-if "%opt%"=="10" goto opt_secrets
-if "%opt%"=="11" goto opt_clean
+if "%opt%"=="3" goto opt_deploy_vercel
+if "%opt%"=="4" goto opt_test
+if "%opt%"=="5" goto opt_kill_port
+if "%opt%"=="6" goto opt_esp_build
+if "%opt%"=="7" goto opt_esp_upload
+if "%opt%"=="8" goto opt_esp_uploadfs
+if "%opt%"=="9" goto opt_esp_monitor
+if "%opt%"=="10" goto opt_sim
+if "%opt%"=="11" goto opt_bot
+if "%opt%"=="12" goto opt_discord
+if "%opt%"=="13" goto opt_mcp
+if "%opt%"=="14" goto opt_secrets
+if "%opt%"=="15" goto opt_clean
 if "%opt%"=="0" goto opt_exit
 
 echo.
@@ -108,20 +116,48 @@ pause
 goto main_menu
 
 :: -------------------------------------------------------------
-:opt_deploy
+:opt_deploy_vercel
 cls
 echo ========================================================
-echo       Deploying to Firebase Hosting
+echo       Deploying to Vercel (Production Live Deployment)
 echo ========================================================
 echo.
-if not exist "web-dashboard\dist\" (
-    echo [INFO] Dist folder not found. Building first...
+if exist "deploy_vercel.bat" (
+    call deploy_vercel.bat
+) else (
     cd web-dashboard
     call cmd.exe /c "npm run build"
     cd ..
+    call cmd.exe /c "npx vercel deploy --prod"
 )
-call firebase deploy --only hosting
 echo.
+pause
+goto main_menu
+
+:: -------------------------------------------------------------
+:opt_test
+cls
+echo ========================================================
+echo       Running Vitest Test Suite (161 Unit & Integration Tests)
+echo ========================================================
+echo.
+cd web-dashboard
+call cmd.exe /c "npm test -- --run"
+cd ..
+echo.
+pause
+goto main_menu
+
+:: -------------------------------------------------------------
+:opt_kill_port
+cls
+echo ========================================================
+echo       Freeing Port 3000 / Killing Zombie Node Processes
+echo ========================================================
+echo.
+powershell -Command "Get-NetTCPConnection -LocalPort 3000, 3001 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue; Write-Host ('Killed PID ' + $_.OwningProcess + ' on port ' + $_.LocalPort) }"
+echo.
+echo [OK] Port check completed.
 pause
 goto main_menu
 
@@ -205,6 +241,34 @@ echo       Starting Telegram Bot Notification Service
 echo ========================================================
 echo.
 call "%PY_CMD%" telegram-bot\telegram_bot.py
+echo.
+pause
+goto main_menu
+
+:: -------------------------------------------------------------
+:opt_discord
+cls
+echo ========================================================
+echo       Starting Discord Bot Alert Service
+echo ========================================================
+echo.
+if exist "run_discord_bot.bat" (
+    call run_discord_bot.bat
+) else (
+    call "%PY_CMD%" discord-bot\discord_bot.py
+)
+echo.
+pause
+goto main_menu
+
+:: -------------------------------------------------------------
+:opt_mcp
+cls
+echo ========================================================
+echo       Starting MCP Server (Stdio JSON-RPC)
+echo ========================================================
+echo.
+node mcp-server\server.js
 echo.
 pause
 goto main_menu

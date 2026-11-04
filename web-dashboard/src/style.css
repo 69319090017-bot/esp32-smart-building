@@ -2934,3 +2934,320 @@ header:hover {
   100% { transform: scaleY(1); opacity: 1; filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6)); }
 }
 
+/* =========================================================
+   APPLE WEATHER & SYSTEM HIG 2026 DESIGN SYSTEM
+   Authentic iOS / macOS Sonoma / Sequoia UI Architecture
+   ========================================================= */
+
+/* Apple Unified Status Strip */
+.ios-status-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  background: rgba(28, 28, 30, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* Apple Select Wrapper */
+.apple-select-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.45rem 0.85rem;
+  transition: all 180ms ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.apple-select-wrapper:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.apple-select-icon {
+  color: #0a84ff;
+  display: flex;
+  align-items: center;
+}
+
+.apple-select-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+}
+
+.apple-select-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: rgba(235, 235, 245, 0.55);
+  letter-spacing: 0.02em;
+}
+
+.apple-select-native {
+  background: transparent;
+  color: #ffffff;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+}
+
+.apple-select-native option {
+  background: #1c1c1e;
+  color: #ffffff;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.apple-select-chevron {
+  color: rgba(235, 235, 245, 0.45);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  margin-left: 0.25rem;
+}
+
+/* Apple Status Chips */
+.apple-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.45rem 0.85rem;
+  transition: all 180ms ease;
+}
+
+.apple-status-chip.status-normal {
+  border-color: rgba(48, 209, 88, 0.25);
+  background: rgba(48, 209, 88, 0.06);
+}
+
+.apple-status-chip.status-warning {
+  border-color: rgba(255, 159, 10, 0.35);
+  background: rgba(255, 159, 10, 0.08);
+}
+
+.apple-status-chip.status-critical {
+  border-color: rgba(255, 69, 58, 0.45);
+  background: rgba(255, 69, 58, 0.12);
+}
+
+.apple-status-text-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.apple-status-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: rgba(235, 235, 245, 0.55);
+}
+
+.apple-status-value {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.apple-status-icon {
+  color: rgba(235, 235, 245, 0.6);
+  display: flex;
+  align-items: center;
+}
+
+/* Apple Weather Cards */
+.card-apple-weather {
+  background: rgba(28, 28, 30, 0.65);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 1.25rem 1.4rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.card-apple-weather:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.apple-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  width: 100%;
+}
+
+.apple-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(235, 235, 245, 0.6);
+}
+
+.apple-card-title svg {
+  color: rgba(235, 235, 245, 0.65);
+}
+
+.apple-badge {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(235, 235, 245, 0.75);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+}
+
+.apple-badge-normal {
+  background: rgba(48, 209, 88, 0.15) !important;
+  color: #30d158 !important;
+  border-color: rgba(48, 209, 88, 0.3) !important;
+}
+
+.apple-badge-warning {
+  background: rgba(255, 159, 10, 0.15) !important;
+  color: #ff9f0a !important;
+  border-color: rgba(255, 159, 10, 0.3) !important;
+}
+
+.apple-badge-critical {
+  background: rgba(255, 69, 58, 0.15) !important;
+  color: #ff453a !important;
+  border-color: rgba(255, 69, 58, 0.3) !important;
+}
+
+.apple-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.apple-hero-metric {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.apple-hero-number {
+  font-size: 2.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Prompt", sans-serif;
+}
+
+.apple-hero-sublabel {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(235, 235, 245, 0.6);
+}
+
+/* Apple Weather Linear Progress Track */
+.apple-gauge-track-wrap {
+  position: relative;
+  width: 100%;
+  padding: 4px 0;
+  margin: 0.25rem 0;
+}
+
+.apple-gauge-track {
+  height: 6px;
+  width: 100%;
+  border-radius: 999px;
+  position: relative;
+}
+
+.uv-track {
+  background: linear-gradient(90deg, #30d158 0%, #ffd60a 28%, #ff9f0a 55%, #ff453a 78%, #bf5af2 100%);
+}
+
+.heat-track {
+  background: linear-gradient(90deg, #64d2ff 0%, #30d158 35%, #ffd60a 65%, #ff9f0a 85%, #ff453a 100%);
+}
+
+.apple-gauge-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 2px solid #1c1c1e;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 0px;
+  transform: translateX(-50%);
+  transition: left 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.apple-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.apple-guidance-line {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: rgba(235, 235, 245, 0.9);
+  line-height: 1.4;
+}
+
+.apple-sub-guidance {
+  font-size: 0.74rem;
+  font-weight: 400;
+  color: rgba(235, 235, 245, 0.5);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Voice Panel Status Pill */
+.voice-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(235, 235, 245, 0.75);
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+
+

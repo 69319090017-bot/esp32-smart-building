@@ -7,11 +7,17 @@ echo       Starting Discord Notification Bot
 echo ========================================================
 echo.
 
-where python >nul 2>nul
-if %errorlevel% neq 0 (
-    echo [ERROR] Python is not installed or not in PATH!
-    pause
-    exit /b 1
+set "PY_CMD=python"
+where py >nul 2>nul
+if %errorlevel% equ 0 (
+    set "PY_CMD=py"
+) else (
+    where python >nul 2>nul
+    if %errorlevel% neq 0 (
+        echo [ERROR] Python is not installed or not in PATH!
+        pause
+        exit /b 1
+    )
 )
 
 if not exist "discord-bot\discord_bot.py" (
@@ -34,7 +40,7 @@ echo [INFO] Starting Discord bot...
 echo [INFO] Press Ctrl+C in this window to stop bot.
 echo.
 
-python discord_bot.py
+"%PY_CMD%" discord_bot.py
 
 cd ..
 pause

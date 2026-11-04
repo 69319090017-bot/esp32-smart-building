@@ -796,36 +796,13 @@ export const initializeIndoorHome = async (): Promise<void> => {
   onAuthStateChanged(auth, (user) => {
     currentUser = user;
     if (user) {
-      loginStatus.textContent = 'เข้าสู่ระบบ Firebase แล้ว';
-      startListeners();
+      loginStatus.textContent = 'เข้าสู่ระบบ Firebase แล้ว (สิทธิ์ควบคุมพร้อม)';
     } else {
-      stopListeners();
-      sensorData = null;
-      sensorUpdatedAt = 0;
-      lastChartSampleAt = 0;
-      trendChart.data.labels = [];
-      trendChart.data.datasets.forEach((dataset) => { dataset.data = []; });
-      trendChart.update('none');
-      trendStatus.textContent = 'เข้าสู่ระบบเพื่อดูกราฟข้อมูล DHT11';
-      ledData = null;
-      updateTrackedLedState(false);
-      servoData = null;
-      servoPowerData = null;
-      updateTrackedMotionState(false);
-      motionSystemData = null;
-      sensorError = false;
-      ledError = false;
-      servoError = false;
-      servoPowerError = false;
-      motionSystemError = false;
-      renderSensors();
-      ledStatus.textContent = 'ต้องเข้าสู่ระบบก่อน';
-      servoStatus.textContent = 'ต้องเข้าสู่ระบบก่อน';
-      if (servoLockStatus) servoLockStatus.textContent = 'สถานะล็อกในระบบ: ต้องเข้าสู่ระบบก่อน';
-      if (servoPowerStatus) servoPowerStatus.textContent = 'ต้องเข้าสู่ระบบก่อน';
-      motionSystemStatus.textContent = 'ต้องเข้าสู่ระบบก่อน';
-      loginStatus.textContent = 'เข้าสู่ระบบด้วยบัญชี Firebase ที่ได้รับสิทธิ์ควบคุม';
+      loginStatus.textContent = 'โหมดดูข้อมูลสด (เข้าสู่ระบบเพื่อสั่งงานสวิตช์และรีเลย์)';
     }
+    // Always start listeners so live sensor telemetry & trend charts stream for everyone
+    startListeners();
+    renderSensors();
     updateControls();
   });
 
