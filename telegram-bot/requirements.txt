@@ -1,0 +1,2 @@
+# Telegram Bot Service Requirements
+# Uses Python standard library only (no external packages required)

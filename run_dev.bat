@@ -14,7 +14,7 @@ set /p mode="เลือกโหมด [1 หรือ 2]: "
 if "%mode%"=="2" goto opt_vite
 
 :opt_instant
-py run_live_web.py
+py scripts\run_live_web.py
 goto end
 
 :opt_vite

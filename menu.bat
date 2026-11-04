@@ -192,7 +192,7 @@ echo ========================================================
 echo       Starting 6-Hazard Disaster Simulator (Python)
 echo ========================================================
 echo.
-call "%PY_CMD%" simulate_esp32.py
+call "%PY_CMD%" simulator\simulate_esp32.py
 echo.
 pause
 goto main_menu
@@ -204,7 +204,7 @@ echo ========================================================
 echo       Starting Telegram Bot Notification Service
 echo ========================================================
 echo.
-call "%PY_CMD%" telegram_bot.py
+call "%PY_CMD%" telegram-bot\telegram_bot.py
 echo.
 pause
 goto main_menu
@@ -216,7 +216,7 @@ echo ========================================================
 echo       Applying Secrets Configuration
 echo ========================================================
 echo.
-call "%PY_CMD%" setup_secrets.py
+call "%PY_CMD%" scripts\setup_secrets.py
 echo.
 pause
 goto main_menu

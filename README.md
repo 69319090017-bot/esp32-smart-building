@@ -145,7 +145,31 @@ py simulate_esp32.py
 - ผังหน่วยความจำ FreeRTOS Task Matrix และ Mutex Semaphore
 - โครงสร้าง JSON Schema ของ Telegram, MQTT, และ Firebase
 
-👉 **กรุณาอ่านไฟล์:** [`SMART_BUILDING_COMMAND_CENTER_2026.md`](SMART_BUILDING_COMMAND_CENTER_2026.md)
+👉 **กรุณาอ่านไฟล์:** [`docs/SMART_BUILDING_COMMAND_CENTER_2026.md`](docs/SMART_BUILDING_COMMAND_CENTER_2026.md) และคู่มือต่อวงจร [`docs/CIRCUIT_WIRING_GUIDE.md`](docs/CIRCUIT_WIRING_GUIDE.md)
+
+---
+
+## 📂 โครงสร้างโปรเจกต์ (Project Structure)
+
+```text
+ESP32-Firebase-007-main/
+├── .github/              # Issue & PR Templates
+├── docs/                 # คู่มือวงจร, พิมพ์เขียวระบบ, และ Architecture
+│   ├── CIRCUIT_WIRING_GUIDE.md
+│   ├── SMART_BUILDING_COMMAND_CENTER_2026.md
+│   └── architecture.md
+├── esp32-firmware/       # เฟิร์มแวร์ C++17 FreeRTOS บนบอร์ด ESP32
+├── web-dashboard/        # เว็บแดชบอร์ด PWA (Vite 8.2 + TS + Tailwind + Workbox)
+├── mcp-server/           # AI Model Context Protocol (MCP) Server สำหรับ Agent
+├── simulator/            # ชุดจำลองเซนเซอร์และภัยพิบัติ 6 มิติ (simulate_esp32.py)
+├── telegram-bot/         # ระบบส่งข้อความแจ้งเตือนภัยผ่าน Telegram Bot
+├── discord-bot/          # ระบบแจ้งเตือนและสังเกตการณ์ผ่าน Discord Bot
+├── scripts/              # สคริปต์ยูทิลิตี้ (setup_secrets, check_db, run_live_web)
+├── menu.bat              # เมนูคำสั่งลัด All-in-One CLI สำหรับ Windows
+├── database.rules.json   # กฎความปลอดภัย Firebase Realtime Database
+├── vercel.json           # การตั้งค่า Deployment บน Vercel
+└── .mcp.json             # คอนฟิก MCP Tool Server สำหรับผู้ช่วย AI
+```
 
 ---
 
