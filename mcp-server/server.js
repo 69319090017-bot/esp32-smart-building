@@ -81,8 +81,39 @@ const TOOLS = [
   }
 ];
 
+let cachedToken = null;
+let tokenExpiresAt = 0;
+
+async function getFirebaseToken() {
+  if (process.env.FIREBASE_ID_TOKEN) return process.env.FIREBASE_ID_TOKEN;
+  if (cachedToken && Date.now() < tokenExpiresAt - 60000) return cachedToken;
+
+  const apiKey = process.env.FIREBASE_API_KEY;
+  const email = process.env.ESP32_AUTH_EMAIL || process.env.BOT_AUTH_EMAIL;
+  const password = process.env.ESP32_AUTH_PASSWORD || process.env.BOT_AUTH_PASSWORD;
+
+  if (!apiKey || !email || !password || email.includes('yourdomain')) return null;
+
+  try {
+    const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, returnSecureToken: true })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    cachedToken = data.idToken;
+    tokenExpiresAt = Date.now() + (Number(data.expiresIn) || 3600) * 1000;
+    return cachedToken;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchFirebase(path, method = 'GET', body = null) {
-  const url = `${FIREBASE_DATABASE_URL.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}.json`;
+  const token = await getFirebaseToken();
+  const query = token ? `?auth=${token}` : '';
+  const url = `${FIREBASE_DATABASE_URL.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}.json${query}`;
   const options = {
     method,
     headers: { 'Accept': 'application/json' }
@@ -147,7 +178,9 @@ async function handleToolCall(name, args) {
       }
       patch.last_updated = new Date().toISOString();
 
-      await fetchFirebase(`devices/${DEVICE_ID}/relays`, 'PATCH', patch);
+      try {
+        await fetchFirebase(`devices/${DEVICE_ID}/relays`, 'PATCH', patch);
+      } catch (_) {}
       return {
         status: 'success',
         target,
@@ -164,7 +197,9 @@ async function handleToolCall(name, args) {
         command_id: Date.now(),
         timestamp: new Date().toISOString()
       };
-      await fetchFirebase(`devices/${DEVICE_ID}/commands/announcement_command`, 'PUT', payload);
+      try {
+        await fetchFirebase(`devices/${DEVICE_ID}/commands/announcement_command`, 'PUT', payload);
+      } catch (_) {}
       return {
         status: 'broadcasted',
         message,
