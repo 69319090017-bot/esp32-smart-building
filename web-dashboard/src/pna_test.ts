@@ -55,8 +55,8 @@ form?.addEventListener('submit', (event) => {
         }
         if (statusElement) {
             statusElement.textContent = saveHistoryCheckbox?.checked
-                ? '🔊 ส่งข้อความและเล่นเสียงออกลำโพงแล้ว (บันทึกประวัติ)'
-                : '🔊 ส่งข้อความและเล่นเสียงออกลำโพงแล้ว';
+                ? 'ส่งข้อความและเล่นเสียงออกลำโพงแล้ว (บันทึกประวัติ)'
+                : 'ส่งข้อความและเล่นเสียงออกลำโพงแล้ว';
         }
 
         if ('speechSynthesis' in window) {

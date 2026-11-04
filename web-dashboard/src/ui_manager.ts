@@ -238,6 +238,7 @@ export const populateProvinces = (currentProvince = "กรุงเทพมห
 export const switchView = (targetView: string) => {
     UI.navLinks.forEach(l => l.classList.toggle('active', l.dataset.view === targetView));
     UI.views.forEach(v => v.classList.toggle('active', v.id === `view-${targetView}`));
+    window.scrollTo({ top: 0, behavior: 'auto' });
 };
 
 export const toggleHumidityDetailView = (forceOpen?: boolean) => {
@@ -250,7 +251,12 @@ export const createToast = (msg: string, type: 'info' | 'success' | 'alert' = 'i
     if (!UI.toastContainer) return;
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<span style="font-weight:600;">${type === 'alert' ? '🚨' : (type === 'success' ? '✅' : 'ℹ️')}</span> <span>${msg}</span>`;
+    const iconSvg = type === 'alert'
+        ? '<svg width="18" height="18" fill="none" stroke="#ff453a" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>'
+        : (type === 'success'
+            ? '<svg width="18" height="18" fill="none" stroke="#30d158" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>'
+            : '<svg width="18" height="18" fill="none" stroke="#0a84ff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>');
+    toast.innerHTML = `<span style="display:inline-flex;align-items:center;">${iconSvg}</span> <span>${msg}</span>`;
     UI.toastContainer.appendChild(toast);
     setTimeout(() => {
         toast.style.opacity = '0';
@@ -435,7 +441,7 @@ export const enableAutomaticSpeech = () => {
     } catch { /* storage unavailable */ }
     const audioContext = getAlertAudioContext();
     if (audioContext?.state === 'suspended') void audioContext.resume();
-    if (UI.enableSpeechBtn) UI.enableSpeechBtn.textContent = '🔊 เปิดเสียงแจ้งเตือนแล้ว';
+    if (UI.enableSpeechBtn) UI.enableSpeechBtn.textContent = 'เปิดเสียงแจ้งเตือนแล้ว';
     if (UI.ttsStatus) UI.ttsStatus.textContent = 'เปิดเสียงแจ้งเตือนแล้ว ระบบจะส่งเสียงประกาศออกลำโพงทันที';
     return true;
 };
@@ -847,7 +853,7 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
         if (UI.highestThreatBadge) {
             UI.highestThreatBadge.textContent = coreDataIncomplete && severity === 'NORMAL'
                 ? 'ข้อมูลไม่ครบ · ยังสรุปไม่ได้'
-                : `${severity} ${severity === 'CRITICAL' ? '🚨' : (severity === 'WARNING' ? '⚠️' : '')}`;
+                : `${severity}`;
             if (severity === 'CRITICAL') {
                 UI.highestThreatBadge.style.cssText = "background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; padding: 0.4rem 0.8rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem;";
             } else if (severity === 'WARNING') {
@@ -908,8 +914,8 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
 
             if (UI.alertBannerTitle) {
                 UI.alertBannerTitle.textContent = severity === 'CRITICAL'
-                    ? '🚨 พบเกณฑ์อากาศระดับอันตรายจากข้อมูลแบบจำลอง'
-                    : '⚠️ พบปัจจัยอากาศที่ควรระวังจากข้อมูลแบบจำลอง';
+                    ? 'พบเกณฑ์อากาศระดับอันตรายจากข้อมูลแบบจำลอง'
+                    : 'พบปัจจัยอากาศที่ควรระวังจากข้อมูลแบบจำลอง';
                 UI.alertBannerTitle.style.color = severity === 'CRITICAL' ? '#ef4444' : '#f59e0b';
             }
 

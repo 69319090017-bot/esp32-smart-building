@@ -201,8 +201,8 @@ export const initializeIndoorHome = async (): Promise<void> => {
     ledOnButton.classList.toggle('btn-selected', ledData?.state === 'ON');
     ledOffButton.classList.toggle('btn-selected', ledData?.state === 'OFF');
     // Support mechanical linkage direction toggle:
-    // Normal (default): ESP32 'OPEN' = physically OPEN (🔓), 'CLOSED' = physically CLOSED (🔒)
-    // Inverted: ESP32 'CLOSED' = physically OPEN (🔓), 'OPEN' = physically CLOSED (🔒)
+    // Normal (default): ESP32 'OPEN' = physically OPEN, 'CLOSED' = physically CLOSED
+    // Inverted: ESP32 'CLOSED' = physically OPEN, 'OPEN' = physically CLOSED
     const isDoorOpen = isServoInverted
       ? servoData?.state === 'CLOSED'
       : servoData?.state === 'OPEN';
@@ -221,11 +221,13 @@ export const initializeIndoorHome = async (): Promise<void> => {
 
     const doorVisualIcon = byId('homeDoorVisualIcon');
     if (doorVisualIcon) {
-      doorVisualIcon.textContent = isDoorOpen ? '🔓' : '🔒';
+      doorVisualIcon.innerHTML = isDoorOpen
+        ? '<svg width="22" height="22" fill="none" stroke="#30d158" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>'
+        : '<svg width="22" height="22" fill="none" stroke="#8e8e93" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>';
     }
 
     if (servoInvertButton) {
-      servoInvertButton.textContent = isServoInverted ? '🔄 ทิศทาง: กลับด้าน' : '🔄 ทิศทาง: ปกติ';
+      servoInvertButton.textContent = isServoInverted ? 'ทิศทาง: กลับด้าน' : 'ทิศทาง: ปกติ';
       servoInvertButton.style.border = isServoInverted ? '1px solid rgba(245, 158, 11, 0.6)' : '';
       servoInvertButton.style.color = isServoInverted ? '#f59e0b' : '';
       servoInvertButton.title = isServoInverted
@@ -298,9 +300,9 @@ export const initializeIndoorHome = async (): Promise<void> => {
     } else if (servoError) {
       servoCommandStatus.textContent = 'อ่านสถานะเซอร์โวไม่สำเร็จ ตรวจสิทธิ์ Firebase';
     } else if (isLocked) {
-      servoCommandStatus.textContent = '🔒 ระบบล็อกอยู่: กดปุ่ม "ปลดล็อก" ก่อนจึงจะสั่งเปิดหรือปิดได้';
+      servoCommandStatus.textContent = 'ระบบล็อกอยู่: กดปุ่ม "ปลดล็อก" ก่อนจึงจะสั่งเปิดหรือปิดได้';
     } else if (servoPowerData?.enabled === false) {
-      servoCommandStatus.textContent = '💡 แนะนำ: กดปุ่ม "จ่ายไฟ 5V" ด้านล่างก่อน เพื่อจ่ายไฟให้เซอร์โว';
+      servoCommandStatus.textContent = 'แนะนำ: กดปุ่ม "จ่ายไฟ 5V" ด้านล่างก่อน เพื่อจ่ายไฟให้เซอร์โว';
     } else if (servoData?.last_command && servoData.last_command !== 'SYNC') {
       const isPhysicalOpen = isServoInverted
         ? servoData.last_command === 'CLOSED'
@@ -662,7 +664,7 @@ export const initializeIndoorHome = async (): Promise<void> => {
     if (state === 'LOCK') {
       if (servoData) servoData.locked = true;
       if (servoLockStatus) servoLockStatus.textContent = 'สถานะล็อกในระบบ: ล็อก';
-      servoCommandStatus.textContent = '🔒 ล็อกระบบแล้ว ปฏิเสธคำสั่งเปิด/ปิดประตู';
+      servoCommandStatus.textContent = 'ล็อกระบบแล้ว ปฏิเสธคำสั่งเปิด/ปิดประตู';
       updateControls();
       try {
         await update(ref(db!, devicePath(FIREBASE_PATHS.HOME_SERVO_STATE)), {
@@ -679,7 +681,7 @@ export const initializeIndoorHome = async (): Promise<void> => {
     if (state === 'UNLOCK') {
       if (servoData) servoData.locked = false;
       if (servoLockStatus) servoLockStatus.textContent = 'สถานะล็อกในระบบ: ปลดล็อก';
-      servoCommandStatus.textContent = '🔓 ปลดล็อกแล้ว พร้อมสั่งเปิด/ปิดประตู';
+      servoCommandStatus.textContent = 'ปลดล็อกแล้ว พร้อมสั่งเปิด/ปิดประตู';
       updateControls();
       try {
         await update(ref(db!, devicePath(FIREBASE_PATHS.HOME_SERVO_STATE)), {
@@ -779,8 +781,8 @@ export const initializeIndoorHome = async (): Promise<void> => {
     isServoInverted = !isServoInverted;
     localStorage.setItem('smart_home_servo_inverted', String(isServoInverted));
     servoCommandStatus.textContent = isServoInverted
-      ? '🔄 สลับเป็น "โหมดกลับทิศทาง" เรียบร้อย'
-      : '🔄 สลับเป็น "โหมดปกติ" เรียบร้อย';
+      ? 'สลับเป็น "โหมดกลับทิศทาง" เรียบร้อย'
+      : 'สลับเป็น "โหมดปกติ" เรียบร้อย';
     updateControls();
   });
   servoPowerOnButton?.addEventListener('click', () => void sendServoPowerCommand(true));

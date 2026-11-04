@@ -23,16 +23,19 @@
     <link rel="manifest" href="/manifest.json">
 </head>
 <body>
-    <!-- Vercel-Style Ambient Aurora & Moving Light System -->
-    <div class="vercel-light-viewport" aria-hidden="true">
-        <div class="vercel-spotlight-top"></div>
-        <div class="vercel-aurora-beam vercel-beam-cyan"></div>
-        <div class="vercel-aurora-beam vercel-beam-violet"></div>
-        <div class="vercel-aurora-beam vercel-beam-platinum"></div>
-        <div class="vercel-aurora-beam vercel-beam-amber"></div>
-        <div class="vercel-mouse-spotlight" id="vercelMouseSpotlight"></div>
-        <div class="vercel-precision-grid"></div>
-    </div>
+    <!-- iOS Mobile Top Header -->
+    <header class="ios-mobile-header" id="iosMobileHeader">
+        <div class="ios-mobile-header-inner">
+            <div class="ios-header-brand">
+                <span class="ios-header-title">Smart Building</span>
+                <span class="ios-header-subtitle">ระบบอาคารอัจฉริยะ</span>
+            </div>
+            <div class="ios-header-badge">
+                <span class="status-dot online"></span>
+                <span class="ios-badge-text">LIVE</span>
+            </div>
+        </div>
+    </header>
 
     <div class="layout-wrapper">
         <!-- Sidebar Navigation -->
@@ -120,8 +123,8 @@
                     <!-- Connection & Live Heartbeat Ribbon -->
                     <div class="card card-apple-glass" style="margin-bottom: 1.5rem; padding: 1.1rem 1.4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
                         <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: inset 0 1px 2px rgba(255,255,255,0.2);">
-                                📡
+                            <div style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center; color: #38bdf8; box-shadow: inset 0 1px 2px rgba(255,255,255,0.2);">
+                                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.393 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
                             </div>
                             <div>
                                 <div id="homeConnectionStatus" class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">กำลังตรวจสอบการเชื่อมต่อ ESP32</div>
@@ -139,7 +142,9 @@
                     <section class="card card-apple-glass" aria-labelledby="homeFirebaseAuthTitle" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
                         <div class="card-header" style="margin-bottom: 0.85rem;">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                <span style="font-size: 1.3rem;">🔐</span>
+                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; color: #cbd5e1;">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                </div>
                                 <div>
                                     <h2 id="homeFirebaseAuthTitle" class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">เชื่อมต่อบัญชีผู้ใช้ Firebase</h2>
                                     <p class="body" style="color: rgba(255,255,255,0.55); margin: 0.2rem 0 0; font-size: 0.82rem;">เข้าสู่ระบบเพื่อยืนยันสิทธิ์ในการอ่านข้อมูลและสั่งงานอุปกรณ์อัตโนมัติ</p>
@@ -156,7 +161,10 @@
                             <button class="btn btn-primary" type="submit" style="min-height: 44px; padding: 0.65rem 1.5rem; font-weight: 700; border-radius: 12px;">เข้าสู่ระบบ</button>
                         </form>
                         <div id="homeFirebaseSignedIn" hidden style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.5rem; padding: 0.75rem 1rem; border-radius: 12px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25);">
-                            <span style="color: #34d399; font-weight: 600; font-size: 0.9rem;">✓ เข้าสู่ระบบแล้ว (สิทธิ์สั่งการพร้อมใช้งาน)</span>
+                            <span style="color: #34d399; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                <span>เข้าสู่ระบบแล้ว (สิทธิ์สั่งการพร้อมใช้งาน)</span>
+                            </span>
                             <button id="homeFirebaseLogout" class="btn btn-secondary" type="button" style="border-radius: 10px; padding: 0.45rem 1rem; font-size: 0.82rem;">ออกจากระบบ</button>
                         </div>
                         <p id="homeFirebaseAuthStatus" class="label" role="status" aria-live="polite" style="margin: 0.65rem 0 0; color: rgba(255,255,255,0.5); font-size: 0.8rem;">กำลังตรวจสอบสิทธิ์ Firebase</p>
@@ -201,12 +209,12 @@
                             <!-- Bottom Sensor Badges -->
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.85rem;">
                                 <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 0.65rem 0.8rem; text-align: center;">
-                                    <div style="font-size: 0.72rem; color: rgba(255,255,255,0.5);">💧 ความชื้น</div>
+                                    <div style="font-size: 0.72rem; color: rgba(255,255,255,0.5); display: inline-flex; align-items: center; gap: 0.3rem;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>ความชื้น</div>
                                     <div id="homeHumidityValue" style="font-size: 1.2rem; font-weight: 700; color: #ffffff; font-family: var(--font-mono); margin: 0.15rem 0;">-- %</div>
                                     <div id="homeHumidityStatus" style="font-size: 0.68rem; color: rgba(255,255,255,0.45);">DHT11</div>
                                 </div>
                                 <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 0.65rem 0.8rem; text-align: center;">
-                                    <div style="font-size: 0.72rem; color: rgba(255,255,255,0.5);">🚶 การเคลื่อนไหว</div>
+                                    <div style="font-size: 0.72rem; color: rgba(255,255,255,0.5); display: inline-flex; align-items: center; gap: 0.3rem;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M10 21l2-7 3 3v5m-1-11l3-3-2-2-4 3-2 5"/></svg>การเคลื่อนไหว</div>
                                     <div id="homeMotionValue" style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin: 0.25rem 0;">ไม่มีข้อมูล</div>
                                     <div id="homeMotionStatus" style="font-size: 0.68rem; color: rgba(255,255,255,0.45);">PIR HC-SR501</div>
                                 </div>
@@ -220,8 +228,8 @@
                             <article class="card card-apple-glass" style="padding: 1.3rem; flex: 1;">
                                 <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
                                     <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                        <div id="homeDoorVisualIcon" style="width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-                                            🚪
+                                        <div id="homeDoorVisualIcon" style="width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                                            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M6 21V5a2 2 0 012-2h8a2 2 0 012 2v16M14 12h.01"/></svg>
                                         </div>
                                         <div>
                                             <span class="label" style="font-family: var(--font-mono); font-size: 0.68rem; color: rgba(255,255,255,0.45); letter-spacing: 0.08em; text-transform: uppercase;">SERVO (SG90 / SG92R)</span>
@@ -239,22 +247,22 @@
                                     <!-- Door Open / Close & Lock / Unlock Action Buttons -->
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.65rem;">
                                         <button id="homeServoOpenButton" class="btn btn-primary" type="button" disabled style="padding: 0.6rem 0.8rem; border-radius: 12px; font-weight: 700;">
-                                            🔓 เปิดประตู
+                                            เปิดประตู
                                         </button>
                                         <button id="homeServoCloseButton" class="btn btn-secondary" type="button" disabled style="padding: 0.6rem 0.8rem; border-radius: 12px; font-weight: 700;">
-                                            🔒 ปิดประตู
+                                            ปิดประตู
                                         </button>
                                         <button id="homeServoLockButton" class="btn btn-secondary" type="button" disabled style="padding: 0.5rem 0.8rem; border-radius: 10px; font-size: 0.8rem;">
-                                            🔒 ล็อกระบบ
+                                            ล็อกระบบ
                                         </button>
                                         <button id="homeServoUnlockButton" class="btn btn-secondary" type="button" disabled style="padding: 0.5rem 0.8rem; border-radius: 10px; font-size: 0.8rem;">
-                                            🔓 ปลดล็อก
+                                            ปลดล็อก
                                         </button>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; gap: 0.5rem;">
                                         <div id="homeServoLockStatus" class="label" style="font-size: 0.72rem; color: rgba(255,255,255,0.5);">สถานะล็อก: รอ ESP32 ยืนยัน</div>
                                         <button id="homeServoInvertButton" class="btn btn-secondary" type="button" style="padding: 0.2rem 0.55rem; font-size: 0.68rem; border-radius: 8px; white-space: nowrap;">
-                                            🔄 สลับทิศทางหมุน
+                                            สลับทิศทางหมุน
                                         </button>
                                     </div>
                                     <div id="homeServoCommandStatus" class="label" role="status" aria-live="polite" style="font-size: 0.75rem; color: rgba(255,255,255,0.45); margin-bottom: 0.85rem;">เข้าสู่ระบบ Firebase ก่อนจึงจะสั่งเซอร์โวได้</div>
@@ -262,7 +270,7 @@
                                     <!-- Servo Power Rail Section -->
                                     <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.75rem;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.6);">⚡ สวิตช์จ่ายไฟเซอร์โว</span>
+                                            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.6); display: inline-flex; align-items: center; gap: 0.35rem;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>สวิตช์จ่ายไฟเซอร์โว</span>
                                             <span id="homeServoPowerStatus" class="label" style="font-size: 0.7rem; color: rgba(255,255,255,0.45);">รอ ESP32 ยืนยัน</span>
                                         </div>
                                         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -278,8 +286,8 @@
                             <article class="card card-apple-glass" style="padding: 1.3rem;">
                                 <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
                                     <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                        <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-                                            💡
+                                        <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; color: #ffd60a; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                                            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                                         </div>
                                         <div>
                                             <span class="label" style="font-family: var(--font-mono); font-size: 0.68rem; color: rgba(255,255,255,0.45); letter-spacing: 0.08em; text-transform: uppercase;">SMART LIGHT & PIR</span>
@@ -305,7 +313,7 @@
                                     <!-- PIR Security System Sub-group -->
                                     <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.75rem;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.6);">🛡️ โหมดตรวจจับ HC-SR501</span>
+                                            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.6); display: inline-flex; align-items: center; gap: 0.35rem;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>โหมดตรวจจับ HC-SR501</span>
                                             <span id="homeMotionSystemStatus" class="label" style="font-size: 0.7rem; color: rgba(255,255,255,0.45);">รอ ESP32 ยืนยัน</span>
                                         </div>
                                         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -323,8 +331,8 @@
                         <article class="card card-apple-glass col-span-6" style="padding: 1.3rem 1.6rem;">
                             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
                                 <div style="display: flex; align-items: center; gap: 0.85rem;">
-                                    <div style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 4px 14px rgba(0,0,0,0.5);">
-                                        🔊
+                                    <div style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; color: #a78bfa; box-shadow: 0 4px 14px rgba(0,0,0,0.5);">
+                                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
                                     </div>
                                     <div>
                                         <span class="label" style="font-family: var(--font-mono); font-size: 0.68rem; color: rgba(255,255,255,0.45); letter-spacing: 0.1em; text-transform: uppercase;">DUAL AUDIO ENGINE · PCM5102 I²S DAC & PIEZO BUZZER</span>
@@ -354,10 +362,10 @@
                                 </span>
                                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                                     <button type="button" class="btn btn-secondary" onclick="window.playLocalChime && window.playLocalChime()" style="padding: 0.45rem 0.95rem; font-size: 0.82rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.4rem;">
-                                        <span>🔔</span> เทสเสียง Chime
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg> เทสเสียง Chime
                                     </button>
                                     <button type="button" class="btn btn-primary" onclick="document.getElementById('btnTestAlarm')?.click()" style="padding: 0.45rem 0.95rem; font-size: 0.82rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.4rem;">
-                                        <span>🚨</span> เทสเสียงไซเรนฉุกเฉิน
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> เทสเสียงไซเรนฉุกเฉิน
                                     </button>
                                 </div>
                             </div>
@@ -367,7 +375,7 @@
                         <article class="card card-apple-glass col-span-6" style="padding: 1.3rem 1.6rem; border-left: 3px solid #34d399 !important;">
                             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.85rem;">
                                 <div style="display: flex; align-items: center; gap: 0.65rem;">
-                                    <span class="metric-sticker" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3);">⚡ พลังงาน ESP32</span>
+                                    <span class="metric-sticker" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3);">พลังงาน ESP32</span>
                                     <span class="label" style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">คำนวณการใช้ไฟจากบอร์ด เซนเซอร์ และอุปกรณ์จริง</span>
                                 </div>
                                 <button type="button" class="btn btn-secondary" onclick="document.querySelector('[data-view=\'electricity\']')?.click()" style="padding: 0.35rem 0.85rem; font-size: 0.8rem; border-radius: 10px;">
@@ -403,7 +411,7 @@
                         <article class="card card-apple-glass col-span-6" style="padding: 1.3rem 1.6rem;">
                             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
                                 <div style="display: flex; align-items: center; gap: 0.65rem;">
-                                    <span class="metric-sticker" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.16); color: #fff;">📈 สถิติย้อนหลัง DHT11</span>
+                                    <span class="metric-sticker" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.16); color: #fff;">สถิติย้อนหลัง DHT11</span>
                                     <span class="label" style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">กราฟขาว-เทา-ดำ ไล่ระดับ · 60 จุดล่าสุด</span>
                                 </div>
                                 <span class="label" style="font-family: var(--font-mono); font-size: 0.72rem; color: rgba(255,255,255,0.45);">ROLLING LIVE BUFFER</span>
@@ -431,10 +439,10 @@
                         </div>
                         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                             <button id="btnEditElecRate" class="btn btn-secondary" type="button" style="font-size: 0.85rem;">
-                                ⚙️ ปรับอัตราค่าไฟ (<span id="esp32RateDisplayValue">4.40 บาท/หน่วย</span>)
+                                ปรับอัตราค่าไฟ (<span id="esp32RateDisplayValue">4.40 บาท/หน่วย</span>)
                             </button>
                             <button id="btnResetChannels" class="btn btn-secondary" type="button" style="font-size: 0.85rem;">
-                                ↺ คืนค่าเริ่มต้น
+                                คืนค่าเริ่มต้น
                             </button>
                         </div>
                     </div>
@@ -443,7 +451,7 @@
                     <div class="bento-grid" style="margin-bottom: 1.5rem;">
                         <article class="card card-spotlight col-span-2">
                             <div class="card-header">
-                                <span class="metric-sticker sticker-wind">⚡ กำลังไฟขณะนี้ (Live)</span>
+                                <span class="metric-sticker sticker-wind">กำลังไฟขณะนี้ (Live)</span>
                                 <span class="label" style="color: var(--color-fg-muted);">Real-time</span>
                             </div>
                             <div class="card-content" style="text-align: center;">
@@ -454,7 +462,7 @@
 
                         <article class="card card-spotlight col-span-2">
                             <div class="card-header">
-                                <span class="metric-sticker sticker-heat">💰 ค่าไฟสะสมวันนี้</span>
+                                <span class="metric-sticker sticker-heat">ค่าไฟสะสมวันนี้</span>
                                 <span class="label" style="color: var(--color-fg-muted);">วันนี้</span>
                             </div>
                             <div class="card-content" style="text-align: center;">
@@ -465,7 +473,7 @@
 
                         <article class="card card-spotlight col-span-2">
                             <div class="card-header">
-                                <span class="metric-sticker sticker-water">📊 พลังงานวันนี้</span>
+                                <span class="metric-sticker sticker-water">พลังงานวันนี้</span>
                                 <span class="label" style="color: var(--color-fg-muted);">Wh</span>
                             </div>
                             <div class="card-content" style="text-align: center;">
@@ -482,7 +490,7 @@
                                     <span style="font-size: 0.8rem; color: var(--text-dim); margin-left: 0.35rem;">/เดือน (ทำงานต่อเนื่อง 24 ชม.)</span>
                                 </div>
                                 <div style="font-size: 0.78rem; color: var(--text-muted);">
-                                    💡 คลิกปุ่ม <span style="color: var(--cyan-neon);">✏️</span> บนการ์ดด้านล่างเพื่อปรับวัตต์ตามอุปกรณ์จริงที่ต่อได้ทันที
+                                    คลิกปุ่มแก้ไขบนการ์ดด้านล่างเพื่อปรับวัตต์ตามอุปกรณ์จริงที่ต่อได้ทันที
                                 </div>
                             </div>
                         </article>
@@ -492,7 +500,7 @@
                     <div class="card" style="padding: 1.5rem;">
                         <div class="card-header" style="margin-bottom: 1.25rem;">
                             <div>
-                                <div class="h3" style="font-size: 1.15rem; color: var(--text-bright);">🎛️ ช่องสัญญาณ & อุปกรณ์ที่จ่ายไฟจาก ESP32</div>
+                                <div class="h3" style="font-size: 1.15rem; color: var(--text-bright);">ช่องสัญญาณ & อุปกรณ์ที่จ่ายไฟจาก ESP32</div>
                                 <p class="body" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
                                     ระบบนับเวลาเปิดใช้งานจริงอัตโนมัติจากสถานะบน Firebase RTDB และคำนวณการกินไฟแบบแยกอุปกรณ์
                                 </p>
@@ -522,7 +530,7 @@
                     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
                         <!-- Region Selector Chip -->
                         <div class="card" style="padding: 0.75rem 1.25rem; flex-direction: row; align-items: center; gap: 0.75rem;">
-                            <span style="font-size: 1.1rem;">📍</span>
+                            <div style="color: var(--color-fg-muted); display: flex; align-items: center;"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
                             <div>
                                 <div class="label">Region</div>
                                 <select id="provinceSelect" style="background: transparent; color: var(--color-fg); border: none; font-size: 0.95rem; font-weight: 600; outline: none; cursor: pointer; padding: 0;">
@@ -563,13 +571,13 @@
                     <div id="alertBanner" class="card" style="display: none; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); margin-bottom: 1.5rem; padding: 1rem 1.25rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                <span style="font-size: 1.5rem;">🚨</span>
+                                <div style="display: flex; align-items: center; color: #ef4444;"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div>
                                 <div>
                                     <div id="alertBannerTitle" class="h3" style="color: #ef4444; font-size: 0.95rem;">CRITICAL HAZARD DETECTED</div>
                                     <p id="alertBannerMsg" style="font-size: 0.85rem; color: var(--color-fg-muted); margin: 0;"></p>
                                 </div>
                             </div>
-                            <button id="speakAlertBtn" class="btn btn-sm btn-secondary" style="font-size: 0.75rem;">🔊 Announce</button>
+                            <button id="speakAlertBtn" class="btn btn-sm btn-secondary" style="font-size: 0.75rem;">ฟังประกาศ</button>
                         </div>
                     </div>
 
@@ -582,8 +590,9 @@
                             <span class="label">เสียงจากเว็บ</span>
                         </div>
                         <div class="voice-panel-body">
-                            <button id="weatherSpeakBtn" class="btn btn-primary voice-main-button" type="button" aria-label="ฟังสรุปสภาพอากาศและคำแนะนำภาษาไทย">
-                                <span aria-hidden="true">🔊</span> ฟังสรุปตอนนี้
+                            <button id="weatherSpeakBtn" class="btn btn-primary voice-main-button" type="button" aria-label="ฟังสรุปสภาพอากาศและคำแนะนำภาษาไทย" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                                <span>ฟังสรุปตอนนี้</span>
                             </button>
                             <div class="voice-speed-control">
                                 <label for="speechRateSelect">ความเร็วเสียง</label>
@@ -652,7 +661,7 @@
                         <!-- 1. UV Index Gauge Card -->
                         <div class="card card-spotlight col-span-3 row-span-2">
                             <div class="card-header">
-                                <span class="metric-sticker sticker-uv">☀️ UV / Radiation</span>
+                                <span class="metric-sticker sticker-uv">UV / Radiation</span>
                                 <div class="status-indicator">
                                     <div id="uvStatusDot" class="status-dot online"></div>
                                     <span id="uvRiskBadge">รอข้อมูล</span>
@@ -682,7 +691,7 @@
                         <!-- 2. Heat Index Gauge Card -->
                         <div class="card card-spotlight col-span-3 row-span-2">
                             <div class="card-header">
-                                <span class="metric-sticker sticker-heat">🔥 Heat / Stress</span>
+                                <span class="metric-sticker sticker-heat">Heat / Stress</span>
                                 <div class="status-indicator">
                                     <div id="heatStatusDot" class="status-dot online"></div>
                                     <span id="heatRiskBadge">รอข้อมูล</span>
@@ -713,7 +722,7 @@
                         <!-- 3. Humidity dedicated card -->
                         <div class="card card-spotlight col-span-2">
                             <div class="card-header">
-                                <span class="metric-sticker sticker-water">💧 Humidity</span>
+                                <span class="metric-sticker sticker-water">Humidity</span>
                                 <span id="humidityRiskBadge" class="label" style="color: var(--color-fg-muted);">ระดับความชื้น</span>
                             </div>
                             <div class="card-content" style="text-align: center;">
@@ -725,11 +734,13 @@
                         <!-- 4. Severe Weather & WMO Code -->
                         <div class="card card-spotlight col-span-2">
                             <div class="card-header">
-                                <span class="metric-sticker sticker-weather">☁️ Conditions</span>
+                                <span class="metric-sticker sticker-weather">Conditions</span>
                                 <span id="wmoCodeBadge" class="label" style="color: var(--color-accent-bright);">WMO --</span>
                             </div>
                             <div class="card-content" style="text-align: center;">
-                                <div id="wmoIcon" style="font-size: 2rem; margin-bottom: 0.25rem;">🌤️</div>
+                                <div id="wmoIcon" style="display: flex; justify-content: center; align-items: center; min-height: 44px; margin-bottom: 0.25rem; color: #38bdf8;">
+                                    <svg width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                                </div>
                                 <div id="wmoDescText" class="h3" style="color: var(--color-fg); font-size: 1rem;">รอข้อมูลสภาพอากาศ</div>
                                 <div class="label" style="margin-top: 0.5rem; color: var(--color-fg-muted);">Storm codes: 95, 96, 99</div>
                             </div>
@@ -738,7 +749,7 @@
                         <!-- 4. Wind Gusts -->
                         <div class="card card-spotlight col-span-2">
                             <div class="card-header">
-                                <span class="metric-sticker sticker-wind">💨 Wind</span>
+                                <span class="metric-sticker sticker-wind">Wind</span>
                                 <span id="gustRiskBadge" class="label" style="color: var(--color-fg-muted);">รอข้อมูล</span>
                             </div>
                             <div class="card-content">
@@ -757,7 +768,7 @@
                         <!-- 5. Rainfall Accumulation -->
                         <div class="card card-spotlight col-span-2">
                             <div class="card-header">
-                                <span class="metric-sticker sticker-rain">🌧️ Rain</span>
+                                <span class="metric-sticker sticker-rain">Rain</span>
                                 <span id="rainRiskBadge" class="label" style="color: var(--color-fg-muted);">รอข้อมูล</span>
                             </div>
                             <div class="card-content">
@@ -776,7 +787,7 @@
                         <!-- 6. River Discharge (Flood Level) -->
                         <div class="card card-spotlight col-span-3">
                             <div class="card-header">
-                                <span class="metric-sticker sticker-river">🌊 River / Flood</span>
+                                <span class="metric-sticker sticker-river">River / Flood</span>
                                 <span id="riverRiskBadge" class="label" style="color: var(--color-fg-muted);">รอข้อมูล</span>
                             </div>
                             <div class="card-content">
@@ -791,19 +802,19 @@
                         <!-- 7. Hardware Relays Status -->
                         <div class="card card-spotlight col-span-3">
                             <div class="card-header">
-                                <span class="metric-sticker sticker-safety">🚨 Safety Relays</span>
+                                <span class="metric-sticker sticker-safety">Safety Relays</span>
                             </div>
                             <div class="card-content" style="gap: 0.5rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 0.85rem; color: var(--color-fg-muted);">🚨 Strobe Alarm (GPIO 2)</span>
+                                    <span style="font-size: 0.85rem; color: var(--color-fg-muted);">Strobe Alarm (GPIO 2)</span>
                                     <span id="strobeStatusPill" class="label" style="color: var(--color-fg-muted);">OFF</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 0.85rem; color: var(--color-fg-muted);">🚪 Emergency Doors (GPIO 4)</span>
+                                    <span style="font-size: 0.85rem; color: var(--color-fg-muted);">Emergency Doors (GPIO 4)</span>
                                     <span id="doorStatusPill" class="label" style="color: var(--color-fg-muted);">LOCKED</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 0.85rem; color: var(--color-fg-muted);">🔊 Audio Siren (PCM5102 · GPIO 19/21/22)</span>
+                                    <span style="font-size: 0.85rem; color: var(--color-fg-muted);">Audio Siren (PCM5102 · GPIO 19/21/22)</span>
                                     <span id="sirenStatusPill" class="label" style="color: var(--color-fg-muted);">MUTED</span>
                                 </div>
                             </div>
@@ -822,7 +833,7 @@
 
                     <div class="bento-grid">
                         <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">☀️ 1. UV Index</span></div>
+                            <div class="card-header"><span class="label">1. UV Index</span></div>
                             <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
                                 Measures ultraviolet radiation damage risk to skin and eyes.
                             </p>
@@ -830,7 +841,7 @@
                         </div>
 
                         <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">🌡️ 2. Heat Index (Apparent Temp)</span></div>
+                            <div class="card-header"><span class="label">2. Heat Index (Apparent Temp)</span></div>
                             <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
                                 Calculates apparent temperature based on temperature and relative humidity.
                             </p>
@@ -838,7 +849,7 @@
                         </div>
 
                         <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">⛈️ 3. Thunderstorm & Hail</span></div>
+                            <div class="card-header"><span class="label">3. Thunderstorm & Hail</span></div>
                             <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
                                 Evaluates convective storm risks according to WMO interpretation codes.
                             </p>
@@ -846,7 +857,7 @@
                         </div>
 
                         <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">💨 4. Wind Gusts</span></div>
+                            <div class="card-header"><span class="label">4. Wind Gusts</span></div>
                             <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
                                 Peak sudden wind speed measured at 10m height.
                             </p>
@@ -854,7 +865,7 @@
                         </div>
 
                         <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">🌧️ 5. Rainfall Accumulation</span></div>
+                            <div class="card-header"><span class="label">5. Rainfall Accumulation</span></div>
                             <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
                                 Precipitation volume over the preceding hour.
                             </p>
@@ -862,7 +873,7 @@
                         </div>
 
                         <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">🌊 6. River Discharge</span></div>
+                            <div class="card-header"><span class="label">6. River Discharge</span></div>
                             <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
                                 Streamflow volume modeling from Open-Meteo Flood API.
                             </p>
@@ -993,7 +1004,7 @@
                         <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                             <span id="pnaOfficialLastChecked" style="font-size: 0.8rem; color: var(--text-muted);">กำลังตรวจสอบข้อมูล...</span>
                             <button id="pnaOfficialRefreshBtn" class="btn btn-secondary" type="button" style="font-size: 0.85rem;">
-                                🔄 ตรวจสอบประกาศใหม่
+                                ตรวจสอบประกาศใหม่
                             </button>
                         </div>
                     </div>
@@ -1002,7 +1013,7 @@
                     <div style="margin-bottom: 2rem;">
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap;">
                             <div style="display: flex; align-items: center; gap: 0.65rem;">
-                                <span class="metric-sticker sticker-heat">📢 ประกาศเตือนภัยของจริง</span>
+                                <span class="metric-sticker sticker-heat">ประกาศเตือนภัยทางการ</span>
                                 <span id="pnaOfficialStatus" class="metric-sticker sticker-wind">กำลังตรวจข้อมูล...</span>
                             </div>
                             <span class="label" style="color: var(--color-fg-muted);">แหล่งข้อมูล: กรมป้องกันและบรรเทาสาธารณภัย (DDPM) & กรมอุตุนิยมวิทยา (TMD)</span>
@@ -1012,7 +1023,7 @@
                             <!-- Latest Real Alert Card -->
                             <article class="card card-apple-glass" style="padding: 1.5rem; border-left: 3px solid var(--magenta-neon) !important;">
                                 <div class="card-header" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                                    <div class="h3" style="font-size: 1.15rem; font-weight: 700; color: #ffffff;">⚠️ ประกาศเตือนภัยล่าสุดที่ยังมีผล</div>
+                                    <div class="h3" style="font-size: 1.15rem; font-weight: 700; color: #ffffff;">ประกาศเตือนภัยล่าสุดที่ยังมีผล</div>
                                     <span class="label" style="background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem;">ประกาศด่วนทางการ</span>
                                 </div>
                                 <div id="pnaOfficialLatest">
@@ -1023,7 +1034,7 @@
                             <!-- Official Archive List Card -->
                             <article class="card card-apple-glass" style="padding: 1.5rem; display: flex; flex-direction: column;">
                                 <div class="card-header" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                                    <div class="h3" style="font-size: 1.15rem; font-weight: 700; color: #ffffff;">📋 ประวัติประกาศเตือนภัยทางการย้อนหลัง</div>
+                                    <div class="h3" style="font-size: 1.15rem; font-weight: 700; color: #ffffff;">ประวัติประกาศเตือนภัยทางการย้อนหลัง</div>
                                     <span class="label" style="background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.16); padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem;">คลังประวัติ ปภ. & กรมอุตุฯ</span>
                                 </div>
                                 <div id="pnaOfficialHistory" style="flex: 1; max-height: 520px; overflow-y: auto; padding-right: 0.35rem;">
@@ -1037,7 +1048,7 @@
                     <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem;">
                         <div class="section-header" style="margin-bottom: 1rem;">
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span class="metric-sticker">🧪 พื้นที่ทดสอบ (Test Mode)</span>
+                                <span class="metric-sticker">พื้นที่ทดสอบ (Test Mode)</span>
                                 <span class="label" style="color: var(--color-fg-muted);">จำลองการส่งข้อความแจ้งเตือน</span>
                             </div>
                         </div>
@@ -1045,14 +1056,14 @@
                         <div class="pna-test-intro card card-spotlight" style="margin-bottom: 1.25rem;">
                             <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
                                 <div>
-                                    <span class="pna-test-badge">📢 ระบบกระจายเสียงเตือนอัตโนมัติ (Online)</span>
+                                    <span class="pna-test-badge">ระบบกระจายเสียงเตือนอัตโนมัติ (Online)</span>
                                     <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.25rem;">
                                         เมื่อมีข้อความแจ้งเตือนเข้ามา ระบบจะส่งเสียงกริ่งสัญญาณและอ่านออกลำโพงคอมพิวเตอร์/มือถือ และ ESP32 โดยอัตโนมัติ
                                     </p>
                                 </div>
                                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                                     <button id="pnaTestSpeakerToneBtn" class="btn btn-secondary" type="button" title="ทดสอบเสียงกริ่งสัญญาณเตือน">
-                                        🔔 ทดสอบเสียงกริ่ง
+                                        ทดสอบเสียงกริ่ง
                                     </button>
                                     <a class="btn btn-secondary" href="/pna-test.html" target="_blank" rel="noopener noreferrer">
                                         เปิดหน้าแยก ↗
@@ -1063,7 +1074,7 @@
                                 <input id="pnaQuickMessageInput" type="text" placeholder="พิมพ์ข้อความแจ้งเตือนที่ต้องการให้ออกลำโพง เช่น ระวังพายุฤดูร้อน ลมกระโชกแรง..." 
                                        style="flex: 1; min-width: 250px; padding: 0.65rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18); color: #fff; font-size: 0.95rem; outline: none; transition: border-color 0.2s;">
                                 <button id="pnaQuickSendBtn" class="btn btn-primary" type="button" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.25rem; font-weight: 600;">
-                                    <span>🔊</span> <span>ส่งเสียงออกลำโพงทันที</span>
+                                    <span>ส่งเสียงออกลำโพงทันที</span>
                                 </button>
                             </div>
                         </div>
@@ -1080,8 +1091,8 @@
                             <h3 id="pnaTestAlertTitle" style="font-size: 1.15rem; font-weight: 700; color: var(--text-bright); margin-bottom: 0.5rem;">ข้อความทดสอบ</h3>
                             <p id="pnaTestAlertMessage" class="pna-test-alert-message" style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6; margin-bottom: 1rem;"></p>
                             <div class="pna-test-audio-actions" style="display: flex; gap: 0.75rem;">
-                                <button id="pnaTestSpeak" class="btn btn-primary" type="button" aria-label="ฟังข้อความแจ้งเตือนทดสอบ">🔊 ฟังข้อความทดสอบ</button>
-                                <button id="pnaTestStop" class="btn btn-secondary" type="button" aria-label="หยุดเสียงข้อความทดสอบ">⏹️ หยุดเสียง</button>
+                                <button id="pnaTestSpeak" class="btn btn-primary" type="button" aria-label="ฟังข้อความแจ้งเตือนทดสอบ">ฟังข้อความทดสอบ</button>
+                                <button id="pnaTestStop" class="btn btn-secondary" type="button" aria-label="หยุดเสียงข้อความทดสอบ">หยุดเสียง</button>
                             </div>
                         </article>
 
@@ -1272,17 +1283,18 @@
                     <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
                         <div>
                             <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.25rem;">
-                                <span class="metric-sticker" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">🤖 MCP AI Engine</span>
+                                <span class="metric-sticker" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">MCP AI Engine</span>
                                 <span class="label" style="color: var(--color-fg-muted);">Observability & Health Monitor (2026)</span>
                             </div>
                             <h2 class="h2">ระบบวิเคราะห์สุขภาพฮาร์ดแวร์ & Live Logs</h2>
                         </div>
                         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                             <button id="runAiDiagnosisBtn" class="btn btn-primary" type="button" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.25rem; font-weight: 600;">
-                                <span>✨</span> <span>วิเคราะห์ปัญหาระบบด้วย AI</span>
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <span>วิเคราะห์ปัญหาระบบด้วย AI</span>
                             </button>
                             <button id="clearTerminalBtn" class="btn btn-secondary" type="button">
-                                🗑️ ล้าง Log
+                                ล้าง Log
                             </button>
                         </div>
                     </div>
@@ -1290,8 +1302,10 @@
                     <!-- AI Diagnosis Insights Banner -->
                     <div id="aiDiagnosisBanner" class="card card-spotlight" style="margin-bottom: 1.5rem; border: 1px solid rgba(56, 189, 248, 0.25); background: linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(139, 92, 246, 0.06) 100%);">
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="font-size: 1.2rem;">🧠</span>
+                            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                <div style="display: flex; align-items: center; color: #38bdf8;">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M3 9h2m-2 6h2m16-6h2m-2 6h2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
+                                </div>
                                 <h3 style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">รายงานการตรวจวิเคราะห์โดย AI Copilot</h3>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -1388,6 +1402,34 @@
 
         </main>
     </div>
+
+    <!-- iOS Native Bottom Tab Bar (Dock for Mobile PWA) -->
+    <nav class="ios-tab-bar" id="iosTabBar" aria-label="แถบนำทางด่วน">
+        <button type="button" class="tab-item nav-link active" data-view="home" aria-label="หน้าหลัก">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v11a1 1 0 01-1 1h-3m-6 0h6"/></svg>
+            <span class="tab-label">หน้าหลัก</span>
+        </button>
+        <button type="button" class="tab-item nav-link" data-view="electricity" aria-label="ค่าไฟ">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span class="tab-label">ค่าไฟ</span>
+        </button>
+        <button type="button" class="tab-item nav-link" data-view="weather" aria-label="สภาพอากาศ">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 18a4 4 0 01-.4-7.98A5.5 5.5 0 0117.3 8.3 4.5 4.5 0 0117 18H7z"/></svg>
+            <span class="tab-label">อากาศ</span>
+        </button>
+        <button type="button" class="tab-item nav-link" data-view="hazards" aria-label="เตือนภัย">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <span class="tab-label">เตือนภัย</span>
+        </button>
+        <button type="button" class="tab-item nav-link" data-view="controls" aria-label="ควบคุม">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            <span class="tab-label">ควบคุม</span>
+        </button>
+        <button type="button" class="tab-item nav-link" data-view="diagnostics" aria-label="Logs">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span class="tab-label">Logs</span>
+        </button>
+    </nav>
 
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>

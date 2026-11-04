@@ -79,25 +79,27 @@ export class RadarChartComponent {
                         margin-bottom: 16px;
                     ">
                         <h3 style="
-                            font-family: 'Orbitron', sans-serif;
-                            font-size: 1rem;
-                            color: #00f3ff;
+                            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+                            font-size: 0.95rem;
+                            font-weight: 600;
+                            color: #ffffff;
                             margin: 0;
                             display: flex;
                             align-items: center;
                             gap: 8px;
-                        ">🛰️ ${this.config.title}</h3>
+                        ">${this.config.title}</h3>
                         ${this.config.showExport ? `
                             <button class="chart-export-btn" data-chart="${this.config.canvasId}" style="
-                                background: rgba(0, 243, 255, 0.1);
-                                border: 1px solid rgba(0, 243, 255, 0.3);
-                                color: #00f3ff;
-                                padding: 6px 12px;
-                                border-radius: 6px;
+                                background: rgba(120, 120, 128, 0.24);
+                                border: none;
+                                color: #0a84ff;
+                                padding: 4px 10px;
+                                border-radius: 8px;
                                 cursor: pointer;
-                                font-size: 0.8rem;
-                                transition: all 0.2s;
-                            ">📥 Export</button>
+                                font-size: 0.75rem;
+                                font-weight: 500;
+                                transition: opacity 0.2s;
+                            ">Export</button>
                         ` : ''}
                     </div>
                 ` : ''}
@@ -192,14 +194,15 @@ export class TimeSeriesChartComponent {
                     gap: 12px;
                 ">
                     <h3 style="
-                        font-family: 'Orbitron', sans-serif;
-                        font-size: 1rem;
-                        color: #00f3ff;
+                        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+                        font-size: 0.95rem;
+                        font-weight: 600;
+                        color: #ffffff;
                         margin: 0;
                         display: flex;
                         align-items: center;
                         gap: 8px;
-                    ">📈 ${this.config.title || this.label}</h3>
+                    ">${this.config.title || this.label}</h3>
                     <div style="display: flex; gap: 8px; align-items: center;">
                         ${this.config.showTimeRange ? `
                             <div class="time-range-selector" style="display: flex; gap: 4px;">
@@ -247,15 +250,16 @@ export class TimeSeriesChartComponent {
                         ` : ''}
                         ${this.config.showExport ? `
                             <button class="chart-export-btn" data-chart="${this.config.canvasId}" style="
-                                background: rgba(0, 243, 255, 0.1);
-                                border: 1px solid rgba(0, 243, 255, 0.3);
-                                color: #00f3ff;
-                                padding: 6px 12px;
-                                border-radius: 6px;
+                                background: rgba(120, 120, 128, 0.24);
+                                border: none;
+                                color: #0a84ff;
+                                padding: 4px 10px;
+                                border-radius: 8px;
                                 cursor: pointer;
-                                font-size: 0.8rem;
-                                transition: all 0.2s;
-                            ">📥 Export</button>
+                                font-size: 0.75rem;
+                                font-weight: 500;
+                                transition: opacity 0.2s;
+                            ">Export</button>
                         ` : ''}
                     </div>
                 </div>
@@ -522,25 +526,27 @@ export class HeatmapComponent {
                     margin-bottom: 16px;
                 ">
                     <h3 style="
-                        font-family: 'Orbitron', sans-serif;
-                        font-size: 1rem;
-                        color: #00f3ff;
+                        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+                        font-size: 0.95rem;
+                        font-weight: 600;
+                        color: #ffffff;
                         margin: 0;
                         display: flex;
                         align-items: center;
                         gap: 8px;
-                    ">🗺️ ${this.config.title || 'Province Hazard Levels'}</h3>
+                    ">${this.config.title || 'Province Hazard Levels'}</h3>
                     ${this.config.showExport ? `
                         <button class="chart-export-btn" data-chart="${this.config.canvasId}" style="
-                            background: rgba(0, 243, 255, 0.1);
-                            border: 1px solid rgba(0, 243, 255, 0.3);
-                            color: #00f3ff;
-                            padding: 6px 12px;
-                            border-radius: 6px;
+                            background: rgba(120, 120, 128, 0.24);
+                            border: none;
+                            color: #0a84ff;
+                            padding: 4px 10px;
+                            border-radius: 8px;
                             cursor: pointer;
-                            font-size: 0.8rem;
-                            transition: all 0.2s;
-                        ">📥 Export</button>
+                            font-size: 0.75rem;
+                            font-weight: 500;
+                            transition: opacity 0.2s;
+                        ">Export</button>
                     ` : ''}
                 </div>
                 <div class="chart-canvas-container" style="

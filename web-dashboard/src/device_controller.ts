@@ -136,7 +136,7 @@ export const fetchOpenMeteoWeather = async (provinceName: string) => {
         }
 
         if (rainAlertConfig.enabled && rainAlert.level !== 'NORMAL') {
-            const rainMessage = `🌧️ ${rainAlert.message}\n📍 จ.${provinceName}\n⏰ ${new Date().toLocaleString('th-TH')}`;
+            const rainMessage = `[รายงานฝน] ${rainAlert.message}\nพื้นที่: จ.${provinceName}\nเวลา: ${new Date().toLocaleString('th-TH')}`;
             const weatherDecision = buildOutdoorReadinessSummary(
                 Number(cur.temperature_2m ?? cur.apparent_temperature ?? 0),
                 Number(cur.relative_humidity_2m ?? 0),
@@ -164,7 +164,7 @@ export const fetchOpenMeteoWeather = async (provinceName: string) => {
 
                 if (alertKey !== lastTelegramAlertKey) {
                     lastTelegramAlertKey = alertKey;
-                    void sendTelegramAlert(`${rainMessage}\n🧠 AI: ${weatherDecision.summary}\n📌 ตัดสินใจ: ${weatherDecision.decision}\n🛡️ คำแนะนำ: ${weatherDecision.action}`, telegramSeverity, provinceName);
+                    void sendTelegramAlert(`${rainMessage}\nการวิเคราะห์: ${weatherDecision.summary}\nการตัดสินใจ: ${weatherDecision.decision}\nคำแนะนำ: ${weatherDecision.action}`, telegramSeverity, provinceName);
                 }
             }
         } else if (rainAlertConfig.enabled && rainAlert.level === 'NORMAL') {
@@ -329,8 +329,8 @@ export const testAudioSiren = async () => {
 
 export const sendTelegramAlert = async (message: string, severity: string, province: string) => {
     createToast("กำลังส่งข้อความแจ้งเตือนไปยัง Telegram...", "info");
-    const icon = severity === 'CRITICAL' ? '🚨' : '⚠️';
-    const text = `${icon} <b>[${severity}]</b> ${message}\n📍 <b>พื้นที่:</b> จ.${province}\n⚙️ <b>การตอบสนองระบบ:</b> เปิดสัญญาณไฟไซเรนฉุกเฉิน | ปลดล็อกประตูอัตโนมัติ\n⏰ <b>เวลา:</b> ${new Date().toLocaleString('th-TH')}\n🌐 <b>โหนด:</b> Smart Building Command Center 2026`;
+    const prefix = severity === 'CRITICAL' ? '[CRITICAL HAZARD]' : '[WARNING]';
+    const text = `<b>${prefix}</b> ${message}\n<b>พื้นที่:</b> จ.${province}\n<b>การตอบสนองระบบ:</b> เปิดสัญญาณไฟไซเรนฉุกเฉิน | ปลดล็อกประตูอัตโนมัติ\n<b>เวลา:</b> ${new Date().toLocaleString('th-TH')}\n<b>โหนด:</b> Smart Building Command Center 2026`;
 
     try {
         if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID || TELEGRAM_BOT_TOKEN.includes('YOUR_') || TELEGRAM_CHAT_ID.includes('YOUR_')) {
@@ -350,7 +350,7 @@ export const sendTelegramAlert = async (message: string, severity: string, provi
         });
 
         if (resp.ok) {
-            createToast("ส่งแจ้งเตือนเข้า Telegram สำเร็จเรียบร้อย! 📱", "success");
+            createToast("ส่งแจ้งเตือนเข้า Telegram สำเร็จเรียบร้อย", "success");
         } else {
             const errData = await resp.json();
             createToast(`Telegram Error: ${errData.description || 'Failed'}`, "alert");

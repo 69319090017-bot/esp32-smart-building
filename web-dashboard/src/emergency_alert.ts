@@ -112,7 +112,7 @@ function speakAlert(text: string): void {
 function showBrowserNotification(title: string, body: string): void {
   if ('Notification' in window && Notification.permission === 'granted') {
     try {
-      new Notification(`🚨 ${title}`, {
+      new Notification(`[เตือนภัย] ${title}`, {
         body,
         icon: '/favicon.ico',
         requireInteraction: true,
@@ -198,7 +198,9 @@ export function showEmergencyAlert(
     <div class="ea-backdrop" id="eaBackdrop" role="presentation"></div>
     <div class="ea-dialog" role="alertdialog" aria-modal="true" aria-labelledby="eaTitle" aria-describedby="eaMsg">
       <div class="ea-header">
-        <div class="ea-siren-icon" aria-hidden="true">🚨</div>
+        <div class="ea-siren-icon" aria-hidden="true" style="display:flex;align-items:center;justify-content:center;">
+          <svg width="24" height="24" fill="none" stroke="#ff453a" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
         <div class="ea-header-text">
           <div class="ea-agency-label">${agency || 'กรมป้องกันและบรรเทาสาธารณภัย (ปภ.)'}</div>
           <div class="ea-system-label">ประกาศเตือนภัยฉุกเฉิน · Emergency Alert</div>
@@ -209,15 +211,15 @@ export function showEmergencyAlert(
       <p class="ea-message" id="eaMsg">${message}</p>
 
       <div class="ea-meta">
-        <span>📅 ${now}</span>
+        <span>เวลา: ${now}</span>
         <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="ea-source-link">
-          🔗 ดูต้นฉบับทางการ
+          ดูต้นฉบับทางการ ↗
         </a>
       </div>
 
       <div class="ea-actions">
-        <button class="ea-btn ea-btn-speak" id="eaSpeakBtn" type="button">🔊 ฟังประกาศ</button>
-        <button class="ea-btn ea-btn-dismiss" id="eaDismissBtn" type="button">✔ รับทราบ / ปิด</button>
+        <button class="ea-btn ea-btn-speak" id="eaSpeakBtn" type="button">ฟังประกาศ</button>
+        <button class="ea-btn ea-btn-dismiss" id="eaDismissBtn" type="button">รับทราบ / ปิด</button>
       </div>
 
       <div class="ea-countdown" id="eaCountdown">ปิดอัตโนมัติใน <span id="eaCountdownNum">30</span> วินาที</div>

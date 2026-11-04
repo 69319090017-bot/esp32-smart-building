@@ -29,7 +29,7 @@ const DEFAULT_CHANNELS: Esp32DeviceChannel[] = [
     id: 'esp32_mcu',
     name: 'บอร์ด ESP32 & เซนเซอร์ (MCU + DHT11 + PIR)',
     pin: 'Vin / 3.3V',
-    icon: '🎛️',
+    icon: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M3 9h2m-2 6h2m14-6h2m-2 6h2M7 5h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>',
     description: 'การกินไฟของชิป ESP32 (Wi-Fi เชื่อมต่อ) และเซนเซอร์วัดอุณหภูมิ/ความชื้น',
     watts: 1.0,
     isCurrentlyOn: true,
@@ -42,7 +42,7 @@ const DEFAULT_CHANNELS: Esp32DeviceChannel[] = [
     id: 'room_led',
     name: 'หลอดไฟห้อง (Room LED)',
     pin: 'GPIO26',
-    icon: '💡',
+    icon: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>',
     description: 'ควบคุมผ่าน Dashboard หรือระบบตรวจจับ PIR ปิดอัตโนมัติ 30 วินาที',
     watts: 10.0,
     isCurrentlyOn: false,
@@ -54,7 +54,7 @@ const DEFAULT_CHANNELS: Esp32DeviceChannel[] = [
     id: 'motion_led',
     name: 'ไฟแสดงตรวจจับความเคลื่อนไหว',
     pin: 'GPIO18',
-    icon: '🚶',
+    icon: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>',
     description: 'ไฟ LED แจ้งเตือนเมื่อ HC-SR501 ตรวจพบคน',
     watts: 0.1,
     isCurrentlyOn: false,
@@ -66,7 +66,7 @@ const DEFAULT_CHANNELS: Esp32DeviceChannel[] = [
     id: 'buzzer',
     name: 'สัญญาณเสียงไซเรน (Buzzer)',
     pin: 'I²S (GPIO 19/21/22)',
-    icon: '🔔',
+    icon: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>',
     description: 'ส่งเสียงเตือนสั้นเมื่อพบการเคลื่อนไหว หรือเสียงไซเรนฉุกเฉิน',
     watts: 0.5,
     isCurrentlyOn: false,
@@ -78,7 +78,7 @@ const DEFAULT_CHANNELS: Esp32DeviceChannel[] = [
     id: 'strobe_relay',
     name: 'รีเลย์ไฟสัญญาณฉุกเฉิน (Strobe)',
     pin: 'GPIO2',
-    icon: '🚨',
+    icon: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
     description: 'รีเลย์เปิดไฟเตือนภัยสภาพอากาศ/ภัยพิบัติ',
     watts: 5.0,
     isCurrentlyOn: false,
@@ -90,7 +90,7 @@ const DEFAULT_CHANNELS: Esp32DeviceChannel[] = [
     id: 'door_relay',
     name: 'รีเลย์ประตูกลอนฉุกเฉิน (Emergency Door)',
     pin: 'GPIO4',
-    icon: '🛑',
+    icon: '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>',
     description: 'รีเลย์ปลดล็อคประตูอัตโนมัติเมื่อเกิดเหตุฉุกเฉิน',
     watts: 3.0,
     isCurrentlyOn: false,
@@ -329,7 +329,7 @@ const renderChannelList = (): void => {
             <span class="channel-metric-label">กำลังไฟฟ้า (วัตต์)</span>
             <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 0.2rem;">
               <span class="channel-metric-val" style="color: var(--cyan-neon);">${ch.watts.toFixed(1)} W</span>
-              <button class="btn-edit-watt" data-id="${ch.id}" data-name="${ch.name}" data-watt="${ch.watts}" title="แก้ไขกำลังวัตต์">✏️</button>
+              <button class="btn-edit-watt" data-id="${ch.id}" data-name="${ch.name}" data-watt="${ch.watts}" title="แก้ไขกำลังวัตต์" style="display:inline-flex;align-items:center;justify-content:center;padding:3px 6px;border-radius:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--text-muted);cursor:pointer;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
             </div>
           </div>
           <div class="channel-metric-cell">

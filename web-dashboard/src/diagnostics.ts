@@ -130,8 +130,8 @@ export async function runAiSystemDiagnosis(): Promise<{
   }
 
   const summary = anomalies.length === 0
-    ? `✅ ระบบสมบูรณ์ 100%: Firebase เชื่อมต่อแบบมีสิทธิ์เข้าถึง (Authorized), ระบบเสียงแจ้งเตือนภาษาไทยพร้อมทำงาน, เซนเซอร์สภาพแวดล้อม DHT11 และ PIR สแตนด์บายปกติ พร้อมสำหรับ TechStack 2026`
-    : `⚠️ ตรวจพบข้อควรปรับปรุง ${anomalies.length} จุด: ${anomalies.join(' · ')}`;
+    ? `ระบบสมบูรณ์ 100%: Firebase เชื่อมต่อแบบมีสิทธิ์เข้าถึง (Authorized), ระบบเสียงแจ้งเตือนภาษาไทยพร้อมทำงาน, เซนเซอร์สภาพแวดล้อม DHT11 และ PIR สแตนด์บายปกติ`
+    : `ตรวจพบข้อควรปรับปรุง ${anomalies.length} จุด: ${anomalies.join(' · ')}`;
 
   // Update UI elements
   if (aiHealthScoreEl) {

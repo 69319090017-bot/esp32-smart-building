@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const section = UI.humidityDetailSection;
         if (section) {
             const isHidden = section.classList.contains('hidden');
-            UI.humidityDetailBtn.textContent = isHidden ? '💧 Humidity Detail' : '✖ Close Humidity Detail';
+            UI.humidityDetailBtn.textContent = isHidden ? 'รายละเอียดความชื้น' : 'ปิดรายละเอียด';
         }
     });
 
@@ -640,7 +640,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderPnaTestHistory();
 
         renderPnaTestAlert(JSON.stringify(alert), true);
-        createToast(`🔊 กระจายเสียงแจ้งเตือนออกลำโพงเรียบร้อย`, 'success');
+        createToast(`กระจายเสียงแจ้งเตือนออกลำโพงเรียบร้อย`, 'success');
         if (pnaQuickMessageInput) pnaQuickMessageInput.value = '';
     };
 
@@ -1157,126 +1157,6 @@ function updateCharts(data: HazardData, province: string): void {
         heatmapChart.render(hazardLevels);
     }
 }
-
-/**
- * Luxury Celestial Sparkle & Shockwave Burst Effect (เอฟเฟกต์ฟรุ้งฟริ้งระเบิดสะเก็ดดาวประกายแสงระดับพรีเมียม)
- */
-function initGlobalTouchBurstEffect(): void {
-    const handleBurst = (x: number, y: number) => {
-        if (!x && x !== 0) return;
-
-        // 1. Shockwave Ripple Ring (คลื่นวงแหวนแสงเรืองระเบิดออกทันทีที่แตะ)
-        const ring = document.createElement('div');
-        ring.className = 'spark-shockwave';
-        ring.style.left = `${x}px`;
-        ring.style.top = `${y}px`;
-        ring.style.width = '64px';
-        ring.style.height = '64px';
-        document.body.appendChild(ring);
-
-        ring.animate([
-            { transform: 'translate(-50%, -50%) scale(0.05)', opacity: 0.95 },
-            { transform: 'translate(-50%, -50%) scale(1.65)', opacity: 0 }
-        ], {
-            duration: 440,
-            easing: 'cubic-bezier(0.12, 0.9, 0.22, 1)'
-        }).onfinish = () => ring.remove();
-
-        // 2. Multi-tier Sparkling Celestial Particles (18 particles)
-        const particleCount = 18;
-        const starGlyphs = ['✦', '✧', '✶', '★', '✸'];
-
-        for (let i = 0; i < particleCount; i++) {
-            const isStar = i % 2 === 0;
-            const isDiamond = i % 4 === 1;
-            const p = document.createElement('div');
-
-            const size = Math.random() * 6 + 4;
-            if (isStar) {
-                p.className = 'spark-star';
-                p.textContent = starGlyphs[Math.floor(Math.random() * starGlyphs.length)];
-                p.style.fontSize = `${Math.random() * 12 + 10}px`;
-            } else if (isDiamond) {
-                p.className = 'spark-diamond';
-                p.style.width = `${size}px`;
-                p.style.height = `${size}px`;
-            } else {
-                p.className = 'spark-orb';
-                p.style.width = `${size}px`;
-                p.style.height = `${size}px`;
-            }
-
-            p.style.left = `${x}px`;
-            p.style.top = `${y}px`;
-            document.body.appendChild(p);
-
-            const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.45;
-            const velocity = Math.random() * 95 + 40;
-            const destX = Math.cos(angle) * velocity;
-            const destY = Math.sin(angle) * velocity + (Math.random() * 14 - 4);
-            const rotStart = Math.random() * 60 - 30;
-            const rotEnd = rotStart + (Math.random() > 0.5 ? 200 : -200);
-
-            const duration = Math.random() * 260 + 480;
-
-            p.animate([
-                { 
-                    transform: `translate(-50%, -50%) scale(0) rotate(${rotStart}deg)`, 
-                    opacity: 1 
-                },
-                { 
-                    transform: `translate(calc(-50% + ${destX * 0.4}px), calc(-50% + ${destY * 0.4}px)) scale(1.35) rotate(${rotStart + 60}deg)`, 
-                    opacity: 1, 
-                    offset: 0.25 
-                },
-                { 
-                    transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY + 16}px)) scale(0) rotate(${rotEnd}deg)`, 
-                    opacity: 0 
-                }
-            ], {
-                duration: duration,
-                easing: 'cubic-bezier(0.16, 1, 0.3, 1)'
-            }).onfinish = () => p.remove();
-        }
-    };
-
-    window.addEventListener('click', (e: MouseEvent) => {
-        handleBurst(e.clientX, e.clientY);
-    });
-
-    window.addEventListener('touchstart', (e: TouchEvent) => {
-        if (e.touches && e.touches[0]) {
-            handleBurst(e.touches[0].clientX, e.touches[0].clientY);
-        }
-    }, { passive: true });
-}
-initGlobalTouchBurstEffect();
-
-/**
- * Vercel-Style Interactive Ambient Spotlight (Follows mouse cursor smoothly)
- */
-function initVercelMouseSpotlight(): void {
-    const spotlight = document.getElementById('vercelMouseSpotlight');
-    if (!spotlight) return;
-
-    let ticking = false;
-    window.addEventListener('pointermove', (e: PointerEvent) => {
-        if (!ticking) {
-            window.requestAnimationFrame(() => {
-                document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
-                document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
-                spotlight.classList.add('active');
-                ticking = false;
-            });
-            ticking = true;
-        }
-    }, { passive: true });
-
-    window.addEventListener('pointerleave', () => {
-        spotlight.classList.remove('active');
-    });
-}
-initVercelMouseSpotlight();
 
 /**
  * Update connection status UI indicators

@@ -257,7 +257,7 @@ function announceOfficialAlert(alert: OfficialAlert): void {
   if (Array.from(text).length > 360) {
     text = `${Array.from(text).slice(0, 300).join('').replace(/[่้๊๋ัิีึืุู์ํ๎็]+$/u, '')} โปรดติดตามประกาศเพิ่มเติมจากหน่วยงานทางการ`;
   }
-  if (pnaOfficialStatus) pnaOfficialStatus.textContent = '🔊 กำลังส่งเสียงประกาศเตือนภัยผ่านลำโพง…';
+  if (pnaOfficialStatus) pnaOfficialStatus.textContent = 'กำลังส่งเสียงประกาศเตือนภัยผ่านลำโพง…';
 
   const button = document.querySelector<HTMLButtonElement>('#pnaRealSpeakBtn');
   if (button) button.disabled = true;
@@ -270,9 +270,9 @@ function announceOfficialAlert(alert: OfficialAlert): void {
 
   // 2. Also trigger ESP32 hardware announcement via Firebase
   void requestEsp32Announcement(text).then(() => {
-    if (pnaOfficialStatus) pnaOfficialStatus.textContent = '🔊 กำลังเล่นเสียงประกาศเตือนภัยผ่านลำโพงและ ESP32 เรียบร้อย';
+    if (pnaOfficialStatus) pnaOfficialStatus.textContent = 'กำลังเล่นเสียงประกาศเตือนภัยผ่านลำโพงและ ESP32 เรียบร้อย';
   }).catch(() => {
-    if (pnaOfficialStatus) pnaOfficialStatus.textContent = '🔊 กำลังเล่นเสียงประกาศผ่านลำโพงเรียบร้อย';
+    if (pnaOfficialStatus) pnaOfficialStatus.textContent = 'กำลังเล่นเสียงประกาศผ่านลำโพงเรียบร้อย';
   }).finally(() => {
     if (button?.isConnected) button.disabled = false;
   });
@@ -374,10 +374,10 @@ function renderPnaView() {
 
   if (pnaOfficialStatus) {
     if (activeAlerts.length > 0) {
-      pnaOfficialStatus.textContent = `🔴 จ.${selectedProvince}: มีประกาศเตือนภัยที่ยังมีผล ${activeAlerts.length} ฉบับ`;
+      pnaOfficialStatus.textContent = `จ.${selectedProvince}: มีประกาศเตือนภัยที่ยังมีผล ${activeAlerts.length} ฉบับ`;
       pnaOfficialStatus.className = 'metric-sticker sticker-heat';
     } else {
-      pnaOfficialStatus.textContent = `🟢 จ.${selectedProvince}: ไม่พบประกาศเตือนภัยที่ยังมีผล`;
+      pnaOfficialStatus.textContent = `จ.${selectedProvince}: ไม่พบประกาศเตือนภัยที่ยังมีผล`;
       pnaOfficialStatus.className = 'metric-sticker sticker-wind';
     }
     if (sourceHealthMessage) {
@@ -406,16 +406,16 @@ function renderPnaView() {
       </p>
       ${latest.effectiveThrough ? `
         <div style="font-size: 0.82rem; color: var(--yellow-warn); margin-bottom: 0.75rem;">
-          ⚠️ มีผลบังคับใช้ถึงวันที่: <strong>${escapeHtml(formatThaiDate(latest.effectiveThrough))}</strong>
+          มีผลบังคับใช้ถึงวันที่: <strong>${escapeHtml(formatThaiDate(latest.effectiveThrough))}</strong>
         </div>
       ` : ''}
       <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
         <button id="pnaRealSpeakBtn" class="btn btn-primary" type="button"
           title="แปลงข้อความประกาศเป็นเสียงภาษาไทยแล้วเล่นผ่านลำโพง PCM5102 ที่ต่อกับ ESP32">
-          🔊 ฟังประกาศผ่านลำโพง ESP32
+          ฟังประกาศผ่านลำโพง ESP32
         </button>
         <a class="btn btn-secondary" href="${escapeHtml(safeOfficialUrl(latest.sourceUrl))}" target="_blank" rel="noopener noreferrer">
-          🔗 ตรวจสอบต้นฉบับทางการ ↗
+          ตรวจสอบต้นฉบับทางการ ↗
         </a>
       </div>
       <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.65rem;">
@@ -479,10 +479,10 @@ function renderPnaView() {
             ${escapeHtml(alert.summary.slice(0, 160))}${alert.summary.length > 160 ? '...' : ''}
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: rgba(255, 255, 255, 0.45); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.4rem;">
-            <span>📅 ออกประกาศ: ${escapeHtml(alert.sourceDate || formatThaiDate(alert.dataDate))}</span>
+            <span>ออกประกาศ: ${escapeHtml(alert.sourceDate || formatThaiDate(alert.dataDate))}</span>
             <div style="display: flex; gap: 0.5rem; align-items: center;">
               <button type="button" class="btn btn-secondary history-speak-btn" style="padding: 0.2rem 0.65rem; font-size: 0.75rem; border-radius: 8px;">
-                🔊 ฟังเสียง
+                ฟังเสียง
               </button>
               <a href="${escapeHtml(safeOfficialUrl(alert.sourceUrl))}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none; font-weight: 500;">
                 ดูต้นฉบับ ↗
@@ -653,7 +653,7 @@ export async function checkOfficialAlerts() {
   if (officialCheckInFlight) return;
   officialCheckInFlight = true;
   if (pnaOfficialRefreshBtn) pnaOfficialRefreshBtn.disabled = true;
-  if (statusElement) statusElement.textContent = '🔄 กำลังดึงข้อมูลตรงจาก API ทางการ (TMD / ปภ.)...';
+  if (statusElement) statusElement.textContent = 'กำลังดึงข้อมูลตรงจาก API ทางการ (TMD / ปภ.)...';
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), 12000);
   try {
@@ -662,7 +662,7 @@ export async function checkOfficialAlerts() {
     if (directAlerts.length > 0) {
       sourceHealthMessage = ' · ดึงข้อมูลสดจาก API ทางการสำเร็จ';
       if (pnaOfficialStatus) {
-        pnaOfficialStatus.textContent = `🔴 มีประกาศเตือนภัยที่ยังมีผล ${directAlerts.length} ฉบับ`;
+        pnaOfficialStatus.textContent = `มีประกาศเตือนภัยที่ยังมีผล ${directAlerts.length} ฉบับ`;
         pnaOfficialStatus.className = 'metric-sticker sticker-heat';
       }
       if (pnaOfficialLastChecked) {
