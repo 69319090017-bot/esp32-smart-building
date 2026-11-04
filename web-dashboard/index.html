@@ -526,43 +526,43 @@
                         </p>
                     </div>
 
-                    <!-- Top Bar Chips -->
-                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
-                        <!-- Region Selector Chip -->
-                        <div class="card" style="padding: 0.75rem 1.25rem; flex-direction: row; align-items: center; gap: 0.75rem;">
-                            <div style="color: var(--color-fg-muted); display: flex; align-items: center;"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+                    <!-- Apple iOS Unified Status Strip (Reduced Tag Box Clutter) -->
+                    <div class="ios-status-strip" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; background: rgba(28, 28, 30, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 0.5px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 0.75rem 1.4rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+                        <!-- Region Selector -->
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="color: #0a84ff; display: flex; align-items: center;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
                             <div>
-                                <div class="label">Region</div>
-                                <select id="provinceSelect" style="background: transparent; color: var(--color-fg); border: none; font-size: 0.95rem; font-weight: 600; outline: none; cursor: pointer; padding: 0;">
+                                <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.55); font-weight: 500;">ภูมิภาค / จังหวัด</div>
+                                <select id="provinceSelect" style="background: transparent; color: #ffffff; border: none; font-size: 0.95rem; font-weight: 600; outline: none; cursor: pointer; padding: 0;">
                                     <!-- 77 provinces populated dynamically -->
                                 </select>
                             </div>
                         </div>
 
-                        <!-- Threat Level Chip -->
-                        <div class="card" style="padding: 0.75rem 1.25rem; flex-direction: row; align-items: center; gap: 0.75rem;">
+                        <!-- Threat Level -->
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
                             <div id="threatStatusDot" class="status-dot online"></div>
                             <div>
-                                <div class="label">Threat Level</div>
-                                <div id="highestThreatText" class="h3" style="color: var(--color-fg-muted); font-size: 0.95rem;">รอข้อมูล</div>
+                                <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.55); font-weight: 500;">ระดับความเสี่ยง</div>
+                                <div id="highestThreatText" class="h3" style="color: #ffffff; font-size: 0.95rem; font-weight: 600;">รอข้อมูล</div>
                             </div>
                         </div>
 
-                        <!-- System Uptime Chip -->
-                        <div class="card" style="padding: 0.75rem 1.25rem; flex-direction: row; align-items: center; gap: 0.75rem;">
-                            <div style="color: var(--color-fg-muted);"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                        <!-- System Uptime -->
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="color: rgba(235, 235, 245, 0.6); display: flex; align-items: center;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
                             <div>
-                                <div class="label">Uptime</div>
-                                <div id="uptimeDisplay" class="h3" style="font-size: 0.95rem;">00:00:00</div>
+                                <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.55); font-weight: 500;">เวลาทำงานระบบ</div>
+                                <div id="uptimeDisplay" class="h3" style="font-size: 0.95rem; font-weight: 600; color: #ffffff;">00:00:00</div>
                             </div>
                         </div>
 
-                        <!-- Last Update Chip -->
-                        <div class="card" style="padding: 0.75rem 1.25rem; flex-direction: row; align-items: center; gap: 0.75rem;">
-                            <div style="color: var(--color-fg-muted);"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg></div>
+                        <!-- Last Update -->
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="color: rgba(235, 235, 245, 0.6); display: flex; align-items: center;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg></div>
                             <div>
-                                <div class="label">Last Update</div>
-                                <div id="lastUpdateDisplay" class="h3" style="font-size: 0.95rem;">Just now</div>
+                                <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.55); font-weight: 500;">อัปเดตล่าสุด</div>
+                                <div id="lastUpdateDisplay" class="h3" style="font-size: 0.95rem; font-weight: 600; color: #ffffff;">Just now</div>
                             </div>
                         </div>
                     </div>
@@ -581,35 +581,48 @@
                         </div>
                     </div>
 
-                    <section class="card voice-panel" aria-labelledby="voice-panel-title">
-                        <div class="card-header">
-                            <div>
-                                <h2 id="voice-panel-title" class="voice-panel-title">ฟังสรุปสภาพอากาศ</h2>
-                                <p class="voice-panel-help">กดปุ่มใหญ่เพื่อฟังคำแนะนำภาษาไทย เสียงจะไม่เริ่มเองจนกว่าคุณจะกดเปิดเสียง</p>
+                    <section class="card card-apple-glass voice-panel" aria-labelledby="voice-panel-title">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(10, 132, 255, 0.15); border: 0.5px solid rgba(10, 132, 255, 0.3); display: flex; align-items: center; justify-content: center; color: #0a84ff;">
+                                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                                </div>
+                                <div>
+                                    <h2 id="voice-panel-title" class="voice-panel-title">ฟังสรุปสภาพอากาศด้วยเสียง</h2>
+                                    <p class="voice-panel-help">สรุปรายงานสภาพอากาศและคำแนะนำด้านความปลอดภัยด้วยเสียงพูดภาษาไทย</p>
+                                </div>
                             </div>
-                            <span class="label">เสียงจากเว็บ</span>
+                            <span class="label" style="background: rgba(10, 132, 255, 0.12); color: #0a84ff; border: 0.5px solid rgba(10, 132, 255, 0.25); padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600;">TH-TTS ENGINE</span>
                         </div>
                         <div class="voice-panel-body">
-                            <button id="weatherSpeakBtn" class="btn btn-primary voice-main-button" type="button" aria-label="ฟังสรุปสภาพอากาศและคำแนะนำภาษาไทย" style="display: inline-flex; align-items: center; gap: 0.4rem;">
-                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
-                                <span>ฟังสรุปตอนนี้</span>
-                            </button>
-                            <div class="voice-speed-control">
-                                <label for="speechRateSelect">ความเร็วเสียง</label>
-                                <select id="speechRateSelect" aria-label="เลือกความเร็วเสียงภาษาไทย">
-                                    <option value="0.75" selected>ชัดและเป็นธรรมชาติ แนะนำ</option>
-                                    <option value="0.7">ช้าลงอีก</option>
-                                    <option value="0.85">เร็วขึ้น</option>
-                                    <option value="0.95">เร็วที่สุด</option>
-                                </select>
+                            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <button id="weatherSpeakBtn" class="btn btn-primary voice-main-button" type="button" aria-label="ฟังสรุปสภาพอากาศและคำแนะนำภาษาไทย" style="display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0.65rem 1.4rem;">
+                                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>ฟังสรุปตอนนี้</span>
+                                </button>
+                                <span id="ttsStatus" class="voice-status" role="status" aria-live="off" aria-atomic="true" style="padding: 0.35rem 0.75rem; border-radius: 8px; background: rgba(255, 255, 255, 0.06); font-size: 0.8rem; color: rgba(235, 235, 245, 0.75);">พร้อมพูด</span>
                             </div>
-                            <div class="voice-speed-control">
-                                <label for="alertToneVolume">ความดังเสียงสัญญาณแจ้งเตือน</label>
-                                <input id="alertToneVolume" type="range" min="10" max="100" step="5" value="80" aria-label="ปรับความดังเสียงสัญญาณแจ้งเตือน">
-                                <output id="alertToneVolumeValue" for="alertToneVolume">80%</output>
-                                <small>ปรับระดับเสียงสัญญาณเตือน เสียงพูดปรับความดังเพิ่มได้จากอุปกรณ์</small>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.85rem; margin-top: 0.5rem;">
+                                <div class="voice-speed-control" style="max-width: 100%;">
+                                    <label for="speechRateSelect">ความเร็วเสียง</label>
+                                    <select id="speechRateSelect" aria-label="เลือกความเร็วเสียงภาษาไทย">
+                                        <option value="0.75" selected>ชัดและเป็นธรรมชาติ (แนะนำ)</option>
+                                        <option value="0.7">ช้าลงเล็กน้อย (ชัดถ้อยคำ)</option>
+                                        <option value="0.85">กระชับเร็วขึ้น</option>
+                                        <option value="0.95">เร็วที่สุด</option>
+                                    </select>
+                                </div>
+                                <div class="voice-speed-control" style="max-width: 100%;">
+                                    <label for="alertToneVolume">ความดังเสียงเตือน</label>
+                                    <div style="display: flex; align-items: center; gap: 0.6rem; width: 100%;">
+                                        <input id="alertToneVolume" type="range" min="10" max="100" step="5" value="80" aria-label="ปรับความดังเสียงสัญญาณแจ้งเตือน" style="flex: 1; accent-color: #0a84ff;">
+                                        <output id="alertToneVolumeValue" for="alertToneVolume" style="font-size: 0.82rem; font-weight: 600; min-width: 38px; color: #fff;">80%</output>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="voice-actions">
+
+                            <div class="voice-actions" style="margin-top: 0.5rem;">
                                 <button id="speechTestBtn" class="btn btn-secondary voice-control-button" type="button" aria-label="ทดลองฟังเสียงภาษาไทย">
                                     ทดลองเสียง
                                 </button>
@@ -625,33 +638,43 @@
                                     เปิดเสียงแจ้งเตือนใหม่
                                 </button>
                             </div>
-                            <p id="ttsStatus" class="voice-status" role="status" aria-live="off" aria-atomic="true">พร้อมพูด</p>
-                            <details class="voice-advanced">
-                                <summary>อ่านข้อความอื่น</summary>
-                                <label for="ttsText">ข้อความที่จะให้อ่าน</label>
-                                <textarea id="ttsText" class="voice-textarea" rows="3" placeholder="พิมพ์ข้อความภาษาไทยที่ต้องการให้พูด"></textarea>
-                                <button id="ttsSpeakBtn" class="btn btn-secondary voice-control-button" type="button" aria-label="อ่านออกเสียงข้อความที่พิมพ์">อ่านข้อความ</button>
+
+                            <details class="voice-advanced" style="margin-top: 0.5rem;">
+                                <summary style="cursor: pointer; color: rgba(235, 235, 245, 0.7); font-size: 0.82rem; user-select: none;">อ่านข้อความกำหนดเอง</summary>
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.65rem;">
+                                    <textarea id="ttsText" class="voice-textarea" rows="2" placeholder="พิมพ์ข้อความภาษาไทยที่ต้องการให้ระบบอ่านออกเสียง..."></textarea>
+                                    <button id="ttsSpeakBtn" class="btn btn-secondary voice-control-button" type="button" aria-label="อ่านออกเสียงข้อความที่พิมพ์" style="align-self: flex-start;">อ่านข้อความที่พิมพ์</button>
+                                </div>
                             </details>
                         </div>
                     </section>
 
-                    <section class="card official-alert-panel" aria-labelledby="official-alert-title">
-                        <div class="card-header">
-                            <div>
-                                <h2 id="official-alert-title">ประกาศเตือนภัยจาก ปภ. และกรมอุตุนิยมวิทยา</h2>
-                                <p class="official-alert-help">ประกาศจาก DDPM Alert Feed และหน้าประกาศกรมอุตุนิยมวิทยา แยกประกาศที่ยังมีผลจากประวัติ</p>
+                    <section class="card card-apple-glass official-alert-panel" aria-labelledby="official-alert-title">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 159, 10, 0.15); border: 0.5px solid rgba(255, 159, 10, 0.3); display: flex; align-items: center; justify-content: center; color: #ff9f0a;">
+                                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                </div>
+                                <div>
+                                    <h2 id="official-alert-title">ประกาศเตือนภัยทางการ ปภ. และกรมอุตุนิยมวิทยา</h2>
+                                    <p class="official-alert-help">ดึงข้อมูลสดจาก DDPM Alert Feed และหน้าประกาศกรมอุตุนิยมวิทยา</p>
+                                </div>
                             </div>
-                            <span class="label">แหล่งข้อมูลทางการ</span>
+                            <span class="label" style="background: rgba(255, 159, 10, 0.12); color: #ff9f0a; border: 0.5px solid rgba(255, 159, 10, 0.25); padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600;">DDPM & TMD LIVE</span>
                         </div>
-                        <p id="officialAlertStatus" class="official-alert-status" role="status" aria-live="off" aria-atomic="true">กำลังเตรียมตรวจข้อมูล</p>
-                        <p id="officialAlertCounts" class="official-alert-counts">กำลังนับประกาศ</p>
-                        <p id="officialAlertLastChecked" class="official-alert-checked">ยังไม่ได้ตรวจแหล่งข้อมูล</p>
+
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+                            <span id="officialAlertStatus" class="official-alert-status" role="status" aria-live="off" aria-atomic="true" style="padding: 0.25rem 0.65rem; border-radius: 8px; background: rgba(255, 255, 255, 0.06); font-size: 0.8rem; color: rgba(235, 235, 245, 0.75);">กำลังเตรียมตรวจข้อมูล</span>
+                            <span id="officialAlertCounts" class="official-alert-counts" style="padding: 0.25rem 0.65rem; border-radius: 8px; background: rgba(255, 255, 255, 0.06); font-size: 0.8rem; color: rgba(235, 235, 245, 0.75);">กำลังนับประกาศ</span>
+                            <span id="officialAlertLastChecked" class="official-alert-checked" style="padding: 0.25rem 0.65rem; border-radius: 8px; background: rgba(255, 255, 255, 0.06); font-size: 0.8rem; color: rgba(235, 235, 245, 0.55);">ยังไม่ได้ตรวจแหล่งข้อมูล</span>
+                        </div>
+
                         <div id="officialAlertLatest" class="official-alert-latest"></div>
                         <div class="official-alert-actions">
                             <button id="officialAlertSpeakBtn" class="btn btn-primary voice-control-button" type="button" aria-label="ฟังประกาศเตือนภัยล่าสุดที่ยังมีผล" disabled>ฟังประกาศล่าสุด</button>
                             <button id="officialAlertRepeatBtn" class="btn btn-secondary voice-control-button" type="button" aria-label="ฟังประกาศเตือนภัยล่าสุดซ้ำ">ฟังประกาศซ้ำ</button>
-                            <a href="https://capportal.apiddpm.com/" target="_blank" rel="noopener noreferrer">เปิด DDPM Alert Feed ทางการ ↗</a>
-                            <a href="https://www.tmd.go.th/warning-and-events/warning-storm" target="_blank" rel="noopener noreferrer">เปิดหน้าประกาศกรมอุตุนิยมวิทยา</a>
+                            <a href="https://capportal.apiddpm.com/" target="_blank" rel="noopener noreferrer" style="margin-left: 0.5rem;">เปิด DDPM Alert Feed ↗</a>
+                            <a href="https://www.tmd.go.th/warning-and-events/warning-storm" target="_blank" rel="noopener noreferrer">เปิดประกาศกรมอุตุฯ ↗</a>
                         </div>
                         <div id="officialAlertHistory" class="official-alert-history" aria-live="off"></div>
                     </section>
@@ -826,58 +849,127 @@
             <!-- ================= VIEW: HAZARDS DETAILED ================= -->
             <div id="view-hazards" class="view-section">
                 <section class="section">
-                    <div class="section-header">
-                        <span class="label">Threat Standards</span>
-                        <h2 class="h2">6-Dimensional Multi-Hazard Evaluation</h2>
+                    <div class="section-header" style="margin-bottom: 1.5rem;">
+                        <span class="label" style="font-size: 0.72rem; color: #0a84ff; font-weight: 600;">THREAT STANDARDS & EVALUATION</span>
+                        <h2 class="h2" style="font-size: 1.6rem; font-weight: 700; color: #ffffff; margin: 0.25rem 0 0.4rem;">เกณฑ์มาตรฐานการประเมินภัย 6 มิติ</h2>
+                        <p class="body" style="color: rgba(235, 235, 245, 0.65); font-size: 0.9rem; max-width: 720px; line-height: 1.5;">
+                            อ้างอิงตามมาตรฐานความปลอดภัยสาธารณะของ WHO, กรมอนามัย, กรมอุตุนิยมวิทยา และองค์การอุตุนิยมวิทยาโลก (WMO)
+                        </p>
                     </div>
 
-                    <div class="bento-grid">
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">1. UV Index</span></div>
-                            <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
-                                Measures ultraviolet radiation damage risk to skin and eyes.
+                    <div class="bento-grid" style="gap: 1rem;">
+                        <!-- 1. UV Index -->
+                        <div class="card card-apple-glass col-span-3" style="padding: 1.25rem 1.4rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(255, 159, 10, 0.15); border: 0.5px solid rgba(255, 159, 10, 0.3); display: flex; align-items: center; justify-content: center; color: #ff9f0a;">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m14.14-14.14l-1.41 1.41"/></svg>
+                                </div>
+                                <div>
+                                    <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.5);">DIMENSION 01</div>
+                                    <h3 class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">ดัชนีรังสีอัลตราไวโอเลต (UV)</h3>
+                                </div>
+                            </div>
+                            <p class="body" style="font-size: 0.85rem; color: rgba(235, 235, 245, 0.65); line-height: 1.5; margin-bottom: 0.85rem;">
+                                ตรวจวัดความเข้มข้นของรังสี UV ที่ส่งผลกระทบต่อผิวหนังและจอประสาทตา
                             </p>
-                            <div class="label" style="color: var(--color-accent-bright);">WHO: ป้องกันแดดเมื่อ UV ตั้งแต่ 3 · หลีกเลี่ยงแดดกลางวันเมื่อ UV ตั้งแต่ 8</div>
+                            <div style="padding: 0.5rem 0.75rem; border-radius: 8px; background: rgba(255, 159, 10, 0.08); border: 0.5px solid rgba(255, 159, 10, 0.2); font-size: 0.78rem; color: #ff9f0a; font-weight: 500;">
+                                WHO: ป้องกันแดดเมื่อ UV ตั้งแต่ 3 · เลี่ยงแดดกลางแจ้งตั้งแต่ UV 8
+                            </div>
                         </div>
 
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">2. Heat Index (Apparent Temp)</span></div>
-                            <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
-                                Calculates apparent temperature based on temperature and relative humidity.
+                        <!-- 2. Heat Index -->
+                        <div class="card card-apple-glass col-span-3" style="padding: 1.25rem 1.4rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(255, 69, 58, 0.15); border: 0.5px solid rgba(255, 69, 58, 0.3); display: flex; align-items: center; justify-content: center; color: #ff453a;">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z"/></svg>
+                                </div>
+                                <div>
+                                    <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.5);">DIMENSION 02</div>
+                                    <h3 class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">ดัชนีความร้อน (Heat Index)</h3>
+                                </div>
+                            </div>
+                            <p class="body" style="font-size: 0.85rem; color: rgba(235, 235, 245, 0.65); line-height: 1.5; margin-bottom: 0.85rem;">
+                                คำนวณอุณหภูมิที่ร่างกายมนุษย์รู้สึกจริงร่วมกับความชื้นสัมพัทธ์ในอากาศ
                             </p>
-                            <div class="label" style="color: var(--color-accent-bright);">กรมอนามัย: เฝ้าระวัง 27–32.9 · เตือนภัย 33–41.9 · อันตราย 42–51.9 · อันตรายมากตั้งแต่ 52°C</div>
+                            <div style="padding: 0.5rem 0.75rem; border-radius: 8px; background: rgba(255, 69, 58, 0.08); border: 0.5px solid rgba(255, 69, 58, 0.2); font-size: 0.78rem; color: #ff453a; font-weight: 500;">
+                                กรมอนามัย: เฝ้าระวัง 27–32.9 · เตือนภัย 33–41.9 · อันตราย ≥ 42°C
+                            </div>
                         </div>
 
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">3. Thunderstorm & Hail</span></div>
-                            <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
-                                Evaluates convective storm risks according to WMO interpretation codes.
+                        <!-- 3. Thunderstorm & Hail -->
+                        <div class="card card-apple-glass col-span-3" style="padding: 1.25rem 1.4rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(191, 90, 242, 0.15); border: 0.5px solid rgba(191, 90, 242, 0.3); display: flex; align-items: center; justify-content: center; color: #bf5af2;">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </div>
+                                <div>
+                                    <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.5);">DIMENSION 03</div>
+                                    <h3 class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">พายุฝนฟ้าคะนอง & ลูกเห็บ</h3>
+                                </div>
+                            </div>
+                            <p class="body" style="font-size: 0.85rem; color: rgba(235, 235, 245, 0.65); line-height: 1.5; margin-bottom: 0.85rem;">
+                                ตรวจจับรหัสสภาพอากาศรุนแรงตามมาตรฐานสากลของ WMO Weather Codes
                             </p>
-                            <div class="label" style="color: var(--color-accent-bright);">WMO 95: Thunderstorm · WMO 96/99: Severe Hailstorm</div>
+                            <div style="padding: 0.5rem 0.75rem; border-radius: 8px; background: rgba(191, 90, 242, 0.08); border: 0.5px solid rgba(191, 90, 242, 0.2); font-size: 0.78rem; color: #bf5af2; font-weight: 500;">
+                                WMO 95: ฝนฟ้าคะนอง · WMO 96/99: พายุฝนฟ้าคะนองมีลูกเห็บรุนแรง
+                            </div>
                         </div>
 
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">4. Wind Gusts</span></div>
-                            <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
-                                Peak sudden wind speed measured at 10m height.
+                        <!-- 4. Wind Gusts -->
+                        <div class="card card-apple-glass col-span-3" style="padding: 1.25rem 1.4rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(100, 210, 255, 0.15); border: 0.5px solid rgba(100, 210, 255, 0.3); display: flex; align-items: center; justify-content: center; color: #64d2ff;">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"/></svg>
+                                </div>
+                                <div>
+                                    <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.5);">DIMENSION 04</div>
+                                    <h3 class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">ความเร็วลมกระโชก (Wind Gusts)</h3>
+                                </div>
+                            </div>
+                            <p class="body" style="font-size: 0.85rem; color: rgba(235, 235, 245, 0.65); line-height: 1.5; margin-bottom: 0.85rem;">
+                                วัดค่าความเร็วลมสูงสุดฉับพลันที่ระดับความสูง 10 เมตรเหนือพื้นดิน
                             </p>
-                            <div class="label" style="color: var(--color-accent-bright);">แสดงค่าลมกระโชกเท่านั้น · ใช้ประกาศกรมอุตุนิยมวิทยาสำหรับระดับอันตราย</div>
+                            <div style="padding: 0.5rem 0.75rem; border-radius: 8px; background: rgba(100, 210, 255, 0.08); border: 0.5px solid rgba(100, 210, 255, 0.2); font-size: 0.78rem; color: #64d2ff; font-weight: 500;">
+                                ติดตามประกาศเตือนภัยลมกระโชกแรงจากกรมอุตุนิยมวิทยาในพื้นที่
+                            </div>
                         </div>
 
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">5. Rainfall Accumulation</span></div>
-                            <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
-                                Precipitation volume over the preceding hour.
+                        <!-- 5. Rainfall -->
+                        <div class="card card-apple-glass col-span-3" style="padding: 1.25rem 1.4rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(48, 209, 88, 0.15); border: 0.5px solid rgba(48, 209, 88, 0.3); display: flex; align-items: center; justify-content: center; color: #30d158;">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                                </div>
+                                <div>
+                                    <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.5);">DIMENSION 05</div>
+                                    <h3 class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">ปริมาณฝนสะสม (Rainfall)</h3>
+                                </div>
+                            </div>
+                            <p class="body" style="font-size: 0.85rem; color: rgba(235, 235, 245, 0.65); line-height: 1.5; margin-bottom: 0.85rem;">
+                                ปริมาณน้ำฝนที่ตกสะสมในรอบ 1 ชั่วโมงเพื่อประเมินความเสี่ยงน้ำท่วมขัง
                             </p>
-                            <div class="label" style="color: var(--color-accent-bright);">กรมอุตุนิยมวิทยา: ฝนหนัก 25.1–50.0 · ฝนหนักมากตั้งแต่ 50.1 มม./ชั่วโมง</div>
+                            <div style="padding: 0.5rem 0.75rem; border-radius: 8px; background: rgba(48, 209, 88, 0.08); border: 0.5px solid rgba(48, 209, 88, 0.2); font-size: 0.78rem; color: #30d158; font-weight: 500;">
+                                กรมอุตุนิยมวิทยา: ฝนหนัก 25.1–50.0 · ฝนหนักมาก ≥ 50.1 มม./ชม.
+                            </div>
                         </div>
 
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header"><span class="label">6. River Discharge</span></div>
-                            <p class="body" style="font-size: 0.9rem; color: var(--color-fg-muted); margin-bottom: 1rem;">
-                                Streamflow volume modeling from Open-Meteo Flood API.
+                        <!-- 6. River Discharge -->
+                        <div class="card card-apple-glass col-span-3" style="padding: 1.25rem 1.4rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(10, 132, 255, 0.15); border: 0.5px solid rgba(10, 132, 255, 0.3); display: flex; align-items: center; justify-content: center; color: #0a84ff;">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>
+                                </div>
+                                <div>
+                                    <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.5);">DIMENSION 06</div>
+                                    <h3 class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">อัตราไหลของลำน้ำ (Discharge)</h3>
+                                </div>
+                            </div>
+                            <p class="body" style="font-size: 0.85rem; color: rgba(235, 235, 245, 0.65); line-height: 1.5; margin-bottom: 0.85rem;">
+                                แบบจำลองอุทกวิทยาจาก Open-Meteo Flood API สำหรับเฝ้าระวังน้ำล้นตลิ่ง
                             </p>
-                            <div class="label" style="color: var(--color-accent-bright);">ไม่มีเกณฑ์น้ำหลากค่าเดียวที่ใช้ได้ทุกแม่น้ำ · ต้องเทียบระดับกับสถานีเฉพาะจุด</div>
+                            <div style="padding: 0.5rem 0.75rem; border-radius: 8px; background: rgba(10, 132, 255, 0.08); border: 0.5px solid rgba(10, 132, 255, 0.2); font-size: 0.78rem; color: #0a84ff; font-weight: 500;">
+                                เฝ้าระวังระดับน้ำร่วมกับสถานีวัดระดับน้ำท้องถิ่นเฉพาะจุด
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -898,93 +990,129 @@
             <!-- ================= VIEW: CONTROLS ================= -->
             <div id="view-controls" class="view-section">
                 <section class="section">
-                    <div class="section-header">
-                        <span class="label">Manual Dispatch</span>
-                        <h2 class="h2">Building Safety Actuator Controls</h2>
+                    <div class="section-header" style="margin-bottom: 1.5rem;">
+                        <span class="label" style="font-size: 0.72rem; color: #0a84ff; font-weight: 600;">MANUAL DISPATCH & ACTUATORS</span>
+                        <h2 class="h2" style="font-size: 1.6rem; font-weight: 700; color: #ffffff; margin: 0.25rem 0 0.4rem;">สวิตช์สั่งการอุปกรณ์นิรภัยฉุกเฉิน</h2>
+                        <p class="body" style="color: rgba(235, 235, 245, 0.65); font-size: 0.9rem; max-width: 720px; line-height: 1.5;">
+                            สั่งงานรีเลย์ไฟสัญญาณฉุกเฉิน กลอนประตูแม่เหล็ก ไซเรนแจ้งเตือน และบอทกระจายข่าว Telegram แบบ Real-time
+                        </p>
                     </div>
 
-                    <div class="bento-grid">
-                        <div class="card card-spotlight col-span-6">
-                            <div class="card-header">
-                                <span class="label">Dispatch Timing & Effects</span>
-                            </div>
-                            <div class="card-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: end;">
-                                <label style="display: flex; flex-direction: column; gap: 0.5rem; color: var(--color-fg-muted); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em;">
-                                    Delay Trigger
-                                    <select id="actionDelaySelect" class="dispatch-select" style="width: 100%;">
-                                        <option value="0">Instant</option>
-                                        <option value="1">1 sec</option>
-                                        <option value="3">3 sec</option>
-                                        <option value="5">5 sec</option>
-                                        <option value="10">10 sec</option>
-                                    </select>
-                                </label>
-                                <label style="display: flex; flex-direction: column; gap: 0.5rem; color: var(--color-fg-muted); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em;">
-                                    Effect
-                                    <select id="actionEffectSelect" class="dispatch-select" style="width: 100%;">
-                                        <option value="pulse">Pulse</option>
-                                        <option value="flash">Flash</option>
-                                        <option value="siren">Siren</option>
-                                        <option value="burst">Burst</option>
-                                        <option value="none">None</option>
-                                    </select>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Strobe Control -->
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header">
-                                <span class="label">Strobe Alarm Relay (GPIO 2)</span>
-                            </div>
-                            <div class="card-content" style="justify-content: space-between;">
-                                <p style="color: var(--color-fg-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
-                                    Toggles the physical high-intensity warning strobe light.
-                                </p>
-                                <button id="toggleStrobeBtn" class="btn btn-primary" style="width: 100%;">Toggle Strobe Alarm</button>
-                            </div>
-                        </div>
-
-                        <!-- Emergency Door Control -->
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header">
-                                <span class="label">Emergency Doors (GPIO 4)</span>
-                            </div>
-                            <div class="card-content" style="justify-content: space-between;">
-                                <p style="color: var(--color-fg-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
-                                    Releases magnetic door locks for emergency evacuation.
-                                </p>
-                                <button id="toggleDoorBtn" class="btn btn-primary" style="width: 100%;">Release Doors (Unlock)</button>
-                            </div>
-                        </div>
-
-                        <!-- Siren & Voice Control -->
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header">
-                                <span class="label">Audio Alarm & Siren</span>
-                            </div>
-                            <div class="card-content" style="justify-content: space-between;">
-                                <p style="color: var(--color-fg-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
-                                    Controls siren tone and voice announcements.
-                                </p>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                                    <button id="silenceAudioBtn" class="btn btn-secondary">Silence</button>
-                                    <button id="testAudioBtn" class="btn btn-primary">Test Siren</button>
+                    <div class="bento-grid" style="gap: 1rem;">
+                        <!-- Dispatch Timing & Effects Config Tile -->
+                        <div class="card card-apple-glass col-span-6" style="padding: 1.25rem 1.4rem;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                                    <div style="width: 34px; height: 34px; border-radius: 9px; background: rgba(10, 132, 255, 0.15); border: 0.5px solid rgba(10, 132, 255, 0.3); display: flex; align-items: center; justify-content: center; color: #0a84ff;">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <div class="label" style="font-size: 0.68rem; color: rgba(235, 235, 245, 0.5);">DISPATCH PARAMETERS</div>
+                                        <div class="h3" style="font-size: 0.95rem; font-weight: 600; color: #ffffff;">ตั้งค่าหน่วงเวลาและเอฟเฟกต์การสั่งการ</div>
+                                    </div>
                                 </div>
                             </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                                <label style="display: flex; flex-direction: column; gap: 0.4rem; color: rgba(235, 235, 245, 0.7); font-size: 0.82rem; font-weight: 500;">
+                                    ระยะเวลาหน่วงก่อนสั่งงาน (Delay)
+                                    <select id="actionDelaySelect" class="dispatch-select" style="width: 100%; min-height: 42px; background: rgba(0,0,0,0.35); border: 0.5px solid rgba(255,255,255,0.14); border-radius: 10px; color: #ffffff; padding: 0.4rem 0.8rem; font-size: 0.88rem;">
+                                        <option value="0">ทันที (Instant)</option>
+                                        <option value="1">1 วินาที (1 sec)</option>
+                                        <option value="3">3 วินาที (3 sec)</option>
+                                        <option value="5">5 วินาที (5 sec)</option>
+                                        <option value="10">10 วินาที (10 sec)</option>
+                                    </select>
+                                </label>
+                                <label style="display: flex; flex-direction: column; gap: 0.4rem; color: rgba(235, 235, 245, 0.7); font-size: 0.82rem; font-weight: 500;">
+                                    รูปแบบสัญญาณเอฟเฟกต์ (Effect)
+                                    <select id="actionEffectSelect" class="dispatch-select" style="width: 100%; min-height: 42px; background: rgba(0,0,0,0.35); border: 0.5px solid rgba(255,255,255,0.14); border-radius: 10px; color: #ffffff; padding: 0.4rem 0.8rem; font-size: 0.88rem;">
+                                        <option value="pulse">ชีพจร (Pulse)</option>
+                                        <option value="flash">กะพริบรัว (Flash)</option>
+                                        <option value="siren">เสียงหวูดไซเรน (Siren)</option>
+                                        <option value="burst">ระเบิดสัญญาณ (Burst)</option>
+                                        <option value="none">ปกติ (None)</option>
+                                    </select>
+                                </label>
+                            </div>
                         </div>
 
-                        <!-- Telegram Bot Dispatch -->
-                        <div class="card card-spotlight col-span-3">
-                            <div class="card-header">
-                                <span class="label">Telegram Dispatch</span>
-                            </div>
-                            <div class="card-content" style="justify-content: space-between;">
-                                <p style="color: var(--color-fg-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
-                                    Sends immediate test emergency notification to Telegram chat.
+                        <!-- 1. Strobe Control Tile -->
+                        <div class="card card-apple-glass col-span-3" style="padding: 1.25rem 1.4rem; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                    <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 159, 10, 0.15); border: 0.5px solid rgba(255, 159, 10, 0.3); display: flex; align-items: center; justify-content: center; color: #ff9f0a;">
+                                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.5);">RELAY · GPIO 2</div>
+                                        <h3 class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">ไฟไซเรนฉุกเฉิน</h3>
+                                    </div>
+                                </div>
+                                <p class="body" style="color: rgba(235, 235, 245, 0.65); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.25rem;">
+                                    ควบคุมเปิด/ปิดไฟกะพริบแจ้งเตือนระดับสูง สั่งงานตรงผ่านรีเลย์ฮาร์ดแวร์
                                 </p>
-                                <button id="testTelegramBtn" class="btn btn-primary" style="width: 100%;">Send Telegram Alert</button>
                             </div>
+                            <button id="toggleStrobeBtn" class="btn btn-primary" style="width: 100%; min-height: 44px;">สลับสถานะไฟไซเรน</button>
+                        </div>
+
+                        <!-- 2. Emergency Door Control Tile -->
+                        <div class="card card-apple-glass col-span-3" style="padding: 1.25rem 1.4rem; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                    <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(10, 132, 255, 0.15); border: 0.5px solid rgba(10, 132, 255, 0.3); display: flex; align-items: center; justify-content: center; color: #0a84ff;">
+                                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.5);">RELAY · GPIO 4</div>
+                                        <h3 class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">กลอนประตูฉุกเฉิน</h3>
+                                    </div>
+                                </div>
+                                <p class="body" style="color: rgba(235, 235, 245, 0.65); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.25rem;">
+                                    ปลดล็อกกลอนแม่เหล็กไฟฟ้าทันทีเพื่อเปิดช่องทางอพยพกรณีเกิดภัยพิบัติ
+                                </p>
+                            </div>
+                            <button id="toggleDoorBtn" class="btn btn-primary" style="width: 100%; min-height: 44px;">ปลดล็อกประตูฉุกเฉิน</button>
+                        </div>
+
+                        <!-- 3. Siren & Voice Control Tile -->
+                        <div class="card card-apple-glass col-span-3" style="padding: 1.25rem 1.4rem; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                    <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(191, 90, 242, 0.15); border: 0.5px solid rgba(191, 90, 242, 0.3); display: flex; align-items: center; justify-content: center; color: #bf5af2;">
+                                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.5);">I²S DAC & BUZZER</div>
+                                        <h3 class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">ไซเรน & เสียงเตือนภัย</h3>
+                                    </div>
+                                </div>
+                                <p class="body" style="color: rgba(235, 235, 245, 0.65); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.25rem;">
+                                    ควบคุมสัญญาณเสียงไซเรนความถี่สูงและเสียงประกาศเตือนภัยภาษาไทย
+                                </p>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
+                                <button id="silenceAudioBtn" class="btn btn-secondary" style="min-height: 44px;">ปิดเสียง</button>
+                                <button id="testAudioBtn" class="btn btn-primary" style="min-height: 44px;">ทดสอบไซเรน</button>
+                            </div>
+                        </div>
+
+                        <!-- 4. Telegram Bot Dispatch Tile -->
+                        <div class="card card-apple-glass col-span-3" style="padding: 1.25rem 1.4rem; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                    <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(100, 210, 255, 0.15); border: 0.5px solid rgba(100, 210, 255, 0.3); display: flex; align-items: center; justify-content: center; color: #64d2ff;">
+                                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="label" style="font-size: 0.7rem; color: rgba(235, 235, 245, 0.5);">TELEGRAM BOT API</div>
+                                        <h3 class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">แจ้งเตือนผ่าน Telegram</h3>
+                                    </div>
+                                </div>
+                                <p class="body" style="color: rgba(235, 235, 245, 0.65); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.25rem;">
+                                    ส่งข้อความแจ้งเตือนภัยฉุกเฉินแบบทันทีเข้ากลุ่มแชตเจ้าหน้าที่ดูแลอาคาร
+                                </p>
+                            </div>
+                            <button id="testTelegramBtn" class="btn btn-primary" style="width: 100%; min-height: 44px;">ส่งแจ้งเตือน Telegram</button>
                         </div>
                     </div>
                 </section>
@@ -1021,65 +1149,65 @@
 
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.25rem;">
                             <!-- Latest Real Alert Card -->
-                            <article class="card card-apple-glass" style="padding: 1.5rem; border-left: 3px solid var(--magenta-neon) !important;">
-                                <div class="card-header" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                                    <div class="h3" style="font-size: 1.15rem; font-weight: 700; color: #ffffff;">ประกาศเตือนภัยล่าสุดที่ยังมีผล</div>
-                                    <span class="label" style="background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem;">ประกาศด่วนทางการ</span>
+                            <article class="card card-apple-glass" style="padding: 1.4rem; border-left: 3px solid #ff453a !important;">
+                                <div class="card-header" style="margin-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="h3" style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">ประกาศเตือนภัยล่าสุดที่ยังมีผล</div>
+                                    <span class="label" style="background: rgba(255, 69, 58, 0.15); color: #ff453a; border: 0.5px solid rgba(255, 69, 58, 0.35); padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600;">ประกาศด่วนทางการ</span>
                                 </div>
                                 <div id="pnaOfficialLatest">
-                                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">กำลังโหลดข้อมูลประกาศเตือนภัยทางการ...</p>
+                                    <p style="color: rgba(235, 235, 245, 0.6); font-size: 0.88rem;">กำลังโหลดข้อมูลประกาศเตือนภัยทางการ...</p>
                                 </div>
                             </article>
 
                             <!-- Official Archive List Card -->
-                            <article class="card card-apple-glass" style="padding: 1.5rem; display: flex; flex-direction: column;">
-                                <div class="card-header" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                                    <div class="h3" style="font-size: 1.15rem; font-weight: 700; color: #ffffff;">ประวัติประกาศเตือนภัยทางการย้อนหลัง</div>
-                                    <span class="label" style="background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.16); padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem;">คลังประวัติ ปภ. & กรมอุตุฯ</span>
+                            <article class="card card-apple-glass" style="padding: 1.4rem; display: flex; flex-direction: column;">
+                                <div class="card-header" style="margin-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="h3" style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">ประวัติประกาศเตือนภัยทางการย้อนหลัง</div>
+                                    <span class="label" style="background: rgba(255, 255, 255, 0.08); color: rgba(235, 235, 245, 0.7); border: 0.5px solid rgba(255, 255, 255, 0.14); padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem;">คลังประวัติ ปภ. & TMD</span>
                                 </div>
                                 <div id="pnaOfficialHistory" style="flex: 1; max-height: 520px; overflow-y: auto; padding-right: 0.35rem;">
-                                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">กำลังโหลดประวัติประกาศ...</p>
+                                    <p style="color: rgba(235, 235, 245, 0.6); font-size: 0.88rem;">กำลังโหลดประวัติประกาศ...</p>
                                 </div>
                             </article>
                         </div>
                     </div>
 
                     <!-- 2. TEST & SIMULATION SECTION -->
-                    <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem;">
+                    <div style="border-top: 0.5px solid rgba(255, 255, 255, 0.08); padding-top: 1.5rem;">
                         <div class="section-header" style="margin-bottom: 1rem;">
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span class="metric-sticker">พื้นที่ทดสอบ (Test Mode)</span>
-                                <span class="label" style="color: var(--color-fg-muted);">จำลองการส่งข้อความแจ้งเตือน</span>
+                                <span class="metric-sticker" style="background: rgba(255, 159, 10, 0.12); color: #ff9f0a; border: 0.5px solid rgba(255, 159, 10, 0.3);">พื้นที่ทดสอบ (Test Mode)</span>
+                                <span class="label" style="color: rgba(235, 235, 245, 0.6);">จำลองการส่งข้อความแจ้งเตือน</span>
                             </div>
                         </div>
 
-                        <div class="pna-test-intro card card-spotlight" style="margin-bottom: 1.25rem;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                        <div class="card card-apple-glass pna-test-intro" style="margin-bottom: 1.25rem;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; width: 100%;">
                                 <div>
                                     <span class="pna-test-badge">ระบบกระจายเสียงเตือนอัตโนมัติ (Online)</span>
-                                    <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.25rem;">
+                                    <p style="font-size: 0.85rem; color: rgba(235, 235, 245, 0.65); margin-top: 0.25rem;">
                                         เมื่อมีข้อความแจ้งเตือนเข้ามา ระบบจะส่งเสียงกริ่งสัญญาณและอ่านออกลำโพงคอมพิวเตอร์/มือถือ และ ESP32 โดยอัตโนมัติ
                                     </p>
                                 </div>
                                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                    <button id="pnaTestSpeakerToneBtn" class="btn btn-secondary" type="button" title="ทดสอบเสียงกริ่งสัญญาณเตือน">
+                                    <button id="pnaTestSpeakerToneBtn" class="btn btn-secondary" type="button" title="ทดสอบเสียงกริ่งสัญญาณเตือน" style="font-size: 0.82rem; padding: 0.45rem 0.85rem;">
                                         ทดสอบเสียงกริ่ง
                                     </button>
-                                    <a class="btn btn-secondary" href="/pna-test.html" target="_blank" rel="noopener noreferrer">
+                                    <a class="btn btn-secondary" href="/pna-test.html" target="_blank" rel="noopener noreferrer" style="font-size: 0.82rem; padding: 0.45rem 0.85rem;">
                                         เปิดหน้าแยก ↗
                                     </a>
                                 </div>
                             </div>
                             <div style="display: flex; gap: 0.6rem; margin-top: 1rem; flex-wrap: wrap; width: 100%;">
                                 <input id="pnaQuickMessageInput" type="text" placeholder="พิมพ์ข้อความแจ้งเตือนที่ต้องการให้ออกลำโพง เช่น ระวังพายุฤดูร้อน ลมกระโชกแรง..." 
-                                       style="flex: 1; min-width: 250px; padding: 0.65rem 1rem; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18); color: #fff; font-size: 0.95rem; outline: none; transition: border-color 0.2s;">
-                                <button id="pnaQuickSendBtn" class="btn btn-primary" type="button" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.25rem; font-weight: 600;">
+                                       style="flex: 1; min-width: 250px; min-height: 44px; padding: 0.65rem 1rem; border-radius: 12px; background: rgba(0, 0, 0, 0.35); border: 0.5px solid rgba(255,255,255,0.14); color: #fff; font-size: 0.9rem; outline: none;">
+                                <button id="pnaQuickSendBtn" class="btn btn-primary" type="button" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.25rem; font-weight: 600; min-height: 44px;">
                                     <span>ส่งเสียงออกลำโพงทันที</span>
                                 </button>
                             </div>
                         </div>
 
-                        <div id="pnaTestEmpty" class="card pna-test-empty" role="status" style="margin-bottom: 1.25rem;">
+                        <div id="pnaTestEmpty" class="card card-apple-glass pna-test-empty" role="status" style="margin-bottom: 1.25rem;">
                             ยังไม่มีข้อความทดสอบ เปิดหน้ากรอกข้อความแล้วกดส่งเพื่อทดลองได้
                         </div>
 

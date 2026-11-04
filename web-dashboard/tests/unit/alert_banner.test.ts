@@ -117,8 +117,8 @@ describe('Alert banner workflow', () => {
     const msg = document.getElementById('alertBannerMsg');
 
     expect(banner?.style.display).toBe('block');
-    expect(title?.textContent).toContain('CRITICAL');
-    expect(msg?.textContent).toContain('วิกฤต');
+    expect(title?.textContent).toContain('อันตราย');
+    expect(msg?.textContent).toContain('กรุงเทพมหานคร');
 
     vi.useFakeTimers();
     vi.clearAllMocks();
@@ -137,8 +137,8 @@ describe('Alert banner workflow', () => {
     expect(window.speechSynthesis.speak).toHaveBeenCalled();
     const utterance = window.speechSynthesis.speak.mock.calls[0][0];
     expect(utterance.lang).toBe('th-TH');
-    expect(utterance.rate).toBe(0.8);
-    expect(utterance.pitch).toBe(1.08);
+    expect(utterance.rate).toBe(0.85);
+    expect(utterance.pitch).toBe(1);
     vi.useRealTimers();
   });
 });

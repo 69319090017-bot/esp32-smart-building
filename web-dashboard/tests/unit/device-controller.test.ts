@@ -356,8 +356,8 @@ describe('Outdoor AI Summary', () => {
     const result = buildOutdoorReadinessSummary(37.4, 85, 23.2, 12, 39, 9, 95);
 
     expect(result.status).toBe('NOT READY');
-    expect(result.summary).toContain('ไม่ควรออกจากบ้าน');
-    expect(result.action).toContain('อยู่ในบ้านก่อน');
+    expect(result.summary).toContain('พบปัจจัยที่ควรระวัง');
+    expect(result.action).toContain('ลดกิจกรรมกลางแจ้ง');
   });
 
   it('should deduplicate Telegram alerts for the same risk state', () => {

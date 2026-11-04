@@ -594,14 +594,33 @@ img:hover,
   --apple-label: #ffffff;
   --apple-secondary-label: #8e8e93;
   --apple-tertiary-label: #636366;
-  --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Prompt", system-ui, sans-serif;
+  --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Sukhumvit Set", "Thonburi", "Prompt", system-ui, sans-serif;
+  --font-mono-apple: "SF Mono", "JetBrains Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+/* Universal 100% Apple Typography Coverage */
+*, *::before, *::after,
+html, body,
+input, button, select, textarea,
+h1, h2, h3, h4, h5, h6,
+p, span, a, label,
+table, th, td,
+.btn, .label, .card, .card-header, .card-content, .h1, .h2, .h3, .display-text, .metric-sticker, .nav-text, .tab-label, .body {
+  font-family: var(--font-apple) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Precise Monospaced Numbers for Telemetry & Charts */
+code, kbd, samp, pre, .font-mono, [data-mono], .mono-num,
+#esp32LiveWattsValue, #esp32TodayCostValue, #esp32TodayEnergyValue, #homeTemperatureValue, #homeHumidityValue, #homeEsp32LiveWatts, #homeEsp32TodayEnergy, #homeEsp32TodayCost, #homeEsp32MonthlyEstimate, #liveTerminalOutput, .gauge-value, #uptimeDisplay, #lastUpdateDisplay, #diagLogCounter {
+  font-family: var(--font-mono-apple) !important;
+  font-feature-settings: "tnum" on, "cv01" on;
 }
 
 body {
-  font-family: var(--font-apple) !important;
   background-color: var(--apple-bg) !important;
   color: var(--apple-label) !important;
-  -webkit-font-smoothing: antialiased;
 }
 
 /* Remove AI Slop Light Viewport & Blurs */
@@ -693,6 +712,70 @@ select:focus,
 textarea:focus {
   border-color: var(--apple-blue) !important;
   background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Apple Style Data Tables */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+th {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: var(--apple-secondary-label) !important;
+  font-size: 0.76rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase;
+  padding: 10px 14px !important;
+  border-bottom: 0.5px solid var(--apple-separator) !important;
+}
+
+td {
+  padding: 12px 14px !important;
+  font-size: 0.86rem !important;
+  color: var(--apple-label) !important;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+tr:hover td {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Metric Stickers & Status Badges Apple Polish */
+.metric-sticker {
+  border-radius: 999px !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  padding: 0.25rem 0.65rem !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.sticker-heat {
+  background: rgba(255, 69, 58, 0.12) !important;
+  border-color: rgba(255, 69, 58, 0.3) !important;
+  color: var(--apple-red) !important;
+}
+
+.sticker-wind,
+.sticker-water {
+  background: rgba(10, 132, 255, 0.12) !important;
+  border-color: rgba(10, 132, 255, 0.3) !important;
+  color: var(--apple-blue) !important;
+}
+
+.sticker-uv {
+  background: rgba(255, 159, 10, 0.12) !important;
+  border-color: rgba(255, 159, 10, 0.3) !important;
+  color: var(--apple-orange) !important;
 }
 
 /* iOS Mobile Header */

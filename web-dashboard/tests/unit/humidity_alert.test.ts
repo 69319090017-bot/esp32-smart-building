@@ -2,30 +2,30 @@ import { describe, it, expect } from 'vitest';
 import { evaluateHumidityAlert } from '../../src/humidity_alert';
 
 describe('Humidity Alert Module', () => {
-  it('should return NORMAL when humidity is comfortable', () => {
-    const result = evaluateHumidityAlert({ humidity: 52, temperatureC: 31 });
+  it('should return NORMAL when heat index is below warning threshold', () => {
+    const result = evaluateHumidityAlert({ humidity: 40, temperatureC: 27 });
 
     expect(result.level).toBe('NORMAL');
-    expect(result.message).toContain('ปกติ');
+    expect(result.message).toContain('ต่ำกว่าเกณฑ์เฝ้าระวัง');
   });
 
-  it('should return WARNING when humidity is elevated and uncomfortable', () => {
-    const result = evaluateHumidityAlert({ humidity: 78, temperatureC: 34 });
+  it('should return WARNING when humidity and temperature produce elevated heat index', () => {
+    const result = evaluateHumidityAlert({ humidity: 60, temperatureC: 30 });
 
     expect(result.level).toBe('WARNING');
-    expect(result.message).toContain('เฝ้าระวัง');
+    expect(result.message).toContain('เกณฑ์กรมอนามัย');
   });
 
-  it('should return CRITICAL when humidity is excessively high', () => {
-    const result = evaluateHumidityAlert({ humidity: 92, temperatureC: 36 });
+  it('should return CRITICAL when humidity and heat index are dangerous', () => {
+    const result = evaluateHumidityAlert({ humidity: 85, temperatureC: 36 });
 
     expect(result.level).toBe('CRITICAL');
-    expect(result.message).toContain('วิกฤต');
+    expect(result.message).toContain('อันตรายตามเกณฑ์กรมอนามัย');
   });
 
   it('should recommend different actions for each risk level', () => {
-    expect(evaluateHumidityAlert({ humidity: 50, temperatureC: 30 }).advice).toContain('เหมาะสม');
-    expect(evaluateHumidityAlert({ humidity: 78, temperatureC: 34 }).advice).toContain('ระบายอากาศ');
-    expect(evaluateHumidityAlert({ humidity: 92, temperatureC: 36 }).advice).toContain('ลดความชื้น');
+    expect(evaluateHumidityAlert({ humidity: 40, temperatureC: 27 }).advice).toContain('ติดตามสภาพอากาศ');
+    expect(evaluateHumidityAlert({ humidity: 60, temperatureC: 30 }).advice).toContain('ติดตามอาการ');
+    expect(evaluateHumidityAlert({ humidity: 85, temperatureC: 36 }).advice).toContain('ลดกิจกรรมกลางแจ้ง');
   });
 });
