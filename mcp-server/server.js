@@ -102,13 +102,13 @@ async function handleToolCall(name, args) {
   switch (name) {
     case 'smart_building_get_telemetry': {
       try {
-        const live = await fetchFirebase(`devices/${DEVICE_ID}/indoor/telemetry/live`);
+        const live = await fetchFirebase(`devices/${DEVICE_ID}/telemetry/indoor/live`);
         const outdoor = await fetchFirebase(`devices/${DEVICE_ID}/telemetry/live`);
         return {
           status: 'success',
           device_id: DEVICE_ID,
           indoor: live || {
-            dht11: { temperature: 28.5, humidity: 62.0, valid: true },
+            dht11: { temperature_c: 28.5, humidity_percent: 62.0, valid: true },
             pir: { motion_detected: false, ready: true, valid: true },
             updated_at: Date.now()
           },
@@ -119,16 +119,32 @@ async function handleToolCall(name, args) {
           }
         };
       } catch (err) {
-        return { status: 'fallback', message: err.message, dht11: { temperature: 28.5, humidity: 62 } };
+        return { status: 'fallback', message: err.message, dht11: { temperature_c: 28.5, humidity_percent: 62.0, valid: true } };
       }
     }
 
     case 'smart_building_control_actuator': {
       const { target, action } = args;
       const patch = {};
-      if (target === 'door') patch.door = action === 'unlock';
-      if (target === 'light') patch.strobe = action === 'on';
-      if (target === 'siren') patch.siren = false;
+      if (target === 'door') {
+        const isUnlocked = action === 'unlock' || action === 'open';
+        patch.door = isUnlocked;
+        try {
+          await fetchFirebase(`devices/${DEVICE_ID}/commands/servo_command`, 'PUT', isUnlocked ? 'OPEN' : 'CLOSED');
+          await fetchFirebase(`devices/${DEVICE_ID}/commands/servo_command_id`, 'PUT', Date.now());
+        } catch (_) {}
+      }
+      if (target === 'light') {
+        const isOn = action === 'on';
+        patch.strobe = isOn;
+        try {
+          await fetchFirebase(`devices/${DEVICE_ID}/commands/led_command`, 'PUT', isOn ? 'ON' : 'OFF');
+          await fetchFirebase(`devices/${DEVICE_ID}/commands/led_command_id`, 'PUT', Date.now());
+        } catch (_) {}
+      }
+      if (target === 'siren') {
+        patch.siren = action === 'on';
+      }
       patch.last_updated = new Date().toISOString();
 
       await fetchFirebase(`devices/${DEVICE_ID}/relays`, 'PATCH', patch);

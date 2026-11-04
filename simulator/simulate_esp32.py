@@ -123,6 +123,69 @@ def publish_mqtt(topic: str, payload: str):
     except Exception as exc:
         print(f"⚠️ [MQTT ERROR] ({topic}): {exc}")
 
+def get_firebase_token() -> Optional[str]:
+    """Retrieve Firebase ID token using email/password if available."""
+    token = ENV.get("FIREBASE_ID_TOKEN", os.getenv("FIREBASE_ID_TOKEN", ""))
+    if token:
+        return token
+    email = ENV.get("ESP32_AUTH_EMAIL", os.getenv("ESP32_AUTH_EMAIL", ""))
+    password = ENV.get("ESP32_AUTH_PASSWORD", os.getenv("ESP32_AUTH_PASSWORD", ""))
+    api_key = ENV.get("FIREBASE_API_KEY", os.getenv("FIREBASE_API_KEY", ""))
+    if not (email and password and api_key and "yourdomain" not in email and "YourStrong" not in password):
+        return None
+    url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={api_key}"
+    payload = json.dumps({"email": email, "password": password, "returnSecureToken": True}).encode("utf-8")
+    req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            return data.get("idToken")
+    except Exception:
+        return None
+
+def sync_firebase(weather_data: Dict[str, Any], highest_severity: str, province: str):
+    if not FIREBASE_URL:
+        return
+    token = get_firebase_token()
+    auth_query = f"?auth={token}" if token else ""
+    telemetry_url = f"{FIREBASE_URL}/devices/{DEVICE_ID}/telemetry/live.json{auth_query}"
+    payload = {
+        **weather_data,
+        "severity": highest_severity,
+        "province": province,
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "_version": 1
+    }
+    data_bytes = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(telemetry_url, data=data_bytes, headers={"Content-Type": "application/json"}, method="PATCH")
+    try:
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status == 200:
+                print(f"🔥 [FIREBASE RTDB] Telemetry synced to {DEVICE_ID} ({highest_severity})")
+    except Exception as exc:
+        print(f"⚠️ [FIREBASE ERROR] Telemetry sync: {exc}")
+
+    # Also sync relays to Firebase RTDB
+    relay_url = f"{FIREBASE_URL}/devices/{DEVICE_ID}/relays.json{auth_query}"
+    relay_payload = {
+        "strobe": highest_severity in ("WARNING", "CRITICAL"),
+        "door": highest_severity == "CRITICAL",
+        "siren": highest_severity == "CRITICAL",
+        "last_updated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    }
+    try:
+        req_relays = urllib.request.Request(
+            relay_url,
+            data=json.dumps(relay_payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="PATCH"
+        )
+        with urllib.request.urlopen(req_relays, timeout=5) as resp:
+            if resp.status == 200:
+                print(f"🔥 [FIREBASE RTDB] Relays synced (Strobe: {relay_payload['strobe']}, Door: {relay_payload['door']})")
+    except Exception as exc:
+        print(f"⚠️ [FIREBASE ERROR] Relay sync: {exc}")
+
 def evaluate_hazards(w: Dict[str, Any], province: str):
     alerts = []
     highest_severity = "NORMAL"
@@ -228,6 +291,9 @@ def run_scenario(name: str, weather_data: Dict[str, Any], province: str = "ก�
     else:
         publish_mqtt("smart_building/alarm/strobe", "OFF")
         publish_mqtt("smart_building/doors/emergency", "LOCKED")
+
+    # ซิงค์ข้อมูลสภาพอากาศและสถานะรีเลย์ขึ้น Firebase RTDB
+    sync_firebase(weather_data, highest_severity, province)
         
     # ส่งแจ้งเตือน Telegram
     for sev, msg in alerts:
