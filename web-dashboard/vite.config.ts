@@ -131,6 +131,9 @@ export default defineConfig({
         ]
       },
       workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\.open-meteo\.com\/.*/i,

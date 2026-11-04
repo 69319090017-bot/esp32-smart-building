@@ -843,6 +843,27 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- RainViewer Live Satellite & Storm Radar Card -->
+                    <div class="card card-apple-glass" style="margin-top: 1.5rem; padding: 1.25rem 1.4rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.65rem;">
+                                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(56, 189, 248, 0.15); border: 0.5px solid rgba(56, 189, 248, 0.3); display: flex; align-items: center; justify-content: center; color: #38bdf8;">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                                </div>
+                                <div>
+                                    <h3 class="h3" style="font-size: 1.05rem; font-weight: 700; color: #ffffff;">เรดาร์ตรวจจับฝนและกลุ่มพายุสด (RainViewer Live Radar)</h3>
+                                    <p class="body" style="font-size: 0.78rem; color: rgba(235, 235, 245, 0.55); margin: 0.1rem 0 0;">ภาพสะท้อนเรดาร์ Doppler ตรวจจับกลุ่มฝนฟ้าคะนองและทิศทางพายุแบบเรียลไทม์</p>
+                                </div>
+                            </div>
+                            <span class="label" style="background: rgba(14, 165, 233, 0.12); color: #38bdf8; border: 0.5px solid rgba(14, 165, 233, 0.3); border-radius: 999px; padding: 0.25rem 0.65rem; font-size: 0.72rem; font-family: var(--font-mono);">
+                                ● LIVE DOPPLER RADAR
+                            </span>
+                        </div>
+                        <div style="border-radius: 14px; overflow: hidden; border: 0.5px solid rgba(255, 255, 255, 0.1); background: #000; height: 380px; position: relative;">
+                            <iframe id="liveRadarIframe" title="RainViewer Radar Map" src="https://www.rainviewer.com/map.html?loc=13.7563,100.5018,6&oFa=0&oc=1&c=1&m=1&sm=1&sn=1&hu=0" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                    </div>
                 </section>
             </div>
 

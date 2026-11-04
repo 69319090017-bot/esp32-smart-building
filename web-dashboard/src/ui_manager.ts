@@ -947,6 +947,14 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
             historyLogs.length = MAX_HISTORY_LOGS;
         }
 
+        // Update RainViewer Live Radar map coordinates to match selected province
+        const radarIframe = document.getElementById('liveRadarIframe') as HTMLIFrameElement | null;
+        const coords = PROVINCES_MAP[province] || PROVINCES_MAP["กรุงเทพมหานคร"];
+        if (radarIframe && coords && radarIframe.dataset.lastProvince !== province) {
+            radarIframe.dataset.lastProvince = province;
+            radarIframe.src = `https://www.rainviewer.com/map.html?loc=${coords.lat},${coords.lon},7&oFa=0&oc=1&c=1&m=1&sm=1&sn=1&hu=0`;
+        }
+
         renderHistoryTable();
     });
 };

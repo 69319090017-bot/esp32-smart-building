@@ -1,0 +1,47 @@
+name: CI/CD Pipeline - Smart Building Command Center
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    name: Automated Verification & Production Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: web-dashboard/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: web-dashboard
+        run: npm ci
+
+      - name: Run Vitest Test Suite (161 Tests)
+        working-directory: web-dashboard
+        run: npm test -- --run
+
+      - name: Build Web Dashboard Production Bundle
+        working-directory: web-dashboard
+        run: npm run build
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify Backend Bots & Simulator Syntax
+        run: |
+          python -m py_compile simulator/simulate_esp32.py
+          python -m py_compile telegram-bot/telegram_bot.py
+          python -m py_compile discord-bot/discord_bot.py
+          echo "All Python backend modules verified successfully!"
