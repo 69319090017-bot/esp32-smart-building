@@ -1,0 +1,57 @@
+{
+  "rules": {
+    "devices": {
+      "$device_id": {
+        // Telemetry data - read for authenticated users, write for device/admin
+        "telemetry": {
+          ".read": "auth != null",
+          ".write": "auth != null && (auth.token.device == $device_id || auth.token.admin == true)",
+          "live": {
+            ".validate": "newData.hasChildren(['uv_index', 'temperature_2m', 'timestamp']) || newData.val() == null"
+          },
+          "historical": {
+            "$timestamp": {
+              ".validate": "newData.hasChildren(['uv_index', 'temperature_2m']) || newData.val() == null"
+            }
+          }
+        },
+        
+        // Device status - read for authenticated users, write for device
+        "status": {
+          ".read": "auth != null",
+          ".write": "auth != null && (auth.token.device == $device_id || auth.token.admin == true)",
+          ".validate": "newData.hasChildren(['uptime_sec', 'last_heartbeat']) || newData.val() == null"
+        },
+        
+        // Relay control - read/write for authenticated users
+        "relays": {
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.hasChildren(['strobe', 'door', 'siren', 'last_updated']) || newData.val() == null"
+        },
+        
+        // Alert logs - read for authenticated users, write for device/admin
+        "alerts": {
+          ".read": "auth != null",
+          ".write": "auth != null && (auth.token.device == $device_id || auth.token.admin == true)",
+          "$alert_id": {
+            ".validate": "newData.hasChildren(['id', 'severity', 'message', 'timestamp', 'type']) || newData.val() == null"
+          }
+        },
+        
+        // Device configuration - read for authenticated users, write for admins only
+        "config": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.token.admin == true",
+          ".validate": "newData.hasChildren(['province', 'polling_interval']) || newData.val() == null"
+        }
+      }
+    },
+    
+    // Internal Firebase paths - read-only
+    ".info": {
+      ".read": true,
+      ".write": false
+    }
+  }
+}

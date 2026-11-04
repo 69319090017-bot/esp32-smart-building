@@ -1,0 +1,2289 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smart Building Command Center - Enterprise Disaster Early Warning System for 77 Thai Provinces">
+    <title>SMART BUILDING COMMAND CENTER v5.0 (ENTERPRISE)</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Kanit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="ui.css">
+    
+    <style>
+        /* Inline styles for quick overrides and animations */
+        :root {
+            --bg-base: #0a0015;
+            --bg-card: rgba(20, 5, 40, 0.85);
+            --border-glow: rgba(139, 92, 246, 0.4);
+            --primary-neon: #00f5ff;
+            --secondary-neon: #ff00ff;
+            --accent-neon: #00ff88;
+            --magenta-neon: #ff0055;
+            --yellow-warn: #ffaa00;
+            --green-safe: #00ff66;
+            --text-main: #ffffff;
+            --text-muted: #7dd3fc;
+            --font-tech: 'Orbitron', sans-serif;
+            --font-body: 'Kanit', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: 
+                radial-gradient(ellipse at top, rgba(0, 245, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0015 0%, #1a0530 50%, #0a0015 100%);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Dynamic background blobs */
+        .bg-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: 0;
+            animation: blobFloat 25s infinite ease-in-out;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .blob-1 {
+            top: -20%;
+            left: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.4) 0%, transparent 70%);
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            top: 20%;
+            right: -20%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(255, 0, 255, 0.35) 0%, transparent 70%);
+            animation-delay: -8s;
+        }
+
+        .blob-3 {
+            bottom: -20%;
+            left: 20%;
+            width: 900px;
+            height: 900px;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.3) 0%, transparent 70%);
+            animation-delay: -15s;
+        }
+
+        @keyframes blobFloat {
+            0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            25% { transform: translate(80px, -60px) scale(1.15) rotate(90deg); }
+            50% { transform: translate(-50px, 40px) scale(0.95) rotate(180deg); }
+            75% { transform: translate(60px, 30px) scale(1.1) rotate(270deg); }
+        }
+
+        /* Additional floating particles */
+        .particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary-neon);
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: floatParticle 15s infinite ease-in-out;
+            box-shadow: 0 0 15px var(--primary-neon), 0 0 30px var(--secondary-neon);
+        }
+
+        @keyframes floatParticle {
+            0%, 100% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Enhanced scrollbar for the entire page */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0015;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary-neon), var(--secondary-neon), var(--accent-neon));
+            border-radius: 6px;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--secondary-neon), var(--magenta-neon), var(--primary-neon));
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.7);
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* HEADER - Dramatic New Design */
+        header {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 255, 0.08), rgba(0, 255, 136, 0.1));
+            border: 3px solid var(--primary-neon);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 24px;
+            padding: 28px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 
+                0 0 60px rgba(0, 245, 255, 0.5),
+                0 0 120px rgba(255, 0, 255, 0.3),
+                inset 0 0 30px rgba(0, 245, 255, 0.15),
+                0 0 0 4px rgba(0, 245, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, var(--primary-neon), transparent, var(--secondary-neon), transparent, var(--accent-neon), transparent);
+            animation: headerRotate 8s linear infinite;
+            opacity: 0.4;
+        }
+
+        @keyframes headerRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .title-block h1 {
+            font-family: var(--font-tech);
+            font-size: 2.3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-neon), var(--accent-neon), var(--primary-neon));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 4px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 0 30px rgba(0, 245, 255, 0.8));
+            animation: titleGlow 2s ease-in-out infinite, gradientShift 4s ease infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: drop-shadow(0 0 30px rgba(0, 245, 255, 0.8)); }
+            50% { filter: drop-shadow(0 0 50px rgba(255, 0, 255, 1)); }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .status-strip {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.25), rgba(255, 0, 255, 0.15));
+            border: 2px solid var(--primary-neon);
+            font-family: var(--font-tech);
+            font-weight: 800;
+            font-size: 0.9rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(15px);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 
+                0 0 30px rgba(0, 245, 255, 0.5),
+                inset 0 0 20px rgba(0, 245, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .status-badge:hover::before {
+            left: 100%;
+        }
+
+        .status-badge:hover {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.4), rgba(255, 0, 255, 0.3));
+            border-color: var(--secondary-neon);
+            transform: translateY(-4px) scale(1.08);
+            box-shadow: 
+                0 0 50px rgba(255, 0, 255, 0.6),
+                inset 0 0 30px rgba(255, 0, 255, 0.2);
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--green-safe);
+            box-shadow: 0 0 20px var(--green-safe), 0 0 40px var(--green-safe), 0 0 60px var(--green-safe);
+            animation: dotPulse 1.2s infinite;
+        }
+
+        @keyframes dotPulse {
+            0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 20px var(--green-safe), 0 0 40px var(--green-safe), 0 0 60px var(--green-safe); }
+            50% { transform: scale(1.4); opacity: 0.8; box-shadow: 0 0 30px var(--green-safe), 0 0 60px var(--green-safe), 0 0 90px var(--green-safe); }
+        }
+
+        .dot.offline {
+            background: var(--magenta-neon);
+            box-shadow: 0 0 20px var(--magenta-neon), 0 0 40px var(--magenta-neon), 0 0 60px var(--magenta-neon);
+            animation: dotPulseRed 0.8s infinite;
+        }
+
+        @keyframes dotPulseRed {
+            0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 20px var(--magenta-neon), 0 0 40px var(--magenta-neon), 0 0 60px var(--magenta-neon); }
+            50% { transform: scale(1.5); opacity: 0.7; box-shadow: 0 0 30px var(--magenta-neon), 0 0 60px var(--magenta-neon), 0 0 90px var(--magenta-neon); }
+        }
+
+        .dot.warn {
+            background: var(--yellow-warn);
+            box-shadow: 0 0 20px var(--yellow-warn), 0 0 40px var(--yellow-warn), 0 0 60px var(--yellow-warn);
+            animation: dotPulseYellow 1s infinite;
+        }
+
+        @keyframes dotPulseYellow {
+            0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 20px var(--yellow-warn), 0 0 40px var(--yellow-warn), 0 0 60px var(--yellow-warn); }
+            50% { transform: scale(1.45); opacity: 0.75; box-shadow: 0 0 30px var(--yellow-warn), 0 0 60px var(--yellow-warn), 0 0 90px var(--yellow-warn); }
+        }
+
+        /* TOOLBAR - Dramatic New Design */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 16px 8px;
+        }
+
+        .select-province {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.25), rgba(255, 0, 255, 0.15));
+            border: 3px solid var(--primary-neon);
+            color: var(--primary-neon);
+            padding: 16px 28px;
+            border-radius: 18px;
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            font-weight: 800;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 0 35px rgba(0, 245, 255, 0.5),
+                inset 0 0 20px rgba(0, 245, 255, 0.1);
+            backdrop-filter: blur(15px);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .select-province::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .select-province:hover::before {
+            left: 100%;
+        }
+
+        .select-province:hover {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.4), rgba(255, 0, 255, 0.3));
+            border-color: var(--secondary-neon);
+            box-shadow: 
+                0 0 50px rgba(255, 0, 255, 0.6),
+                inset 0 0 30px rgba(255, 0, 255, 0.15);
+            transform: translateY(-5px) scale(1.03);
+        }
+
+        .select-province:focus {
+            box-shadow: 
+                0 0 60px rgba(0, 245, 255, 0.7),
+                0 0 0 4px var(--primary-neon);
+        }
+
+        .select-province option {
+            background: #0a0015;
+            color: #fff;
+            padding: 14px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.25), rgba(0, 255, 136, 0.15));
+            border: 3px solid var(--primary-neon);
+            color: var(--text-main);
+            padding: 16px 28px;
+            border-radius: 18px;
+            font-family: var(--font-body);
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 
+                0 0 35px rgba(0, 245, 255, 0.4),
+                inset 0 0 20px rgba(0, 245, 255, 0.1);
+        }
+
+        .btn-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .btn-action:hover::before {
+            left: 100%;
+        }
+
+        .btn-action:hover {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.45), rgba(0, 255, 136, 0.3));
+            border-color: var(--secondary-neon);
+            color: #fff;
+            transform: translateY(-6px) scale(1.08);
+            box-shadow: 
+                0 0 50px rgba(255, 0, 255, 0.6),
+                inset 0 0 30px rgba(255, 0, 255, 0.15);
+        }
+
+        .btn-action:active {
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .btn-danger {
+            border-color: var(--magenta-neon);
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.3), rgba(255, 0, 85, 0.2));
+            box-shadow: 
+                0 0 35px rgba(255, 0, 255, 0.5),
+                inset 0 0 20px rgba(255, 0, 255, 0.1);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.55), rgba(255, 0, 85, 0.4));
+            border-color: #ff4d88;
+            color: #fff;
+            box-shadow: 
+                0 0 60px rgba(255, 0, 85, 0.7),
+                inset 0 0 30px rgba(255, 0, 85, 0.2);
+        }
+
+        .decision-summary {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.12), rgba(255, 0, 255, 0.08), rgba(0, 255, 136, 0.12));
+            border: 3px solid var(--primary-neon);
+            border-radius: 28px;
+            padding: 40px 36px 36px;
+            box-shadow: 
+                0 0 60px rgba(0, 245, 255, 0.5),
+                0 0 120px rgba(255, 0, 255, 0.3),
+                inset 0 0 40px rgba(0, 245, 255, 0.15),
+                0 0 0 4px rgba(0, 245, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .decision-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--primary-neon), var(--secondary-neon), var(--accent-neon), transparent);
+            animation: gradientMove 6s linear infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .decision-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .decision-header h2 {
+            margin-top: 6px;
+            font-family: var(--font-tech);
+            font-size: clamp(1.8rem, 2.8vw, 2.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-neon), var(--accent-neon));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2.5px;
+            filter: drop-shadow(0 0 30px rgba(0, 245, 255, 0.7));
+            animation: gradientShift 4s ease infinite;
+        }
+
+        .eyebrow {
+            color: var(--text-muted);
+            font-family: var(--font-tech);
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 3.5px;
+            font-weight: 800;
+            opacity: 0.95;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            padding: 16px 28px;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            font-family: var(--font-tech);
+            text-transform: uppercase;
+            min-width: 140px;
+            font-weight: 900;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-pill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .status-pill:hover::before {
+            left: 100%;
+        }
+
+        .status-good {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 255, 136, 0.18));
+            border: 3px solid var(--green-safe);
+            color: #00ff66;
+            box-shadow: 
+                0 0 40px rgba(0, 255, 136, 0.5),
+                inset 0 0 25px rgba(0, 255, 136, 0.15);
+        }
+
+        .status-warn {
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.3), rgba(255, 170, 0, 0.18));
+            border: 3px solid var(--yellow-warn);
+            color: #ffaa00;
+            box-shadow: 
+                0 0 40px rgba(255, 170, 0, 0.5),
+                inset 0 0 25px rgba(255, 170, 0, 0.15);
+        }
+
+        .status-critical {
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.35), rgba(255, 0, 85, 0.25));
+            border: 3px solid var(--magenta-neon);
+            color: #ff00ff;
+            box-shadow: 
+                0 0 50px rgba(255, 0, 255, 0.6),
+                inset 0 0 30px rgba(255, 0, 255, 0.2);
+            animation: statusPulse 1.2s infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { box-shadow: 0 0 50px rgba(255, 0, 255, 0.6); transform: scale(1); }
+            50% { box-shadow: 0 0 70px rgba(255, 0, 255, 0.8); transform: scale(1.08); }
+        }
+
+        .decision-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .decision-card {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.12), rgba(0, 255, 136, 0.08));
+            border: 3px solid rgba(0, 245, 255, 0.35);
+            border-radius: 22px;
+            padding: 28px 28px 26px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 170px;
+            justify-content: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 30px rgba(0, 245, 255, 0.25),
+                inset 0 0 25px rgba(0, 245, 255, 0.08);
+        }
+
+        .decision-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-neon), var(--secondary-neon), var(--accent-neon), transparent);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .decision-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            border-color: var(--primary-neon);
+            box-shadow: 
+                0 0 50px rgba(0, 245, 255, 0.5),
+                inset 0 0 35px rgba(0, 245, 255, 0.15);
+        }
+
+        .decision-card:hover::before {
+            opacity: 1;
+        }
+
+        .decision-card.accent {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(255, 0, 255, 0.15), rgba(0, 255, 136, 0.2));
+            border-color: var(--secondary-neon);
+            box-shadow: 
+                0 0 40px rgba(255, 0, 255, 0.35),
+                inset 0 0 30px rgba(255, 0, 255, 0.12);
+        }
+
+        .decision-card.accent:hover {
+            box-shadow: 
+                0 0 60px rgba(255, 0, 255, 0.6),
+                inset 0 0 40px rgba(255, 0, 255, 0.2);
+        }
+
+        .tiny-label {
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            letter-spacing: 3px;
+            font-family: var(--font-tech);
+            text-transform: uppercase;
+            font-weight: 800;
+            opacity: 0.95;
+        }
+
+        .decision-card strong {
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            color: var(--text-main);
+            font-family: var(--font-tech);
+            font-weight: 900;
+            line-height: 1.2;
+            filter: drop-shadow(0 0 25px rgba(0, 245, 255, 0.6));
+        }
+
+        .decision-card small {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.95;
+            font-weight: 600;
+        }
+
+        /* 6-HAZARD GRID */
+        .hazard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* Detail Page styles - Dramatic New Design */
+        .detail-page {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(20, 5, 40, 0.85));
+            border: 2px solid var(--primary-neon);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(139, 92, 246, 0.15),
+                0 0 40px rgba(139, 92, 246, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .detail-page.hidden {
+            display: none;
+        }
+
+        .detail-page-header {
+            margin-bottom: 24px;
+            font-family: var(--font-tech);
+            color: var(--primary-neon);
+            letter-spacing: 2px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+            padding-bottom: 14px;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+            text-transform: uppercase;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(6, 182, 212, 0.05));
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+        }
+
+        .detail-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-neon), var(--secondary-neon), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary-neon);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .detail-card:hover::before {
+            opacity: 1;
+        }
+
+        .detail-card.wide {
+            grid-column: span 1;
+        }
+
+        .detail-card.full {
+            grid-column: 1 / -1;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            font-weight: 700;
+        }
+
+        .detail-value {
+            font-family: var(--font-tech);
+            font-size: 2.6rem;
+            color: var(--text-main);
+            line-height: 1.2;
+            font-weight: 800;
+            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.4));
+        }
+
+        .detail-value.small {
+            font-size: 1.2rem;
+            font-family: var(--font-body);
+            font-weight: 600;
+            filter: none;
+        }
+
+        .humidity-chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 28px;
+        }
+
+        .chart-panel {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(6, 182, 212, 0.05));
+            border: 2px solid rgba(139, 92, 246, 0.25);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+        }
+
+        .chart-panel:hover {
+            border-color: var(--primary-neon);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .chart-panel-header {
+            color: var(--primary-neon);
+            font-family: var(--font-tech);
+            font-size: 1rem;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            text-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+            text-transform: uppercase;
+        }
+
+        .hazard-card {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(20, 5, 40, 0.85));
+            border: 3px solid rgba(0, 245, 255, 0.35);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 12px 35px rgba(0, 0, 0, 0.4),
+                0 0 0 2px rgba(0, 245, 255, 0.15),
+                0 0 40px rgba(0, 245, 255, 0.2),
+                inset 0 0 30px rgba(0, 245, 255, 0.08);
+        }
+
+        .hazard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--primary-neon), var(--secondary-neon), var(--accent-neon), transparent);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .hazard-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0, 245, 255, 0.2), transparent 50%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .hazard-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: var(--primary-neon);
+            box-shadow: 
+                0 18px 50px rgba(0, 0, 0, 0.5),
+                0 0 0 3px rgba(0, 245, 255, 0.35),
+                0 0 60px rgba(0, 245, 255, 0.4),
+                inset 0 0 40px rgba(0, 245, 255, 0.15);
+        }
+
+        .hazard-card:hover::before {
+            opacity: 1;
+        }
+
+        .hazard-card:hover::after {
+            opacity: 1;
+        }
+
+        .hazard-card.warning {
+            border-color: var(--yellow-warn);
+            box-shadow: 
+                0 0 40px rgba(255, 170, 0, 0.4),
+                inset 0 0 30px rgba(255, 170, 0, 0.1);
+        }
+
+        .hazard-card.warning:hover {
+            box-shadow: 
+                0 18px 50px rgba(0, 0, 0, 0.5),
+                0 0 0 3px rgba(255, 170, 0, 0.5),
+                0 0 70px rgba(255, 170, 0, 0.5),
+                inset 0 0 40px rgba(255, 170, 0, 0.15);
+        }
+
+        .hazard-card.warning::before {
+            background: linear-gradient(90deg, transparent, var(--yellow-warn), var(--primary-neon), var(--secondary-neon), transparent);
+        }
+
+        .hazard-card.critical {
+            border-color: var(--magenta-neon);
+            box-shadow: 
+                0 0 50px rgba(255, 0, 255, 0.5),
+                inset 0 0 35px rgba(255, 0, 255, 0.12);
+            animation: pulse-border 0.8s infinite;
+        }
+
+        .hazard-card.critical:hover {
+            box-shadow: 
+                0 18px 50px rgba(0, 0, 0, 0.5),
+                0 0 0 3px rgba(255, 0, 255, 0.6),
+                0 0 80px rgba(255, 0, 255, 0.6),
+                inset 0 0 45px rgba(255, 0, 255, 0.2);
+        }
+
+        .hazard-card.critical::before {
+            background: linear-gradient(90deg, transparent, var(--magenta-neon), var(--secondary-neon), var(--accent-neon), transparent);
+        }
+
+        @keyframes pulse-border {
+            0%, 100% {
+                border-color: var(--magenta-neon);
+                box-shadow: 
+                    0 0 50px rgba(255, 0, 255, 0.5),
+                    inset 0 0 35px rgba(255, 0, 255, 0.12);
+            }
+            50% {
+                border-color: #ff4d88;
+                box-shadow: 
+                    0 0 70px rgba(255, 0, 255, 0.7),
+                    inset 0 0 45px rgba(255, 0, 255, 0.18);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-title {
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .value-display {
+            font-family: var(--font-tech);
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--primary-neon);
+            margin: 14px 0;
+            filter: drop-shadow(0 0 25px rgba(139, 92, 246, 0.5));
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s ease;
+        }
+
+        .hazard-card:hover .value-display {
+            filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.7));
+            transform: scale(1.05);
+        }
+
+        .value-unit {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-left: 6px;
+            font-weight: 600;
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(52, 211, 153, 0.1));
+            color: var(--green-safe);
+            border: 2px solid var(--green-safe);
+            box-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+            transition: all 0.4s ease;
+        }
+
+        .level-badge.warn {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(251, 191, 36, 0.15));
+            color: var(--yellow-warn);
+            border-color: var(--yellow-warn);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+        }
+
+        .level-badge.crit {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(255, 0, 85, 0.2));
+            color: var(--magenta-neon);
+            border-color: var(--magenta-neon);
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.5);
+            animation: badgePulse 1.5s infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 25px rgba(236, 72, 153, 0.5); transform: scale(1); }
+            50% { box-shadow: 0 0 35px rgba(236, 72, 153, 0.7); transform: scale(1.08); }
+        }
+
+        /* Circular Gauge Components */
+        .gauge-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            animation: gaugeFadeIn 0.8s ease-out;
+        }
+
+        @keyframes gaugeFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .gauge-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .gauge-bg-circle {
+            fill: none;
+            stroke: rgba(0, 245, 255, 0.2);
+            stroke-width: 14;
+        }
+
+        .gauge-progress-circle {
+            fill: none;
+            stroke: var(--primary-neon);
+            stroke-width: 14;
+            stroke-linecap: round;
+            stroke-dasharray: 565.48;
+            stroke-dashoffset: 565.48;
+            transition: stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.6s ease, filter 0.6s ease;
+            filter: 
+                drop-shadow(0 0 30px var(--primary-neon)) 
+                drop-shadow(0 0 60px rgba(0, 245, 255, 0.4))
+                drop-shadow(0 0 90px rgba(0, 245, 255, 0.2));
+        }
+
+        .gauge-progress-circle.warning {
+            stroke: var(--yellow-warn);
+            filter: 
+                drop-shadow(0 0 30px var(--yellow-warn)) 
+                drop-shadow(0 0 60px rgba(255, 170, 0, 0.4))
+                drop-shadow(0 0 90px rgba(255, 170, 0, 0.2));
+        }
+
+        .gauge-progress-circle.danger {
+            stroke: var(--magenta-neon);
+            filter: 
+                drop-shadow(0 0 30px var(--magenta-neon)) 
+                drop-shadow(0 0 60px rgba(255, 0, 255, 0.4))
+                drop-shadow(0 0 90px rgba(255, 0, 255, 0.2));
+        }
+
+        .gauge-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .gauge-value {
+            font-family: var(--font-tech);
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--text-main);
+            line-height: 1;
+            filter: 
+                drop-shadow(0 0 30px rgba(0, 245, 255, 0.7))
+                drop-shadow(0 0 60px rgba(0, 245, 255, 0.4));
+            animation: valueGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes valueGlow {
+            0%, 100% { filter: drop-shadow(0 0 30px rgba(0, 245, 255, 0.7)) drop-shadow(0 0 60px rgba(0, 245, 255, 0.4)); }
+            50% { filter: drop-shadow(0 0 40px rgba(255, 0, 255, 0.8)) drop-shadow(0 0 80px rgba(255, 0, 255, 0.5)); }
+        }
+
+        .gauge-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .gauge-indicator {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-neon);
+            box-shadow: 0 0 20px var(--primary-neon);
+            transition: all 0.3s ease;
+        }
+
+        /* BOTTOM PANEL - Dramatic New Design */
+        .bottom-panel {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .bottom-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .radar-box {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(20, 5, 40, 0.85));
+            border: 2px solid var(--primary-neon);
+            border-radius: 20px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(139, 92, 246, 0.15),
+                0 0 40px rgba(139, 92, 246, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .radar-box::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15), transparent 70%);
+            pointer-events: none;
+            animation: radarPulse 3s infinite;
+        }
+
+        @keyframes radarPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        #radar-canvas {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(139, 92, 246, 0.5), inset 0 0 30px rgba(139, 92, 246, 0.2);
+            position: relative;
+            z-index: 1;
+            border: 3px solid var(--primary-neon);
+        }
+
+        .logs-box {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(20, 5, 40, 0.85));
+            border: 2px solid var(--primary-neon);
+            border-radius: 20px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(139, 92, 246, 0.15),
+                0 0 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .logs-header {
+            font-family: var(--font-tech);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-neon);
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 14px;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .logs-header span:last-child {
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 10px;
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.15));
+            border: 2px solid var(--primary-neon);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .logs-header span:last-child:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(236, 72, 153, 0.3));
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .logs-content {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            border-radius: 14px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            backdrop-filter: blur(12px);
+        }
+
+        .logs-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .logs-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 4px;
+        }
+
+        .logs-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary-neon), var(--secondary-neon));
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+        }
+
+        .logs-content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--secondary-neon), var(--accent-neon));
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.7);
+        }
+
+        .log-entry {
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+            padding-bottom: 8px;
+            transition: all 0.3s ease;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .log-entry:hover {
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateX(4px);
+        }
+
+        .log-entry.warn {
+            color: var(--yellow-warn);
+            border-left: 3px solid var(--yellow-warn);
+            padding-left: 14px;
+            background: rgba(251, 191, 36, 0.05);
+        }
+
+        .log-entry.crit {
+            color: var(--magenta-neon);
+            border-left: 3px solid var(--magenta-neon);
+            padding-left: 14px;
+            background: rgba(236, 72, 153, 0.1);
+            animation: logFlash 0.6s ease;
+        }
+
+        @keyframes logFlash {
+            0% { background: rgba(236, 72, 153, 0.4); transform: translateX(10px); }
+            100% { background: rgba(236, 72, 153, 0.1); transform: translateX(0); }
+        }
+
+        .log-entry.info {
+            color: var(--accent-neon);
+            border-left: 3px solid var(--accent-neon);
+            padding-left: 14px;
+            background: rgba(6, 182, 212, 0.05);
+        }
+
+        /* MODAL - Enhanced */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-card {
+            background: linear-gradient(135deg, rgba(13, 20, 36, 0.98), rgba(7, 15, 28, 0.95));
+            border: 1px solid var(--cyan-neon);
+            border-radius: 18px;
+            width: 90%;
+            max-width: 500px;
+            padding: 28px;
+            box-shadow: 
+                0 0 40px rgba(0, 243, 255, 0.3),
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyan-neon), var(--magenta-neon), var(--cyan-neon), transparent);
+            animation: gradientMove 3s linear infinite;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-title {
+            font-family: var(--font-tech);
+            color: var(--cyan-neon);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glow);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--cyan-neon);
+            box-shadow: 0 0 0 2px rgba(0, 243, 255, 0.2), 0 0 15px rgba(0, 243, 255, 0.15);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(148, 163, 184, 0.5);
+        }
+
+        /* AI Summary Box - Dramatic New Design */
+        .ai-summary-box {
+            margin-top: 1.6rem;
+            padding: 1.6rem 1.8rem;
+            border: 2px solid var(--primary-neon);
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(236, 72, 153, 0.08), rgba(6, 182, 212, 0.12));
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.3), 0 0 0 1px rgba(139, 92, 246, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-summary-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-neon), var(--secondary-neon), var(--accent-neon), transparent);
+            animation: gradientMove 4s linear infinite;
+        }
+
+        /* Detail Page - Enhanced */
+        .detail-page {
+            background: linear-gradient(135deg, var(--bg-card), rgba(13, 20, 36, 0.85));
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 
+                0 8px 24px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(0, 243, 255, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .detail-page.hidden {
+            display: none;
+        }
+
+        .detail-page-header {
+            margin-bottom: 20px;
+            font-family: var(--font-tech);
+            color: var(--cyan-neon);
+            letter-spacing: 2px;
+            font-size: 1rem;
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .detail-card {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.06), rgba(0, 243, 255, 0.03));
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 14px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.5), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 243, 255, 0.4);
+            box-shadow: 0 8px 24px rgba(0, 243, 255, 0.15);
+        }
+
+        .detail-card:hover::before {
+            opacity: 1;
+        }
+
+        .detail-card.wide {
+            grid-column: span 1;
+        }
+
+        .detail-card.full {
+            grid-column: 1 / -1;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-family: var(--font-tech);
+            font-size: 2.4rem;
+            color: var(--text-main);
+            line-height: 1.2;
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        .detail-value.small {
+            font-size: 1.15rem;
+            font-family: var(--font-body);
+            text-shadow: none;
+        }
+
+        .humidity-chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .chart-panel {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.05), rgba(0, 243, 255, 0.02));
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            border-radius: 14px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-panel:hover {
+            border-color: rgba(0, 243, 255, 0.35);
+            box-shadow: 0 8px 24px rgba(0, 243, 255, 0.1);
+        }
+
+        .chart-panel-header {
+            color: var(--cyan-neon);
+            font-family: var(--font-tech);
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#00f5ff" />
+                <stop offset="50%" style="stop-color:#ff00ff" />
+                <stop offset="100%" style="stop-color:#00ff88" />
+            </linearGradient>
+            <linearGradient id="gaugeGradientHeat" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#00f5ff" />
+                <stop offset="50%" style="stop-color:#ff00ff" />
+                <stop offset="100%" style="stop-color:#00ff88" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <canvas id="bg-canvas"></canvas>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+    <div class="particle-container" id="particles"></div>
+
+    <div class="app-container">
+        <!-- HEADER -->
+        <header>
+            <div class="title-block">
+                <h1>🏢 SMART BUILDING COMMAND CENTER</h1>
+            </div>
+            <div class="status-strip">
+                <div class="status-badge">
+                    <div id="net-dot" class="dot"></div>
+                    <span id="net-status">ONLINE</span>
+                </div>
+                <div class="status-badge">
+                    <span>LATENCY: </span>
+                    <span id="latency-val" style="color:var(--primary-neon);">-- ms</span>
+                </div>
+                <div class="status-badge">
+                    <span>TIME: </span>
+                    <span id="clock-val" style="color:#fff;">--:--:--</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <select id="provinceSelect" class="select-province" onchange="onProvinceChange(this.value)">
+                <option value="สิงห์บุรี">จังหวัดสิงห์บุรี (Sing Buri)</option>
+                <option value="กรุงเทพมหานคร">กรุงเทพมหานคร (Bangkok)</option>
+                <option value="เชียงใหม่">จังหวัดเชียงใหม่ (Chiang Mai)</option>
+                <option value="ภูเก็ต">จังหวัดภูเก็ต (Phuket)</option>
+                <option value="ขอนแก่น">จังหวัดขอนแก่น (Khon Kaen)</option>
+                <option value="ชลบุรี">จังหวัดชลบุรี (Chonburi)</option>
+            </select>
+
+            <div class="btn-group">
+                <button class="btn-action" id="humidityDetailBtn">✖ Close Humidity Detail</button>
+                <button class="btn-action" onclick="fetchDataManual()">🔄 Sync Now</button>
+                <button class="btn-action" onclick="toggleAudioMute()" id="btn-audio">🔊 Sound: ON</button>
+                <button class="btn-action btn-danger" onclick="silenceAlarm()">🔕 Silence Alarm</button>
+                <button class="btn-action" onclick="openConfigModal()">⚙️ Config</button>
+            </div>
+        </div>
+
+        <section class="decision-summary">
+            <div class="decision-header">
+                <div>
+                    <div class="eyebrow">OUTSIDE NOW</div>
+                    <h2>Departure Readiness</h2>
+                </div>
+                <div id="departureStatusPill" class="status-pill status-good">READY</div>
+            </div>
+
+            <div class="decision-grid">
+                <div class="decision-card">
+                    <span class="tiny-label">AIR</span>
+                    <strong id="departureAirValue">31.5°C</strong>
+                    <small id="departureAirText">Feels hot / humid</small>
+                </div>
+                <div class="decision-card">
+                    <span class="tiny-label">RAIN</span>
+                    <strong id="departureRainValue">0.0 mm/h</strong>
+                    <small id="departureRainText">No rain risk now</small>
+                </div>
+                <div class="decision-card">
+                    <span class="tiny-label">WIND</span>
+                    <strong id="departureWindValue">23.8 km/h</strong>
+                    <small id="departureWindText">Light breeze</small>
+                </div>
+                <div class="decision-card accent">
+                    <span class="tiny-label">ACTION</span>
+                    <strong id="departureActionValue">Take umbrella</strong>
+                    <small id="departureActionText">Check rain before leaving</small>
+                </div>
+            </div>
+
+            <div class="ai-summary-box" style="margin-top: 1.6rem; padding: 1.6rem 1.8rem; border: 2px solid var(--primary-neon); border-radius: 20px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(236, 72, 153, 0.08), rgba(6, 182, 212, 0.12)); box-shadow: 0 0 40px rgba(139, 92, 246, 0.3), 0 0 0 1px rgba(139, 92, 246, 0.15); position: relative; overflow: hidden;">
+                <div class="ai-summary-box::before" style="content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--primary-neon), var(--secondary-neon), var(--accent-neon), transparent); animation: gradientMove 4s linear infinite;"></div>
+                <div class="eyebrow" style="margin-bottom: 0.7rem; letter-spacing: 0.2em; font-size: 0.72rem; color: var(--primary-neon); text-shadow: 0 0 15px rgba(139, 92, 246, 0.5); font-weight: 800;">AI OUTSIDE STATUS</div>
+                <div id="outdoorSummaryText" style="font-size: 1.15rem; line-height: 1.7; color: var(--text-main); font-weight: 700; text-shadow: 0 0 20px rgba(139, 92, 246, 0.3);">สภาพอากาศข้างนอกตอนนี้: อากาศค่อนข้างเหมาะสมสำหรับการเดินทาง</div>
+                <div id="outdoorActionText" style="margin-top: 0.8rem; font-size: 0.95rem; line-height: 1.6; color: var(--text-muted); font-weight: 500;">ออกจากบ้านได้ · ควรพกน้ำและติดตามสภาพอากาศต่อเนื่อง</div>
+            </div>
+        </section>
+
+        <section id="humidityDetailPage" class="detail-page">
+            <div class="detail-page-header">
+                <h2>💧 HUMIDITY DETAIL</h2>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-card">
+                    <div class="detail-label">Humidity</div>
+                    <div class="detail-value" id="humidityDetailValue">67%</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-label">Dew Point</div>
+                    <div class="detail-value" id="humidityDetailDew">24.6°C</div>
+                </div>
+                <div class="detail-card wide">
+                    <div class="detail-label">Comfort Level</div>
+                    <div class="detail-value small" id="humidityDetailComfort">Comfortable</div>
+                </div>
+                <div class="detail-card wide">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value small" id="humidityDetailStatus">สภาพอากาศปกติ</div>
+                </div>
+                <div class="detail-card full">
+                    <div class="detail-label">Recommendation</div>
+                    <div class="detail-value small" id="humidityDetailAdvice">สภาวะเหมาะสมสำหรับกิจกรรมทั่วไป</div>
+                </div>
+            </div>
+
+            <div class="humidity-chart-grid">
+                <div class="chart-panel">
+                    <div class="chart-panel-header">Humidity Trend</div>
+                    <canvas id="humidity-history-canvas" height="180"></canvas>
+                </div>
+                <div class="chart-panel">
+                    <div class="chart-panel-header">Dew Point Trend</div>
+                    <canvas id="dew-history-canvas" height="180"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6 HAZARD METRICS GRID -->
+        <div class="hazard-grid">
+            <div class="hazard-card" id="card-uv">
+                <div class="card-header">
+                    <span class="card-title">☀️ UV Index</span>
+                    <span class="level-badge" id="badge-uv">NORMAL</span>
+                </div>
+                <div class="gauge-wrapper">
+                    <svg class="gauge-svg" viewBox="0 0 200 200">
+                        <circle class="gauge-bg-circle" cx="100" cy="100" r="90"></circle>
+                        <circle class="gauge-progress-circle" id="uv-gauge" cx="100" cy="100" r="90" style="stroke: url(#gaugeGradient)"></circle>
+                    </svg>
+                    <div class="gauge-center">
+                        <div class="gauge-value" id="val-uv">0.0</div>
+                        <div class="gauge-label">UV</div>
+                    </div>
+                </div>
+                <div style="font-size:0.85rem; color:var(--text-muted; text-align:center; margin-top:12px;" id="desc-uv">ดัชนีรังสียูวี</div>
+            </div>
+
+            <div class="hazard-card" id="card-heat">
+                <div class="card-header">
+                    <span class="card-title">🌡️ Apparent Temp</span>
+                    <span class="level-badge" id="badge-heat">NORMAL</span>
+                </div>
+                <div class="gauge-wrapper">
+                    <svg class="gauge-svg" viewBox="0 0 200 200">
+                        <circle class="gauge-bg-circle" cx="100" cy="100" r="90"></circle>
+                        <circle class="gauge-progress-circle" id="heat-gauge" cx="100" cy="100" r="90" style="stroke: url(#gaugeGradientHeat)"></circle>
+                    </svg>
+                    <div class="gauge-center">
+                        <div class="gauge-value" id="val-heat">0.0</div>
+                        <div class="gauge-label">°C</div>
+                    </div>
+                </div>
+                <div style="font-size:0.85rem; color:var(--text-muted; text-align:center; margin-top:12px;" id="desc-heat">ดัชนีความร้อน / ความรู้สึกจริง
+                </div>
+            </div>
+
+            <div class="hazard-card" id="card-storm">
+                <div class="card-header">
+                    <span class="card-title">⛈️ Weather State</span>
+                    <span class="level-badge" id="badge-storm">NORMAL</span>
+                </div>
+                <div class="value-display" id="val-storm" style="font-size:1.4rem; padding: 8px 0;">Clear</div>
+                <div style="font-size:0.85rem; color:var(--text-muted);" id="desc-storm">สภาพอากาศ WMO</div>
+            </div>
+
+            <div class="hazard-card" id="card-wind">
+                <div class="card-header">
+                    <span class="card-title">💨 Wind Gusts</span>
+                    <span class="level-badge" id="badge-wind">NORMAL</span>
+                </div>
+                <div class="value-display"><span id="val-wind">0.0</span><span class="value-unit">km/h</span></div>
+                <div style="font-size:0.85rem; color:var(--text-muted);" id="desc-wind">ลมกระโชกสูงสุด</div>
+            </div>
+
+            <div class="hazard-card" id="card-rain">
+                <div class="card-header">
+                    <span class="card-title">🌧️ Rainfall</span>
+                    <span class="level-badge" id="badge-rain">NORMAL</span>
+                </div>
+                <div class="value-display"><span id="val-rain">0.0</span><span class="value-unit">mm/h</span></div>
+                <div style="font-size:0.85rem; color:var(--text-muted);" id="desc-rain">ปริมาณน้ำฝนต่อชั่วโมง</div>
+            </div>
+
+            <div class="hazard-card" id="card-flood">
+                <div class="card-header">
+                    <span class="card-title">🌊 River Discharge</span>
+                    <span class="level-badge" id="badge-flood">NORMAL</span>
+                </div>
+                <div class="value-display"><span id="val-flood">0.0</span><span class="value-unit">m³/s</span></div>
+                <div style="font-size:0.85rem; color:var(--text-muted);" id="desc-flood">อัตราการไหลของน้ำในแม่น้ำ</div>
+            </div>
+        </div>
+
+        <!-- INDOOR SMART HOME CONTROLS -->
+        <section class="bottom-panel" style="margin-top:1.2rem; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem;">
+            <div class="logs-box" style="padding:1rem;">
+                <div class="logs-header"><span>🏠 INDOOR SENSORS & ACTUATORS</span><span id="homeConnectionStatus">กำลังเชื่อมต่อ…</span></div>
+                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin:1rem 0;">
+                    <div><small>อุณหภูมิ</small><div id="homeTemperatureValue">-- °C</div><small id="homeTemperatureStatus">รอข้อมูล</small></div>
+                    <div><small>ความชื้น</small><div id="homeHumidityValue">-- %</div><small id="homeHumidityStatus">รอข้อมูล</small></div>
+                    <div><small>การเคลื่อนไหว</small><div id="homeMotionValue">--</div><small id="homeMotionStatus">รอข้อมูล</small></div>
+                </div>
+                <div id="homeUpdatedAt" style="font-size:.8rem;margin-bottom:.75rem;">ยังไม่มีเวลาอัปเดต</div>
+                <hr style="margin:.75rem 0;border-color:rgba(125,211,252,.2);">
+                <div class="logs-header"><span>🚶 ตรวจจับความเคลื่อนไหว · ไฟห้อง D26 · ไฟแสดง PIR D18 · Buzzer D27</span><span id="homeMotionSystemStatus">ปิด</span></div>
+                <div style="display:flex;gap:.5rem;margin:.75rem 0;">
+                    <button id="homeMotionSystemOnButton" class="btn-action" type="button" disabled>เปิดระบบ</button>
+                    <button id="homeMotionSystemOffButton" class="btn-action" type="button" disabled>ปิดระบบ</button>
+                </div>
+                <div id="homeMotionSystemCommandStatus" style="font-size:.85rem;">เข้าสู่ระบบ Firebase เพื่อควบคุมระบบตรวจจับ</div>
+                <form id="homeFirebaseLoginForm" style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;">
+                    <input id="homeFirebaseEmail" type="email" autocomplete="username" placeholder="อีเมล Firebase" required>
+                    <input id="homeFirebasePassword" type="password" autocomplete="current-password" placeholder="รหัสผ่าน Firebase" required>
+                    <button class="btn-action" type="submit">เข้าสู่ระบบ</button>
+                </form>
+                <div style="font-size:.8rem;opacity:.8;margin-top:.35rem;">เข้าสู่ระบบครั้งแรกแล้ว เว็บจะจำบัญชีไว้ในเบราว์เซอร์นี้จนกว่าจะกดออกจากระบบ</div>
+                <div id="homeFirebaseAuthStatus" style="font-size:.85rem;margin:.5rem 0;">เข้าสู่ระบบ Firebase เพื่อควบคุมอุปกรณ์</div>
+                <div id="homeFirebaseSignedIn" hidden style="margin:.5rem 0;"><button id="homeFirebaseLogout" class="btn-action" type="button">ออกจากระบบ</button></div>
+            </div>
+            <div class="logs-box" style="padding:1rem;">
+                <div class="logs-header"><span>💡 LED ที่ D26</span><span id="homeLedStatus">รอ ESP32</span></div>
+                <div style="display:flex;gap:.5rem;margin:.75rem 0;">
+                    <button id="homeLedOnButton" class="btn-action" type="button" disabled>เปิด LED</button>
+                    <button id="homeLedOffButton" class="btn-action" type="button" disabled>ปิด LED</button>
+                </div>
+                <div id="homeLedCommandStatus" style="font-size:.85rem;">เข้าสู่ระบบ Firebase ก่อนจึงจะสั่งงาน LED ได้</div>
+                <div style="font-size:.75rem;margin-top:.5rem;">เมื่อเปิดระบบ PIR ไฟ GPIO26 จะติดตามการเคลื่อนไหวและดับเองหลังไม่พบการเคลื่อนไหว 30 วินาที</div>
+                <hr style="margin:1rem 0;border-color:rgba(125,211,252,.2);">
+                <div class="logs-header"><span>↔️ เซอร์โวที่ D25</span><span id="homeServoStatus">รอ ESP32</span></div>
+                <div style="display:flex;gap:.5rem;margin:.75rem 0;">
+                    <button id="homeServoOpenButton" class="btn-action" type="button" disabled>เปิด</button>
+                    <button id="homeServoCloseButton" class="btn-action" type="button" disabled>ปิด</button>
+                </div>
+                <div style="display:flex;gap:.5rem;margin:.75rem 0;">
+                    <button id="homeServoLockButton" class="btn-action" type="button" disabled>ล็อก</button>
+                    <button id="homeServoUnlockButton" class="btn-action" type="button" disabled>ปลดล็อก</button>
+                </div>
+                <div id="homeServoLockStatus" style="font-size:.85rem;">สถานะล็อกในระบบ: รอ ESP32 ยืนยัน</div>
+                <div id="homeServoCommandStatus" style="font-size:.85rem;">เข้าสู่ระบบ Firebase ก่อนจึงจะสั่งเซอร์โวได้</div>
+                <div style="font-size:.75rem;margin-top:.5rem;">ล็อกเป็นการห้ามระบบส่งคำสั่งขยับเซอร์โว ไม่ใช่กลไกล็อกประตูทางกายภาพ</div>
+                <div style="font-size:.75rem;margin-top:.75rem;">ล็อกจะกันคำสั่งขยับและคงแรงยึดตำแหน่งไว้; ปลดล็อกแล้วจึงสั่งเปิด/ปิดได้ · เซอร์โวใช้ไฟ 5V ภายนอกค้างไว้ โดยต่อ GND ร่วมกับ ESP32</div>
+            </div>
+        </section>
+
+        <!-- BOTTOM PANEL -->
+        <div class="bottom-panel">
+            <div class="radar-box">
+                <div
+                    style="font-family:var(--font-tech); font-size:0.9rem; margin-bottom:10px; color:var(--cyan-neon);">
+                    🛰️ RADAR SCANNER
+                </div>
+                <canvas id="radar-canvas" width="200" height="200"></canvas>
+            </div>
+
+            <div class="logs-box">
+                <div class="logs-header">
+                    <span>📋 REAL-TIME TELEMETRY LOGS</span>
+                    <span style="font-size:0.8rem; cursor:pointer;" onclick="clearLogs()">Clear Log</span>
+                </div>
+                <div class="logs-content" id="log-container">
+                    <div class="log-entry info">[SYSTEM] Command Center v5.0 Initialized successfully.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIG MODAL -->
+    <div class="modal-overlay" id="config-modal">
+        <div class="modal-card">
+            <div class="modal-title">⚙️ SYSTEM CONFIGURATION</div>
+            <div class="form-group">
+                <label>Telegram Bot Token</label>
+                <input type="password" id="cfg-token" placeholder="8867483532:AAEDOR..." />
+            </div>
+            <div class="form-group">
+                <label>Telegram Chat ID</label>
+                <input type="text" id="cfg-chat" placeholder="-5358266072" />
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button class="btn-action" onclick="closeConfigModal()">Cancel</button>
+                <button class="btn-action" style="border-color:var(--cyan-neon);" onclick="saveConfig()">Save &
+                    Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PROVINCES = {
+            "สิงห์บุรี": { lat: 14.8936, lon: 100.3967 },
+            "กรุงเทพมหานคร": { lat: 13.7563, lon: 100.5018 },
+            "เชียงใหม่": { lat: 18.7883, lon: 98.9853 },
+            "ภูเก็ต": { lat: 7.8804, lon: 98.3923 },
+            "ขอนแก่น": { lat: 16.4322, lon: 102.8236 },
+            "ชลบุรี": { lat: 13.3611, lon: 100.9847 }
+        };
+
+        let currentProvince = "กรุงเทพมหานคร";
+        let audioMuted = false;
+        let audioCtx = null;
+        let activeOsc = null;
+
+        // FETCH ENGINE WITH TIMEOUT & RETRY
+        async function fetchWithTimeout(url, timeoutMs = 5000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const res = await fetch(url, { signal: controller.signal });
+                clearTimeout(timer);
+                if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+                return await res.json();
+            } catch (err) {
+                clearTimeout(timer);
+                throw err;
+            }
+        }
+
+        async function fetchWeatherData(province) {
+            const pos = PROVINCES[province] || PROVINCES["สิงห์บุรี"];
+            const t0 = performance.now();
+
+            const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${pos.lat}&longitude=${pos.lon}&current=temperature_2m,apparent_temperature,precipitation,weather_code,wind_gusts_10m,uv_index&timezone=Asia%2FBangkok`;
+            const fUrl = `https://flood-api.open-meteo.com/v1/flood?latitude=${pos.lat}&longitude=${pos.lon}&daily=river_discharge&forecast_days=1`;
+
+            try {
+                const [wData, fData] = await Promise.allSettled([
+                    fetchWithTimeout(wUrl),
+                    fetchWithTimeout(fUrl)
+                ]);
+
+                const latency = Math.round(performance.now() - t0);
+                document.getElementById('latency-val').innerText = `${latency} ms`;
+                updateNetworkStatus(true);
+
+                let weather = {};
+                if (wData.status === 'fulfilled' && wData.value.current) {
+                    const c = wData.value.current;
+                    weather = {
+                        uv: c.uv_index || 0,
+                        heat: c.apparent_temperature || 0,
+                        code: c.weather_code || 0,
+                        wind: c.wind_gusts_10m || 0,
+                        rain: c.precipitation || 0
+                    };
+                }
+
+                let river = 0;
+                if (fData.status === 'fulfilled' && fData.value.daily && fData.value.daily.river_discharge) {
+                    river = fData.value.daily.river_discharge[0] || 0;
+                }
+                weather.river = river;
+
+                localStorage.setItem(`cache_${province}`, JSON.stringify({ data: weather, timestamp: Date.now() }));
+                renderMetrics(weather);
+                addLog(`[SYNC] ดึงข้อมูลสดสำเร็จ (${province})`, 'info');
+
+            } catch (err) {
+                updateNetworkStatus(false);
+                addLog(`[WARN] เชื่อมต่อ API ล้มเหลว สลับไปใช้ข้อมูลแคช (${err.message})`, 'warn');
+
+                const cached = localStorage.getItem(`cache_${province}`);
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    renderMetrics(parsed.data);
+                }
+            }
+        }
+
+        function renderMetrics(d) {
+            // 1. UV INDEX
+            updateCard('uv', d.uv, 8.0, 11.0, '0.0');
+            updateGauge('uv-gauge', d.uv || 0, 11, 6, 8);
+            // 2. HEAT INDEX
+            updateCard('heat', d.heat, 37.0, 41.0, '°C');
+            updateGauge('heat-gauge', d.heat || 0, 50, 35, 42);
+            // 3. WIND GUSTS
+            updateCard('wind', d.wind, 50.0, 89.0, 'km/h');
+            // 4. RAIN
+            updateCard('rain', d.rain, 10.0, 35.0, 'mm/h');
+            // 5. FLOOD
+            updateCard('flood', d.river, 15.0, 30.0, 'm³/s');
+
+            // 6. WEATHER CODE
+            const stormCard = document.getElementById('card-storm');
+            const stormVal = document.getElementById('val-storm');
+            const stormBadge = document.getElementById('badge-storm');
+
+            if (d.code >= 95) {
+                stormCard.className = 'hazard-card critical';
+                stormBadge.className = 'level-badge crit';
+                stormBadge.innerText = 'CRITICAL';
+                stormVal.innerText = `Code ${d.code} (พายุรุนแรง)`;
+                playSiren();
+            } else if (d.code >= 80 || d.code >= 51) {
+                stormCard.className = 'hazard-card warning';
+                stormBadge.className = 'level-badge warn';
+                stormBadge.innerText = 'WARNING';
+                stormVal.innerText = `Code ${d.code} (ฝนตก)`;
+            } else {
+                stormCard.className = 'hazard-card';
+                stormBadge.className = 'level-badge';
+                stormBadge.innerText = 'NORMAL';
+                stormVal.innerText = `Code ${d.code} (ท้องฟ้าแจ่มใส)`;
+            }
+        }
+
+        function updateCard(id, val, warnThresh, critThresh, unit) {
+            const card = document.getElementById(`card-${id}`);
+            const valElem = document.getElementById(`val-${id}`);
+            const badge = document.getElementById(`badge-${id}`);
+
+            valElem.innerText = (typeof val === 'number') ? val.toFixed(1) : val;
+
+            if (val >= critThresh) {
+                card.className = 'hazard-card critical';
+                badge.className = 'level-badge crit';
+                badge.innerText = 'CRITICAL';
+                playSiren();
+            } else if (val >= warnThresh) {
+                card.className = 'hazard-card warning';
+                badge.className = 'level-badge warn';
+                badge.innerText = 'WARNING';
+            } else {
+                card.className = 'hazard-card';
+                badge.className = 'level-badge';
+                badge.innerText = 'NORMAL';
+            }
+        }
+
+        // SYNTHESIZED WEB AUDIO SIREN
+        function playSiren() {
+            if (audioMuted) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (activeOsc) return;
+
+            activeOsc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            activeOsc.type = 'sawtooth';
+            activeOsc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            activeOsc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.5);
+
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            activeOsc.connect(gain);
+            gain.connect(audioCtx.destination);
+            activeOsc.start();
+
+            setTimeout(() => { silenceAlarm(); }, 1000);
+        }
+
+        function silenceAlarm() {
+            if (activeOsc) {
+                activeOsc.stop();
+                activeOsc.disconnect();
+                activeOsc = null;
+            }
+            addLog('[USER] ปิดเสียงแจ้งเตือนชั่วคราว', 'info');
+        }
+
+        function toggleAudioMute() {
+            audioMuted = !audioMuted;
+            document.getElementById('btn-audio').innerText = audioMuted ? "🔇 Sound: OFF" : "🔊 Sound: ON";
+            if (audioMuted) silenceAlarm();
+        }
+
+        // Enhanced mouse tracking for hazard cards
+        document.querySelectorAll('.hazard-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--mouse-x', `${x}%`);
+                card.style.setProperty('--mouse-y', `${y}%`);
+            });
+        });
+
+        // Initialize floating particles
+        function initParticles() {
+            const container = document.getElementById('particles');
+            if (!container) return;
+
+            const particleCount = 30;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particle.style.width = (2 + Math.random() * 4) + 'px';
+                particle.style.height = particle.style.width;
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize particles on load
+        window.addEventListener('load', initParticles);
+
+        function updateNetworkStatus(online) {
+            const dot = document.getElementById('net-dot');
+            const txt = document.getElementById('net-status');
+            if (online) {
+                dot.className = 'dot';
+                txt.innerText = 'ONLINE';
+            } else {
+                dot.className = 'dot offline';
+                txt.innerText = 'OFFLINE';
+            }
+        }
+
+        function addLog(msg, type = 'info') {
+            const container = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            entry.innerText = `[${time}] ${msg}`;
+            container.prepend(entry);
+        }
+
+        function clearLogs() {
+            document.getElementById('log-container').innerHTML = '';
+        }
+
+        function onProvinceChange(val) {
+            const targetProvince = val || 'กรุงเทพมหานคร';
+            currentProvince = targetProvince;
+            addLog(`[SYSTEM] เปลี่ยนพื้นที่ติดตามไปที่ ${targetProvince}`, 'info');
+
+            if (window.onProvinceChange && window.onProvinceChange !== onProvinceChange) {
+                return window.onProvinceChange(targetProvince);
+            }
+
+            fetchWeatherData(targetProvince);
+        }
+
+        function fetchDataManual() {
+            const activeProvince = currentProvince || 'กรุงเทพมหานคร';
+            if (window.fetchDataManual && window.fetchDataManual !== fetchDataManual) {
+                return window.fetchDataManual();
+            }
+            fetchWeatherData(activeProvince);
+        }
+
+        // CONFIG MODAL HANDLERS
+        function openConfigModal() {
+            document.getElementById('cfg-token').value = localStorage.getItem('tg_token') || '';
+            document.getElementById('cfg-chat').value = localStorage.getItem('tg_chat') || '';
+            document.getElementById('config-modal').style.display = 'flex';
+        }
+
+        function closeConfigModal() {
+            document.getElementById('config-modal').style.display = 'none';
+        }
+
+        function saveConfig() {
+            localStorage.setItem('tg_token', document.getElementById('cfg-token').value);
+            localStorage.setItem('tg_chat', document.getElementById('cfg-chat').value);
+            closeConfigModal();
+            addLog('[CONFIG] บันทึกการตั้งค่า Telegram สำเร็จ', 'info');
+        }
+
+        // RADAR CANVAS (ZERO MEMORY LEAK)
+        const radarCanvas = document.getElementById('radar-canvas');
+        const radarCtx = radarCanvas.getContext('2d');
+        let radarAngle = 0;
+
+        function drawRadar() {
+            if (document.hidden) {
+                requestAnimationFrame(drawRadar);
+                return;
+            }
+
+            const w = radarCanvas.width;
+            const h = radarCanvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+            const r = w / 2 - 5;
+
+            radarCtx.clearRect(0, 0, w, h);
+
+            // Radar Circle Rings
+            radarCtx.strokeStyle = 'rgba(0, 245, 255, 0.5)';
+            radarCtx.lineWidth = 2;
+            for (let i = 1; i <= 3; i++) {
+                radarCtx.beginPath();
+                radarCtx.arc(cx, cy, (r / 3) * i, 0, Math.PI * 2);
+                radarCtx.stroke();
+            }
+
+            // Crosshair Lines
+            radarCtx.beginPath();
+            radarCtx.moveTo(cx, 5); radarCtx.lineTo(cx, h - 5);
+            radarCtx.moveTo(5, cy); radarCtx.lineTo(w - 5, cy);
+            radarCtx.strokeStyle = 'rgba(0, 245, 255, 0.4)';
+            radarCtx.lineWidth = 2;
+            radarCtx.stroke();
+
+            // Sweep Line
+            radarCtx.save();
+            radarCtx.translate(cx, cy);
+            radarCtx.rotate(radarAngle);
+            radarCtx.beginPath();
+            radarCtx.moveTo(0, 0);
+            radarCtx.lineTo(0, -r);
+            radarCtx.strokeStyle = '#00f5ff';
+            radarCtx.lineWidth = 4;
+            radarCtx.stroke();
+            radarCtx.restore();
+
+            radarAngle += 0.03;
+            requestAnimationFrame(drawRadar);
+        }
+
+        // INITIALIZATION
+        setInterval(() => {
+            document.getElementById('clock-val').innerText = new Date().toLocaleTimeString('en-US', { hour12: false });
+        }, 1000);
+
+        // Auto Refreshทุกๆ 60 วินาที
+        setInterval(() => {
+            fetchWeatherData(currentProvince);
+        }, 60000);
+
+        // GAUGE UPDATE FUNCTION
+        function updateGauge(gaugeId, value, max, warnThreshold, critThreshold) {
+            const gauge = document.getElementById(gaugeId);
+            if (!gauge) return;
+
+            const circumference = 2 * Math.PI * 90; // r=90
+            const percentage = Math.min(value / max, 1);
+            const offset = circumference - (percentage * circumference);
+
+            gauge.style.strokeDashoffset = offset;
+
+            // Remove existing classes
+            gauge.classList.remove('warning', 'danger');
+
+            // Add warning/danger classes based on thresholds
+            if (value >= critThreshold) {
+                gauge.classList.add('danger');
+                gauge.style.stroke = 'var(--magenta-neon)';
+            } else if (value >= warnThreshold) {
+                gauge.classList.add('warning');
+                gauge.style.stroke = 'var(--yellow-warn)';
+            } else {
+                // Reset to gradient - check which gauge
+                if (gaugeId === 'heat-gauge') {
+                    const gradientEl = document.getElementById('gaugeGradientHeat');
+                    if (gradientEl) {
+                        gauge.style.stroke = 'url(#gaugeGradientHeat)';
+                    } else {
+                        gauge.style.stroke = 'var(--primary-neon)';
+                    }
+                } else {
+                    const gradientEl = document.getElementById('gaugeGradient');
+                    if (gradientEl) {
+                        gauge.style.stroke = 'url(#gaugeGradient)';
+                    } else {
+                        gauge.style.stroke = 'var(--primary-neon)';
+                    }
+                }
+            }
+        }
+
+        fetchWeatherData(currentProvince);
+        drawRadar();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,953 @@
+# Deployment Guide
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Build Process](#build-process)
+3. [Firebase Deployment](#firebase-deployment)
+4. [PWA Deployment](#pwa-deployment)
+5. [Environment Variables](#environment-variables)
+6. [Deployment Platforms](#deployment-platforms)
+7. [Troubleshooting](#troubleshooting)
+8. [Maintenance](#maintenance)
+
+## Overview
+
+The Smart Building Command Center web dashboard can be deployed to various platforms:
+
+- **Firebase Hosting** - Recommended for Firebase-integrated deployments
+- **GitHub Pages** - Free static hosting
+- **Netlify** - Easy deployment with CI/CD
+- **Vercel** - High-performance edge network
+- **Custom Server** - Nginx, Apache, or any static file server
+
+The dashboard is a Progressive Web App (PWA) that works offline and can be installed on devices.
+
+## Build Process
+
+### Prerequisites
+
+Ensure you have:
+- Node.js v18+ installed
+- All dependencies installed (`npm install`)
+- Environment variables configured (if using Firebase)
+
+### Development Build
+
+For development and testing:
+
+```bash
+npm run dev
+```
+
+This starts the Vite dev server with:
+- Hot Module Replacement (HMR)
+- Source maps for debugging
+- Unminified code
+- Fast rebuild times
+
+### Production Build
+
+For deployment:
+
+```bash
+npm run build
+```
+
+This creates an optimized production build in the `dist/` directory with:
+- Minified JavaScript
+- Optimized CSS
+- Tree-shaking (removes unused code)
+- Asset optimization
+- PWA service worker generation
+- No source maps (smaller bundle size)
+
+### Build Output Structure
+
+```
+dist/
+├── index.html              # Main HTML file
+├── assets/
+│   ├── index-[hash].js    # Minified JavaScript
+│   ├── index-[hash].css   # Optimized CSS
+│   └── icon.svg           # Icons
+├── sw.js                  # Service worker (PWA)
+├── manifest.json          # PWA manifest
+└── workbox-*.js           # Workbox runtime
+```
+
+### Build Options
+
+The build can be customized in `vite.config.ts`:
+
+```typescript
+export default defineConfig({
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,          // Set to true for debugging
+    minify: 'terser',          // or 'esbuild'
+    target: 'es2015',          // Browser target
+    rollupOptions: {
+      output: {
+        manualChunks: {        // Code splitting
+          firebase: ['firebase']
+        }
+      }
+    }
+  }
+});
+```
+
+### Preview Production Build
+
+Before deploying, test the production build locally:
+
+```bash
+npm run preview
+```
+
+This serves the `dist/` directory at `http://localhost:4173`
+
+## Firebase Deployment
+
+### Step 1: Install Firebase CLI
+
+```bash
+npm install -g firebase-tools
+```
+
+### Step 2: Initialize Firebase Project
+
+```bash
+firebase login
+firebase init
+```
+
+During initialization:
+1. Select **Hosting**
+2. Select your existing Firebase project or create a new one
+3. Set public directory to `dist`
+4. Configure as single-page app: **Yes**
+5. Set up automatic builds: **No** (we'll use npm scripts)
+
+### Step 3: Configure firebase.json
+
+Create or update `firebase.json` in the project root:
+
+```json
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=1800"
+          }
+        ]
+      },
+      {
+        "source": "sw.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Step 4: Build and Deploy
+
+```bash
+npm run build
+firebase deploy
+```
+
+### Step 5: Verify Deployment
+
+After deployment, Firebase will provide a URL:
+```
+Hosting URL: https://your-project.web.app
+```
+
+Visit the URL to verify the deployment.
+
+### Firebase Hosting Features
+
+- **Global CDN** - Fast content delivery worldwide
+- **Automatic SSL** - HTTPS by default
+- **Custom Domains** - Connect your own domain
+- **Rollbacks** - Revert to previous deployments
+- **Preview Channels** - Test changes before production
+
+### Custom Domain Setup
+
+1. Go to Firebase Console → Hosting
+2. Click "Add custom domain"
+3. Enter your domain (e.g., `dashboard.yourdomain.com`)
+4. Configure DNS records as instructed
+5. Wait for SSL certificate provisioning
+
+## PWA Deployment
+
+### PWA Features
+
+The dashboard includes Progressive Web App features:
+
+- **Offline Support** - Works without internet
+- **Installable** - Can be installed on desktop/mobile
+- **Background Sync** - Syncs data when connection restored
+- **Push Notifications** - Can receive push alerts (future)
+- **App-like Experience** - Full-screen, app shell
+
+### PWA Manifest
+
+The PWA manifest is automatically generated by Vite PWA plugin. Customize in `vite.config.ts`:
+
+```typescript
+import { VitePWA } from 'vite-plugin-pwa';
+
+export default defineConfig({
+  plugins: [
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['icon.svg'],
+      manifest: {
+        name: 'Smart Building Command Center',
+        short_name: 'Smart Building',
+        description: 'Multi-Hazard Early Warning System',
+        theme_color: '#050506',
+        background_color: '#050506',
+        display: 'standalone',
+        icons: [
+          {
+            src: 'icon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml'
+          }
+        ]
+      }
+    })
+  ]
+});
+```
+
+### Service Worker
+
+The service worker is automatically generated and includes:
+- Precaching of static assets
+- Runtime caching for API responses
+- Offline fallback
+- Background sync
+
+### Testing PWA
+
+**Chrome DevTools:**
+1. Open DevTools (F12)
+2. Go to Application tab
+3. Check Service Workers section
+4. Verify service worker is registered
+5. Test offline mode (Network tab → Offline)
+
+**Lighthouse Audit:**
+1. Open DevTools
+2. Go to Lighthouse tab
+3. Run Progressive Web App audit
+4. Aim for score > 90
+
+### Installing PWA
+
+**Desktop (Chrome/Edge):**
+1. Visit the deployed URL
+2. Click install icon in address bar
+3. Confirm installation
+
+**Mobile (Android/iOS):**
+1. Visit the deployed URL
+2. Tap "Add to Home Screen" (iOS) or install prompt (Android)
+3. Confirm installation
+
+## Environment Variables
+
+### Required Variables
+
+For Firebase integration:
+
+```bash
+# .env.local
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_DATABASE_URL=https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app/
+VITE_FIREBASE_APP_ID=your_app_id
+```
+
+For device identification:
+
+```bash
+VITE_DEVICE_ID=smart_building_001
+```
+
+### Optional Variables
+
+For Telegram alerts (update in `src/device_controller.ts`):
+
+```typescript
+const TELEGRAM_BOT_TOKEN = "your_bot_token";
+const TELEGRAM_CHAT_ID = "your_chat_id";
+```
+
+### Environment-Specific Config
+
+Create environment-specific files:
+
+**Development (.env.development):**
+```bash
+VITE_FIREBASE_PROJECT_ID=dev-project-id
+```
+
+**Production (.env.production):**
+```bash
+VITE_FIREBASE_PROJECT_ID=prod-project-id
+```
+
+### Security Best Practices
+
+1. **Never commit .env files**
+```bash
+# .gitignore
+.env.local
+.env.*.local
+```
+
+2. **Use CI/CD secrets**
+- Store secrets in GitHub Secrets, GitLab CI Variables, etc.
+- Inject during build process
+
+3. **Validate environment variables**
+```typescript
+const validateEnv = () => {
+  if (!import.meta.env.VITE_FIREBASE_API_KEY) {
+    console.warn("Firebase API key not configured");
+  }
+};
+```
+
+## Deployment Platforms
+
+### GitHub Pages
+
+#### Step 1: Configure vite.config.ts
+
+```typescript
+export default defineConfig({
+  base: '/your-repo-name/',  // Repository name
+  // ...
+});
+```
+
+#### Step 2: Build
+
+```bash
+npm run build
+```
+
+#### Step 3: Deploy
+
+**Option A: Using gh-pages package**
+```bash
+npm install -g gh-pages
+gh-pages -d dist
+```
+
+**Option B: Using GitHub Actions**
+
+Create `.github/workflows/deploy.yml`:
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm run build
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+```
+
+#### Step 4: Enable GitHub Pages
+
+1. Go to repository Settings → Pages
+2. Source: Deploy from a branch
+3. Branch: gh-pages (or main)
+4. Save
+
+### Netlify
+
+#### Step 1: Connect Repository
+
+1. Sign up at [netlify.com](https://netlify.com)
+2. Click "Add new site" → "Import an existing project"
+3. Connect your Git repository
+
+#### Step 2: Configure Build Settings
+
+```
+Build command: npm run build
+Publish directory: dist
+```
+
+#### Step 3: Deploy
+
+Netlify will automatically deploy on push to main branch.
+
+#### Step 4: Custom Domain (Optional)
+
+1. Go to Domain settings
+2. Add custom domain
+3. Configure DNS records
+
+### Vercel
+
+#### Step 1: Install Vercel CLI
+
+```bash
+npm install -g vercel
+```
+
+#### Step 2: Deploy
+
+```bash
+vercel
+```
+
+Follow the prompts to configure.
+
+#### Step 3: Production Deploy
+
+```bash
+vercel --prod
+```
+
+### Custom Server (Nginx)
+
+#### Step 1: Build
+
+```bash
+npm run build
+```
+
+#### Step 2: Upload to Server
+
+```bash
+scp -r dist/* user@server:/var/www/dashboard/
+```
+
+#### Step 3: Configure Nginx
+
+```nginx
+server {
+    listen 80;
+    server_name dashboard.yourdomain.com;
+
+    root /var/www/dashboard;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location /sw.js {
+        add_header Cache-Control "no-cache";
+    }
+}
+```
+
+#### Step 4: Reload Nginx
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+### Docker Deployment
+
+#### Step 1: Create Dockerfile
+
+```dockerfile
+FROM node:18-alpine as builder
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+#### Step 2: Build Docker Image
+
+```bash
+docker build -t smart-building-dashboard .
+```
+
+#### Step 3: Run Container
+
+```bash
+docker run -d -p 80:80 smart-building-dashboard
+```
+
+## Troubleshooting
+
+### Build Issues
+
+**Issue: Build fails with TypeScript errors**
+
+```
+Solution:
+1. Check TypeScript version: npm list typescript
+2. Update if needed: npm install typescript@latest
+3. Check tsconfig.json configuration
+4. Run: npm run build -- --debug
+```
+
+**Issue: Assets not found after build**
+
+```
+Solution:
+1. Check base path in vite.config.ts
+2. For GitHub Pages, set base to '/repo-name/'
+3. For custom domains, set base to '/'
+4. Verify asset paths in index.html
+```
+
+**Issue: Service worker not registering**
+
+```
+Solution:
+1. Check if serving over HTTPS (required for SW)
+2. Verify service worker file exists in dist/
+3. Check browser console for errors
+4. Clear site data and reload
+```
+
+### Deployment Issues
+
+**Issue: 404 errors on refresh**
+
+```
+Solution:
+1. Configure server to redirect all routes to index.html
+2. For Nginx: try_files $uri $uri/ /index.html;
+3. For Firebase: rewrites in firebase.json
+4. For Netlify: create _redirects file with /* /index.html 200
+```
+
+**Issue: Environment variables not working**
+
+```
+Solution:
+1. Ensure variables start with VITE_
+2. Use import.meta.env.VITE_ to access
+3. Rebuild after changing .env files
+4. Check .env.local is in .gitignore
+```
+
+**Issue: Firebase connection fails**
+
+```
+Solution:
+1. Verify Firebase project is active
+2. Check credentials in .env.local
+3. Verify database rules allow read/write
+4. Check browser console for specific error
+5. App will work in standalone mode without Firebase
+```
+
+**Issue: PWA not installable**
+
+```
+Solution:
+1. Verify HTTPS is enabled
+2. Check manifest.json is valid
+3. Ensure service worker is registered
+4. Run Lighthouse PWA audit
+5. Check browser compatibility
+```
+
+### Performance Issues
+
+**Issue: Slow initial load**
+
+```
+Solution:
+1. Enable gzip compression on server
+2. Use CDN for static assets
+3. Implement lazy loading for images
+4. Reduce bundle size with code splitting
+5. Enable HTTP/2 on server
+```
+
+**Issue: High memory usage**
+
+```
+Solution:
+1. Check for memory leaks in WebSocket client
+2. Limit history log size
+3. Implement cache eviction policy
+4. Monitor memory usage in DevTools
+```
+
+### Runtime Issues
+
+**Issue: Weather data not updating**
+
+```
+Solution:
+1. Check Open-Meteo API status
+2. Verify network connectivity
+3. Check browser console for errors
+4. Verify polling interval is active
+5. Try manual refresh
+```
+
+**Issue: Telegram alerts not sending**
+
+```
+Solution:
+1. Verify bot token and chat ID
+2. Check bot has send message permission
+3. Test bot via Telegram web interface
+4. Check for API rate limiting
+5. Verify network connectivity
+```
+
+**Issue: WebSocket connection dropping**
+
+```
+Solution:
+1. Check server WebSocket configuration
+2. Verify firewall allows WebSocket traffic
+3. Check heartbeat interval
+4. Enable debug logging
+5. Verify reconnection logic
+```
+
+## Maintenance
+
+### Regular Updates
+
+**Dependencies:**
+```bash
+# Check for outdated packages
+npm outdated
+
+# Update dependencies
+npm update
+
+# Update major versions (carefully)
+npx npm-check-updates -u
+npm install
+```
+
+**Security:**
+```bash
+# Check for vulnerabilities
+npm audit
+
+# Fix vulnerabilities
+npm audit fix
+```
+
+### Monitoring
+
+**Firebase Console:**
+- Monitor database usage
+- Check connection statistics
+- Review error logs
+- Monitor quota usage
+
+**Analytics:**
+- Add Google Analytics or similar
+- Track user engagement
+- Monitor performance metrics
+- Track error rates
+
+**Logging:**
+- Implement server-side logging
+- Use error tracking (Sentry, LogRocket)
+- Monitor console errors
+- Track API response times
+
+### Backups
+
+**Firebase Data:**
+- Enable automatic backups in Firebase Console
+- Export data regularly
+- Test restore process
+
+**Configuration:**
+- Version control all config files
+- Document environment variables
+- Keep .env.example updated
+
+### Scaling
+
+**Performance Optimization:**
+- Implement CDN for static assets
+- Use image optimization
+- Enable HTTP/2
+- Implement caching strategies
+- Consider server-side rendering for SEO
+
+**High Availability:**
+- Use multiple Firebase regions
+- Implement load balancing
+- Set up monitoring alerts
+- Have disaster recovery plan
+
+### Version Management
+
+**Semantic Versioning:**
+- Major: Breaking changes
+- Minor: New features (backward compatible)
+- Patch: Bug fixes
+
+**Release Process:**
+1. Update version in package.json
+2. Update CHANGELOG.md
+3. Create git tag
+4. Build and test
+5. Deploy to staging
+6. Test thoroughly
+7. Deploy to production
+8. Monitor for issues
+
+**Rollback Plan:**
+1. Keep previous builds accessible
+2. Document rollback procedure
+3. Test rollback process
+4. Communicate with users
+
+## CI/CD
+
+### GitHub Actions Example
+
+```yaml
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Build
+        run: npm run build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+      
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+```
+
+### GitLab CI Example
+
+```yaml
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  image: node:18
+  script:
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+
+deploy:
+  stage: deploy
+  image: node:18
+  script:
+    - npm install -g firebase-tools
+    - firebase deploy --token $FIREBASE_TOKEN
+  only:
+    - main
+```
+
+## Security
+
+### HTTPS
+
+Always use HTTPS in production:
+- Free SSL from Let's Encrypt
+- Firebase Hosting provides automatic SSL
+- Configure HSTS headers
+- Redirect HTTP to HTTPS
+
+### Content Security Policy
+
+Add CSP headers:
+
+```nginx
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.open-meteo.com https://*.firebaseio.com https://*.firebaseapp.com https://api.telegram.org;";
+```
+
+### Rate Limiting
+
+Implement rate limiting for:
+- API requests
+- WebSocket connections
+- Form submissions
+
+### Input Validation
+
+Validate all user inputs:
+- Province selection
+- Configuration values
+- API parameters
+
+## Support
+
+### Documentation
+
+- Project README
+- Architecture documentation
+- API reference
+- Developer guide
+
+### Community
+
+- GitHub Issues
+- Firebase Community
+- Vite Community
+
+### Professional Support
+
+For enterprise support:
+- Firebase Support Plans
+- Custom development services
+- SLA agreements
+
+## Checklist
+
+### Pre-Deployment
+
+- [ ] All tests passing
+- [ ] Build successful
+- [ ] Environment variables configured
+- [ ] Firebase rules configured
+- [ ] PWA manifest valid
+- [ ] Service worker registered
+- [ ] HTTPS enabled
+- [ ] Custom domain configured (if applicable)
+- [ ] DNS records updated
+- [ ] Cache headers configured
+- [ ] Error tracking enabled
+- [ ] Analytics configured
+- [ ] Backup plan in place
+- [ ] Rollback plan documented
+
+### Post-Deployment
+
+- [ ] Verify live deployment
+- [ ] Test all features
+- [ ] Check console for errors
+- [ ] Monitor performance
+- [ ] Test offline mode
+- [ ] Test PWA installation
+- [ ] Verify alerts working
+- [ ] Check Firebase connection
+- [ ] Monitor analytics
+- [ ] Update documentation
+- [ ] Notify users
+
+## Resources
+
+### Documentation
+
+- [Vite Deployment](https://vitejs.dev/guide/build.html)
+- [Firebase Hosting](https://firebase.google.com/docs/hosting)
+- [PWA Best Practices](https://web.dev/progressive-web-apps/)
+- [Netlify Deployment](https://docs.netlify.com/)
+- [Vercel Deployment](https://vercel.com/docs)
+
+### Tools
+
+- [Firebase CLI](https://firebase.google.com/docs/cli)
+- [Netlify CLI](https://docs.netlify.com/cli/get-started)
+- [Vercel CLI](https://vercel.com/docs/cli)
+- [Lighthouse](https://developers.google.com/web/tools/lighthouse)
+
+### Services
+
+- [Firebase](https://firebase.google.com/)
+- [GitHub Pages](https://pages.github.com/)
+- [Netlify](https://netlify.com/)
+- [Vercel](https://vercel.com/)
+- [Cloudflare Pages](https://pages.cloudflare.com/)

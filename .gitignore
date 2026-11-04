@@ -1,0 +1,88 @@
+# ==============================================================
+# SMART GARAGE - ROOT .GITIGNORE (Open Source Safe)
+# ==============================================================
+
+# Central Secrets Vault & Environment Variables
+secrets.env
+*.env
+*.env.local
+.env.*.local
+*.local
+!.env.example
+!secrets.example.env
+!secrets.example.h
+
+
+# ESP32 / PlatformIO Credentials & Build Artifacts
+secrets.h
+**/secrets.h
+*.bin
+*.elf
+*.hex
+*.ino.cpp
+*.map
+.pio/
+.pioenvs/
+.piolibdeps/
+esp32-firmware/.pio/
+esp32-firmware/secrets.h
+esp32-firmware/smart_building_esp32/secrets.h
+esp32-firmware/smart_garage_esp32/secrets.h
+*.pem
+*.key
+*.crt
+
+# Vercel & Deployment
+.vercel/
+*.vercel
+
+# Web Dashboard (Node / Vite / Tailwind)
+node_modules/
+web-dashboard/node_modules/
+dist/
+web-dashboard/dist/
+build_err.txt
+web-dashboard/build_err.txt
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
+# Python / Discord Bot
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+*.log
+discord-bot/.env
+discord-bot/__pycache__/
+
+# Testing & Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# OS / Editor Specific Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Archives
+*.rar
+*.zip
+*.7z
+*.tar.gz

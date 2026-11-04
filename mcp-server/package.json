@@ -1,0 +1,11 @@
+{
+  "name": "smart-building-mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) Server for Smart Building & Disaster Command Center",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["mcp", "iot", "smart-building", "esp32", "firebase"]
+}

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏢 ESP32 Smart Building Command Center</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #151d30;
+      --card-border: #22304e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --cyan: #06b6d4;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --purple: #a855f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Prompt", sans-serif; }
+    body { background: var(--bg); color: var(--text-main); padding: 1.5rem; min-height: 100vh; }
+    .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--card-border); }
+    .header h1 { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .badge-live { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 1px solid var(--green); padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+    .status-badge { padding: 0.35rem 0.75rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+    .status-normal { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 1px solid var(--green); }
+    .status-warning { background: rgba(245, 158, 11, 0.2); color: var(--yellow); border: 1px solid var(--yellow); animation: pulse 2s infinite; }
+    .status-critical { background: rgba(239, 68, 68, 0.25); color: var(--red); border: 1px solid var(--red); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+    .banner-alert { display: none; background: rgba(239, 68, 68, 0.15); border-left: 4px solid var(--red); padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; }
+    .banner-alert.active { display: block; }
+    .banner-alert h3 { color: var(--red); font-size: 1rem; margin-bottom: 0.25rem; }
+
+    .province-bar { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; background: var(--card-bg); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--card-border); }
+    select { background: #0b0f19; color: var(--text-main); border: 1px solid var(--card-border); padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.95rem; outline: none; cursor: pointer; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 1.25rem; }
+    .card-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; justify-content: space-between; }
+    .metric { font-size: 2rem; font-weight: 700; color: var(--cyan); }
+    .metric-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+    .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .btn { background: #22304e; color: var(--text-main); border: none; padding: 0.75rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center; text-decoration: none; display: inline-block; }
+    .btn:hover { opacity: 0.9; }
+    .btn-silence { background: #d97706; }
+    .btn-test { background: #dc2626; }
+    .btn-csv { background: #059669; }
+
+    .actuator-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .actuator-row:last-child { border-bottom: none; }
+    .state-pill { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600; }
+    .state-on { background: rgba(239, 68, 68, 0.2); color: var(--red); border: 1px solid var(--red); }
+    .state-off { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div>
+      <h1>🏢 Smart Building Command Center <span class="badge-live">ESP32 2026</span></h1>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-top:0.25rem;">ระบบเฝ้าระวัง ประเมินความเสี่ยง และแจ้งเตือนภัยพิบัติ 6 มิติ</p>
+    </div>
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+      <span id="highestStatusBadge" class="status-badge status-normal">NORMAL</span>
+      <span id="wsStatus" style="font-size:0.75rem; color:var(--text-muted);">เชื่อมต่อ WebSocket...</span>
+    </div>
+  </header>
+
+  <div id="alertBanner" class="banner-alert">
+    <h3 id="alertBannerTitle">🚨 ตรวจพบสัญญาณเตือนภัยฉุกเฉิน</h3>
+    <p id="alertBannerMsg" style="font-size:0.9rem; margin-top:0.25rem;"></p>
+  </div>
+
+  <div class="province-bar">
+    <label for="provinceSelect" style="font-size:0.9rem; font-weight:600;">📍 จังหวัดที่เฝ้าระวัง:</label>
+    <select id="provinceSelect" onchange="changeProvince(this.value)">
+      <option value="กรุงเทพมหานคร">กรุงเทพมหานคร (Bangkok)</option>
+      <option value="เชียงใหม่">เชียงใหม่ (Chiang Mai)</option>
+      <option value="ภูเก็ต">ภูเก็ต (Phuket)</option>
+      <option value="ขอนแก่น">ขอนแก่น (Khon Kaen)</option>
+      <option value="ชลบุรี">ชลบุรี (Chonburi)</option>
+      <option value="นครราชสีมา">นครราชสีมา (Nakhon Ratchasima)</option>
+      <option value="อุบลราชธานี">อุบลราชธานี (Ubon Ratchathani)</option>
+      <option value="สงขลา">สงขลา (Songkhla)</option>
+    </select>
+    <span id="coordsDisplay" style="font-size:0.8rem; color:var(--text-muted); margin-left:auto;">13.7563°N, 100.5018°E</span>
+  </div>
+
+  <div class="grid">
+    <!-- 1. UV Index -->
+    <div class="card">
+      <div class="card-title"><span>☀️ 1. ดัชนีรังสียูวี (UV Index)</span><span id="uvRiskBadge">ปกติ</span></div>
+      <div class="metric" id="uvValue">--</div>
+      <div class="metric-sub">เกณฑ์เฝ้าระวัง: ≥ 8.0 (สูงมาก) | วิกฤต: ≥ 11.0 (จัดมาก)</div>
+    </div>
+
+    <!-- 2. Heat Index -->
+    <div class="card">
+      <div class="card-title"><span>🌡️ 2. ความรู้สึกร้อน (Heat Index)</span><span id="heatRiskBadge">ปกติ</span></div>
+      <div class="metric" id="heatValue">-- °C</div>
+      <div class="metric-sub">อุณหภูมิวัดจริง: <span id="tempValue">--</span>°C | เสี่ยงลมแดด: ≥ 41°C</div>
+    </div>
+
+    <!-- 3. Thunderstorm -->
+    <div class="card">
+      <div class="card-title"><span>⛈️ 3. สภาพอากาศ & พายุฟ้าคะนอง</span><span id="stormRiskBadge">ปกติ</span></div>
+      <div class="metric" style="font-size:1.4rem;" id="wmoValue">--</div>
+      <div class="metric-sub">WMO Code: <span id="wmoCode">--</span> (95: พายุ | 96,99: ลูกเห็บ)</div>
+    </div>
+
+    <!-- 4. Wind Gust -->
+    <div class="card">
+      <div class="card-title"><span>💨 4. ลมกระโชกแรง (Wind Gust)</span><span id="gustRiskBadge">ปกติ</span></div>
+      <div class="metric" id="gustValue">-- <span style="font-size:1rem;">km/h</span></div>
+      <div class="metric-sub">ความเร็วลมปกติ: <span id="windSpeedValue">--</span> km/h | วิกฤต: ≥ 89 km/h</div>
+    </div>
+
+    <!-- 5. Rain -->
+    <div class="card">
+      <div class="card-title"><span>🌧️ 5. ปริมาณฝน (Precipitation)</span><span id="rainRiskBadge">ปกติ</span></div>
+      <div class="metric" id="rainValue">-- <span style="font-size:1rem;">mm/h</span></div>
+      <div class="metric-sub">เฝ้าระวัง: ≥ 10.0 mm | เสี่ยงน้ำท่วมฉับพลัน: ≥ 35.0 mm</div>
+    </div>
+
+    <!-- 6. River Discharge -->
+    <div class="card">
+      <div class="card-title"><span>🌊 6. น้ำในแม่น้ำ (River Discharge)</span><span id="riverRiskBadge">ปกติ</span></div>
+      <div class="metric" id="riverValue">-- <span style="font-size:1rem;">m³/s</span></div>
+      <div class="metric-sub">เกณฑ์เฝ้าระวังน้ำท่วม: ≥ 500 m³/s</div>
+    </div>
+  </div>
+
+  <div class="grid" style="grid-template-columns: 1fr 1fr;">
+    <!-- Actuator States -->
+    <div class="card">
+      <h3 style="font-size:1rem; margin-bottom:1rem;">⚙️ สถานะอุปกรณ์ควบคุมฮาร์ดแวร์</h3>
+      <div class="actuator-row">
+        <span>🚨 ไฟกระพริบฉุกเฉิน (Strobe Relay GPIO 2)</span>
+        <span id="strobeState" class="state-pill state-off">OFF</span>
+      </div>
+      <div class="actuator-row">
+        <span>🚪 ประตูหนีไฟฉุกเฉิน (Door Relay GPIO 4)</span>
+        <span id="doorState" class="state-pill state-off">LOCKED</span>
+      </div>
+      <div class="actuator-row">
+        <span>🔊 เสียงไซเรนเตือนภัย (GPIO 27 / DFPlayer)</span>
+        <span id="sirenState" class="state-pill state-off">MUTED</span>
+      </div>
+      <div class="actuator-row">
+        <span>💡 แสงสว่างในอาคาร (LDR Sensor GPIO 34)</span>
+        <span id="ldrValue" style="color:var(--text-main); font-weight:600;">--</span>
+      </div>
+    </div>
+
+    <!-- Command & Controls -->
+    <div class="card">
+      <h3 style="font-size:1rem; margin-bottom:1rem;">🎛️ ศูนย์สั่งการและดาวน์โหลดข้อมูล</h3>
+      <div class="controls">
+        <button class="btn btn-silence" onclick="silenceAlarm()">🔕 ปิดเสียงเตือนภัย (Silence)</button>
+        <button class="btn btn-test" onclick="toggleTestMode()">⚠️ ทดสอบไซเรนฉุกเฉิน (Test)</button>
+        <a href="/api/history.csv" class="btn btn-csv" download>📥 ดาวน์โหลดประวัติ (CSV)</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ws;
+    function initWebSocket() {
+      const loc = window.location;
+      const wsUri = (loc.protocol === 'https:' ? 'wss://' : 'ws://') + loc.host + '/ws';
+      ws = new WebSocket(wsUri);
+      ws.onopen = () => { document.getElementById('wsStatus').innerText = '🟢 WebSocket เชื่อมต่อแล้ว'; };
+      ws.onclose = () => {
+        document.getElementById('wsStatus').innerText = '🔴 กำลังเชื่อมต่อใหม่...';
+        setTimeout(initWebSocket, 2000);
+      };
+      ws.onmessage = (evt) => {
+        try {
+          const data = JSON.parse(evt.data);
+          updateUI(data);
+        } catch (e) { console.error(e); }
+      };
+    }
+
+    function updateUI(d) {
+      if (!d) return;
+      document.getElementById('uvValue').innerText = (d.uv_index !== undefined) ? d.uv_index.toFixed(1) : '--';
+      document.getElementById('heatValue').innerText = (d.apparent_temp !== undefined) ? d.apparent_temp.toFixed(1) + ' °C' : '--';
+      document.getElementById('tempValue').innerText = (d.temperature !== undefined) ? d.temperature.toFixed(1) : '--';
+      document.getElementById('wmoValue').innerText = d.weather_desc || 'ไม่มีข้อมูล';
+      document.getElementById('wmoCode').innerText = d.weather_code || '--';
+      document.getElementById('gustValue').innerHTML = (d.wind_gusts_kmh !== undefined) ? d.wind_gusts_kmh.toFixed(1) + ' <span style="font-size:1rem;">km/h</span>' : '--';
+      document.getElementById('windSpeedValue').innerText = (d.wind_speed_kmh !== undefined) ? d.wind_speed_kmh.toFixed(1) : '--';
+      document.getElementById('rainValue').innerHTML = (d.precipitation_mm !== undefined) ? d.precipitation_mm.toFixed(1) + ' <span style="font-size:1rem;">mm/h</span>' : '--';
+      document.getElementById('riverValue').innerHTML = (d.river_discharge_m3s !== undefined) ? d.river_discharge_m3s.toFixed(0) + ' <span style="font-size:1rem;">m³/s</span>' : '--';
+
+      // Status Badge
+      const statusBadge = document.getElementById('highestStatusBadge');
+      statusBadge.innerText = d.severity || 'NORMAL';
+      statusBadge.className = 'status-badge ' + (d.severity === 'CRITICAL' ? 'status-critical' : (d.severity === 'WARNING' ? 'status-warning' : 'status-normal'));
+
+      // Relays
+      const strobe = document.getElementById('strobeState');
+      strobe.innerText = d.strobe ? 'ON (ACTIVE)' : 'OFF';
+      strobe.className = 'state-pill ' + (d.strobe ? 'state-on' : 'state-off');
+
+      const door = document.getElementById('doorState');
+      door.innerText = d.door_unlocked ? 'UNLOCKED' : 'LOCKED';
+      door.className = 'state-pill ' + (d.door_unlocked ? 'state-on' : 'state-off');
+
+      const siren = document.getElementById('sirenState');
+      siren.innerText = d.siren ? 'SIREN ACTIVE' : 'MUTED';
+      siren.className = 'state-pill ' + (d.siren ? 'state-on' : 'state-off');
+
+      // Alert Banner
+      const banner = document.getElementById('alertBanner');
+      if (d.severity === 'CRITICAL' || d.severity === 'WARNING') {
+        banner.classList.add('active');
+        document.getElementById('alertBannerMsg').innerText = `ระบบตรวจพบภัยพิบัติระดับ [${d.severity}] ในพื้นที่ ${d.province} - ไซเรนและไฟเตือนภัยเปิดใช้งานอัตโนมัติ`;
+      } else {
+        banner.classList.remove('active');
+      }
+    }
+
+    function changeProvince(name) {
+      fetch('/api/set_province', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'name=' + encodeURIComponent(name)
+      });
+    }
+
+    function silenceAlarm() {
+      fetch('/api/silence', { method: 'POST' });
+    }
+
+    function toggleTestMode() {
+      fetch('/api/test_alarm', { method: 'POST' });
+    }
+
+    // Load provinces list dynamically
+    fetch('/api/provinces').then(r => r.json()).then(provinces => {
+      const sel = document.getElementById('provinceSelect');
+      sel.innerHTML = '';
+      provinces.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.name_th;
+        opt.innerText = `${p.name_th} (${p.name_en})`;
+        sel.appendChild(opt);
+      });
+    }).catch(() => {});
+
+    // Fallback polling if WebSocket drops
+    setInterval(() => {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        fetch('/api/weather').then(r => r.json()).then(updateUI).catch(() => {});
+      }
+    }, 5000);
+
+    window.onload = initWebSocket;
+  </script>
+</body>
+</html>

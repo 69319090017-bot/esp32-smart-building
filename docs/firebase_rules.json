@@ -1,0 +1,39 @@
+{
+  "rules": {
+    "devices": {
+      "$deviceId": {
+        ".read": "auth != null",
+        "commands": {
+          ".write": "auth != null",
+          "distance_threshold": {
+            ".validate": "newData.isNumber() && newData.val() >= 5 && newData.val() <= 200"
+          },
+          "led_command": {
+            ".validate": "newData.isString() && (newData.val() === 'AUTO' || newData.val() === 'ON' || newData.val() === 'OFF')"
+          },
+          "armed": {
+            ".validate": "newData.isBoolean()"
+          },
+          "maintenance_mode": {
+            ".validate": "newData.isBoolean()"
+          },
+          "manual_override": {
+            ".validate": "newData.isBoolean()"
+          }
+        },
+        "telemetry": {
+          ".write": "auth != null"
+        },
+        "status": {
+          ".write": "auth != null"
+        },
+        "history": {
+          ".write": "auth != null"
+        },
+        "events": {
+          ".write": "auth != null"
+        }
+      }
+    }
+  }
+}

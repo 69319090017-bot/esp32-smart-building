@@ -1,0 +1,80 @@
+name: CI Build & Verification
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-esp32:
+    name: Build ESP32 Firmware
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Prepare Secrets Template
+        run: |
+          cp esp32-firmware/secrets.example.h esp32-firmware/smart_garage_esp32/secrets.h
+
+      - name: Compile ESP32 Firmware
+        run: |
+          cd esp32-firmware
+          pio run
+
+  build-web-dashboard:
+    name: Build Web Dashboard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'web-dashboard/package.json'
+
+      - name: Install Dependencies
+        run: |
+          cd web-dashboard
+          npm install
+
+      - name: Build Web Dashboard
+        run: |
+          cd web-dashboard
+          npm run build
+
+  verify-python-bot:
+    name: Lint & Verify Python Bot
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          cd discord-bot
+          pip install -r requirements.txt
+          pip install flake8
+
+      - name: Lint Python Code
+        run: |
+          cd discord-bot
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics

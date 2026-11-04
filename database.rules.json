@@ -1,0 +1,20 @@
+{
+  "rules": {
+    "devices": {
+      "smart_building_001": {
+        ".read": true,
+        ".write": true
+      },
+      "$device_id": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    ".info": {
+      ".read": true,
+      ".write": false
+    },
+    ".read": "auth != null",
+    ".write": "auth != null"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/mcp-settings.json",
+  "mcpServers": {
+    "smart-building-controller": {
+      "command": "node",
+      "args": ["mcp-server/server.js"],
+      "env": {
+        "FIREBASE_DATABASE_URL": "https://projectsmart-home-default-rtdb.asia-southeast1.firebasedatabase.app/",
+        "DEVICE_ID": "smart_building_001"
+      }
+    }
+  }
+}

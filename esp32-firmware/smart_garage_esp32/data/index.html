@@ -1,0 +1,3255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ultimate ESP32 Smart Security & Garage Monitoring System Dashboard">
+    <meta name="theme-color" content="#050506">
+    <title>Smart Garage | Security Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    
+    <style>
+/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
+@layer properties;
+@layer theme, base, components, utilities;
+@layer theme {
+  :root, :host {
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+      "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol", "Noto Color Emoji";
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --color-red-400: oklch(70.4% 0.191 22.216);
+    --color-red-500: oklch(63.7% 0.237 25.331);
+    --color-amber-400: oklch(82.8% 0.189 84.429);
+    --color-emerald-400: oklch(76.5% 0.177 163.223);
+    --color-emerald-500: oklch(69.6% 0.17 162.48);
+    --color-blue-400: oklch(70.7% 0.165 254.624);
+    --color-blue-500: oklch(62.3% 0.214 259.815);
+    --color-slate-200: oklch(92.9% 0.013 255.508);
+    --color-slate-300: oklch(86.9% 0.022 252.894);
+    --color-slate-400: oklch(70.4% 0.04 256.788);
+    --color-slate-500: oklch(55.4% 0.046 257.417);
+    --color-slate-700: oklch(37.2% 0.044 257.287);
+    --color-slate-800: oklch(27.9% 0.041 260.031);
+    --color-slate-900: oklch(20.8% 0.042 265.755);
+    --color-slate-950: oklch(12.9% 0.042 264.695);
+    --color-white: #fff;
+    --spacing: 0.25rem;
+    --container-6xl: 72rem;
+    --text-xs: 0.75rem;
+    --text-xs--line-height: calc(1 / 0.75);
+    --text-sm: 0.875rem;
+    --text-sm--line-height: calc(1.25 / 0.875);
+    --text-lg: 1.125rem;
+    --text-lg--line-height: calc(1.75 / 1.125);
+    --text-xl: 1.25rem;
+    --text-xl--line-height: calc(1.75 / 1.25);
+    --text-5xl: 3rem;
+    --text-5xl--line-height: 1;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    --blur-md: 12px;
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    --default-font-family: var(--font-sans);
+    --default-mono-font-family: var(--font-mono);
+    --color-fg-muted: #8A8F98;
+    --color-accent: #5E6AD2;
+    --color-border: rgba(255, 255, 255, 0.06);
+    --font-main: 'Prompt', system-ui, -apple-system, sans-serif;
+  }
+}
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+  }
+  html, :host {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+    font-family: var(--default-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
+    font-feature-settings: var(--default-font-feature-settings, normal);
+    font-variation-settings: var(--default-font-variation-settings, normal);
+    -webkit-tap-highlight-color: transparent;
+  }
+  hr {
+    height: 0;
+    color: inherit;
+    border-top-width: 1px;
+  }
+  abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  a {
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit;
+  }
+  b, strong {
+    font-weight: bolder;
+  }
+  code, kbd, samp, pre {
+    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+    font-feature-settings: var(--default-mono-font-feature-settings, normal);
+    font-variation-settings: var(--default-mono-font-variation-settings, normal);
+    font-size: 1em;
+  }
+  small {
+    font-size: 80%;
+  }
+  sub, sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  sub {
+    bottom: -0.25em;
+  }
+  sup {
+    top: -0.5em;
+  }
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+  }
+  :-moz-focusring:where(:not(iframe)) {
+    outline: auto;
+  }
+  progress {
+    vertical-align: baseline;
+  }
+  summary {
+    display: list-item;
+  }
+  ol, ul, menu {
+    list-style: none;
+  }
+  img, svg, video, canvas, audio, iframe, embed, object {
+    display: block;
+    vertical-align: middle;
+  }
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  button, input, select, optgroup, textarea, ::file-selector-button {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+  :where(select:is([multiple], [size])) optgroup {
+    font-weight: bolder;
+  }
+  :where(select:is([multiple], [size])) optgroup option {
+    padding-inline-start: 20px;
+  }
+  ::file-selector-button {
+    margin-inline-end: 4px;
+  }
+  ::placeholder {
+    opacity: 1;
+  }
+  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
+    ::placeholder {
+      color: currentcolor;
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, currentcolor 50%, transparent);
+      }
+    }
+  }
+  textarea {
+    resize: vertical;
+  }
+  ::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+  ::-webkit-date-and-time-value {
+    min-height: 1lh;
+    text-align: inherit;
+  }
+  ::-webkit-datetime-edit {
+    display: inline-flex;
+  }
+  ::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {
+    padding-block: 0;
+  }
+  ::-webkit-calendar-picker-indicator {
+    line-height: 1;
+  }
+  :-moz-ui-invalid {
+    box-shadow: none;
+  }
+  button, input:where([type="button"], [type="reset"], [type="submit"]), ::file-selector-button {
+    appearance: button;
+  }
+  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+    height: auto;
+  }
+  [hidden]:where(:not([hidden="until-found"])) {
+    display: none !important;
+  }
+}
+@layer utilities {
+  .visible {
+    visibility: visible;
+  }
+  .absolute {
+    position: absolute;
+  }
+  .fixed {
+    position: fixed;
+  }
+  .relative {
+    position: relative;
+  }
+  .static {
+    position: static;
+  }
+  .sticky {
+    position: sticky;
+  }
+  .inset-0 {
+    inset: 0px;
+  }
+  .top-0 {
+    top: 0px;
+  }
+  .right-0 {
+    right: 0px;
+  }
+  .z-10 {
+    z-index: 10;
+  }
+  .z-50 {
+    z-index: 50;
+  }
+  .col-span-1 {
+    grid-column: span 1 / span 1;
+  }
+  .col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+  .col-span-3 {
+    grid-column: span 3 / span 3;
+  }
+  .col-span-4 {
+    grid-column: span 4 / span 4;
+  }
+  .col-span-5 {
+    grid-column: span 5 / span 5;
+  }
+  .col-span-6 {
+    grid-column: span 6 / span 6;
+  }
+  .row-span-1 {
+    grid-row: span 1 / span 1;
+  }
+  .row-span-2 {
+    grid-row: span 2 / span 2;
+  }
+  .container {
+    width: 100%;
+    @media (width >= 40rem) {
+      max-width: 40rem;
+    }
+    @media (width >= 48rem) {
+      max-width: 48rem;
+    }
+    @media (width >= 64rem) {
+      max-width: 64rem;
+    }
+    @media (width >= 80rem) {
+      max-width: 80rem;
+    }
+    @media (width >= 96rem) {
+      max-width: 96rem;
+    }
+  }
+  .mx-auto {
+    margin-inline: auto;
+  }
+  .mt-1 {
+    margin-top: var(--spacing);
+  }
+  .mt-4 {
+    margin-top: calc(var(--spacing) * 4);
+  }
+  .mb-2 {
+    margin-bottom: calc(var(--spacing) * 2);
+  }
+  .mb-4 {
+    margin-bottom: calc(var(--spacing) * 4);
+  }
+  .mb-6 {
+    margin-bottom: calc(var(--spacing) * 6);
+  }
+  .block {
+    display: block;
+  }
+  .contents {
+    display: contents;
+  }
+  .flex {
+    display: flex;
+  }
+  .grid {
+    display: grid;
+  }
+  .hidden {
+    display: none;
+  }
+  .inline {
+    display: inline;
+  }
+  .table {
+    display: table;
+  }
+  .h-2 {
+    height: calc(var(--spacing) * 2);
+  }
+  .h-3 {
+    height: calc(var(--spacing) * 3);
+  }
+  .h-5 {
+    height: calc(var(--spacing) * 5);
+  }
+  .h-16 {
+    height: calc(var(--spacing) * 16);
+  }
+  .h-48 {
+    height: calc(var(--spacing) * 48);
+  }
+  .h-full {
+    height: 100%;
+  }
+  .min-h-screen {
+    min-height: 100vh;
+  }
+  .w-2 {
+    width: calc(var(--spacing) * 2);
+  }
+  .w-5 {
+    width: calc(var(--spacing) * 5);
+  }
+  .w-16 {
+    width: calc(var(--spacing) * 16);
+  }
+  .w-48 {
+    width: calc(var(--spacing) * 48);
+  }
+  .w-full {
+    width: 100%;
+  }
+  .max-w-6xl {
+    max-width: var(--container-6xl);
+  }
+  .flex-1 {
+    flex: 1;
+  }
+  .flex-shrink {
+    flex-shrink: 1;
+  }
+  .border-collapse {
+    border-collapse: collapse;
+  }
+  .transform {
+    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
+  }
+  .animate-pulse {
+    animation: var(--animate-pulse);
+  }
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  .resize {
+    resize: both;
+  }
+  .appearance-none {
+    appearance: none;
+  }
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .flex-col {
+    flex-direction: column;
+  }
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+  .items-center {
+    align-items: center;
+  }
+  .justify-between {
+    justify-content: space-between;
+  }
+  .justify-center {
+    justify-content: center;
+  }
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
+  }
+  .gap-3 {
+    gap: calc(var(--spacing) * 3);
+  }
+  .gap-4 {
+    gap: calc(var(--spacing) * 4);
+  }
+  .gap-6 {
+    gap: calc(var(--spacing) * 6);
+  }
+  .gap-10 {
+    gap: calc(var(--spacing) * 10);
+  }
+  :where(.space-y-2 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 2) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  :where(.space-y-4 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 4) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 4) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  :where(.space-y-6 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 6) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 6) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  .overflow-hidden {
+    overflow: hidden;
+  }
+  .rounded-2xl {
+    border-radius: var(--radius-2xl);
+  }
+  .rounded-full {
+    border-radius: calc(infinity * 1px);
+  }
+  .rounded-lg {
+    border-radius: var(--radius-lg);
+  }
+  .rounded-xl {
+    border-radius: var(--radius-xl);
+  }
+  .border {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+  }
+  .border-8 {
+    border-style: var(--tw-border-style);
+    border-width: 8px;
+  }
+  .border-b {
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 1px;
+  }
+  .border-emerald-500 {
+    border-color: var(--color-emerald-500);
+  }
+  .border-emerald-500\/30 {
+    border-color: color-mix(in srgb, oklch(69.6% 0.17 162.48) 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-emerald-500) 30%, transparent);
+    }
+  }
+  .border-red-500 {
+    border-color: var(--color-red-500);
+  }
+  .border-red-500\/30 {
+    border-color: color-mix(in srgb, oklch(63.7% 0.237 25.331) 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-red-500) 30%, transparent);
+    }
+  }
+  .border-slate-800 {
+    border-color: var(--color-slate-800);
+  }
+  .bg-amber-400 {
+    background-color: var(--color-amber-400);
+  }
+  .bg-blue-500 {
+    background-color: var(--color-blue-500);
+  }
+  .bg-emerald-500 {
+    background-color: var(--color-emerald-500);
+  }
+  .bg-emerald-500\/10 {
+    background-color: color-mix(in srgb, oklch(69.6% 0.17 162.48) 10%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-emerald-500) 10%, transparent);
+    }
+  }
+  .bg-emerald-500\/20 {
+    background-color: color-mix(in srgb, oklch(69.6% 0.17 162.48) 20%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-emerald-500) 20%, transparent);
+    }
+  }
+  .bg-red-500 {
+    background-color: var(--color-red-500);
+  }
+  .bg-red-500\/10 {
+    background-color: color-mix(in srgb, oklch(63.7% 0.237 25.331) 10%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-red-500) 10%, transparent);
+    }
+  }
+  .bg-red-500\/20 {
+    background-color: color-mix(in srgb, oklch(63.7% 0.237 25.331) 20%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-red-500) 20%, transparent);
+    }
+  }
+  .bg-slate-800 {
+    background-color: var(--color-slate-800);
+  }
+  .bg-slate-900 {
+    background-color: var(--color-slate-900);
+  }
+  .bg-slate-900\/80 {
+    background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 80%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-900) 80%, transparent);
+    }
+  }
+  .bg-slate-950 {
+    background-color: var(--color-slate-950);
+  }
+  .bg-gradient-to-r {
+    --tw-gradient-position: to right in oklab;
+    background-image: linear-gradient(var(--tw-gradient-stops));
+  }
+  .from-blue-400 {
+    --tw-gradient-from: var(--color-blue-400);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+  .to-emerald-400 {
+    --tw-gradient-to: var(--color-emerald-400);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+  .bg-clip-text {
+    background-clip: text;
+  }
+  .p-2 {
+    padding: calc(var(--spacing) * 2);
+  }
+  .p-3 {
+    padding: calc(var(--spacing) * 3);
+  }
+  .p-4 {
+    padding: calc(var(--spacing) * 4);
+  }
+  .p-6 {
+    padding: calc(var(--spacing) * 6);
+  }
+  .px-6 {
+    padding-inline: calc(var(--spacing) * 6);
+  }
+  .py-2 {
+    padding-block: calc(var(--spacing) * 2);
+  }
+  .py-4 {
+    padding-block: calc(var(--spacing) * 4);
+  }
+  .pb-20 {
+    padding-bottom: calc(var(--spacing) * 20);
+  }
+  .text-center {
+    text-align: center;
+  }
+  .font-sans {
+    font-family: var(--font-sans);
+  }
+  .text-5xl {
+    font-size: var(--text-5xl);
+    line-height: var(--tw-leading, var(--text-5xl--line-height));
+  }
+  .text-lg {
+    font-size: var(--text-lg);
+    line-height: var(--tw-leading, var(--text-lg--line-height));
+  }
+  .text-sm {
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+  }
+  .text-xl {
+    font-size: var(--text-xl);
+    line-height: var(--tw-leading, var(--text-xl--line-height));
+  }
+  .text-xs {
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+  }
+  .font-bold {
+    --tw-font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-bold);
+  }
+  .font-medium {
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+  }
+  .font-semibold {
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
+  }
+  .text-amber-400 {
+    color: var(--color-amber-400);
+  }
+  .text-blue-400 {
+    color: var(--color-blue-400);
+  }
+  .text-emerald-400 {
+    color: var(--color-emerald-400);
+  }
+  .text-red-400 {
+    color: var(--color-red-400);
+  }
+  .text-slate-200 {
+    color: var(--color-slate-200);
+  }
+  .text-slate-300 {
+    color: var(--color-slate-300);
+  }
+  .text-slate-400 {
+    color: var(--color-slate-400);
+  }
+  .text-slate-500 {
+    color: var(--color-slate-500);
+  }
+  .text-slate-900 {
+    color: var(--color-slate-900);
+  }
+  .text-transparent {
+    color: transparent;
+  }
+  .text-white {
+    color: var(--color-white);
+  }
+  .underline {
+    text-decoration-line: underline;
+  }
+  .accent-blue-500 {
+    accent-color: var(--color-blue-500);
+  }
+  .opacity-10 {
+    opacity: 10%;
+  }
+  .opacity-80 {
+    opacity: 80%;
+  }
+  .shadow {
+    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-\[0_0_30px_rgba\(251\,191\,36\,0\.5\)\] {
+    --tw-shadow: 0 0 30px var(--tw-shadow-color, rgba(251,191,36,0.5));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-inner {
+    --tw-shadow: inset 0 2px 4px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.05));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-lg {
+    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .outline {
+    outline-style: var(--tw-outline-style);
+    outline-width: 1px;
+  }
+  .blur {
+    --tw-blur: blur(8px);
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .drop-shadow {
+    --tw-drop-shadow-size: drop-shadow(0 1px 2px var(--tw-drop-shadow-color, rgb(0 0 0 / 0.1))) drop-shadow(0 1px 1px var(--tw-drop-shadow-color, rgb(0 0 0 / 0.06)));
+    --tw-drop-shadow: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow( 0 1px 1px rgb(0 0 0 / 0.06));
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .filter {
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .backdrop-blur-md {
+    --tw-backdrop-blur: blur(var(--blur-md));
+    -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+    backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+  }
+  .backdrop-filter {
+    -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+    backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+  }
+  .transition {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-colors {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-opacity {
+    transition-property: opacity;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .duration-500 {
+    --tw-duration: 500ms;
+    transition-duration: 500ms;
+  }
+  .ease-in {
+    --tw-ease: var(--ease-in);
+    transition-timing-function: var(--ease-in);
+  }
+  .ease-in-out {
+    --tw-ease: var(--ease-in-out);
+    transition-timing-function: var(--ease-in-out);
+  }
+  .ease-out {
+    --tw-ease: var(--ease-out);
+    transition-timing-function: var(--ease-out);
+  }
+  @media (hover: hover) {
+    .group-hover\:opacity-20:is(:where(.group):hover *) {
+      opacity: 20%;
+    }
+    .hover\:bg-slate-700:hover {
+      background-color: var(--color-slate-700);
+    }
+  }
+  @media (width >= 48rem) {
+    .md\:col-span-2 {
+      grid-column: span 2 / span 2;
+    }
+    .md\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .md\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .md\:flex-row {
+      flex-direction: row;
+    }
+  }
+}
+:root {
+  --bg-deep: #020203;
+  --bg-base: #050506;
+  --bg-elevated: #0a0a0c;
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-hover: rgba(255, 255, 255, 0.08);
+  --fg: #EDEDEF;
+  --fg-muted: #8A8F98;
+  --fg-subtle: rgba(255, 255, 255, 0.60);
+  --accent: #5E6AD2;
+  --accent-bright: #6872D9;
+  --accent-glow: rgba(94, 106, 210, 0.3);
+  --border: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.10);
+  --border-accent: rgba(94, 106, 210, 0.30);
+  --radius-lg: 16px;
+  --radius-md: 8px;
+  --radius-full: 9999px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --transition-fast: 150ms var(--ease-out);
+  --transition-normal: 300ms var(--ease-out);
+  --transition-slow: 500ms var(--ease-out);
+  --font-main: 'Prompt', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --gauge-circumference: 565.48;
+  --gauge-offset: 565.48;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  height: 100%;
+}
+body {
+  background-color: var(--bg-deep);
+  background: radial-gradient(circle at top center, #0a0a0f, var(--bg-base) 40%, var(--bg-deep) 100%);
+  color: var(--fg);
+  font-family: var(--font-main);
+  line-height: 1.5;
+  min-height: 100%;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.015;
+  pointer-events: none;
+}
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: 64px 64px;
+  background-image: linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+  mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+  pointer-events: none;
+}
+.bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: -1;
+  animation: float 10s infinite ease-in-out alternate;
+  pointer-events: none;
+}
+.blob-1 {
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 1400px;
+  background: radial-gradient(circle, rgba(94, 106, 210, 0.25) 0%, transparent 70%);
+  filter: blur(150px);
+}
+.blob-2 {
+  top: 10%;
+  left: -20%;
+  width: 600px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(219, 39, 119, 0.15) 0%, transparent 70%);
+  animation-delay: -2s;
+  animation-duration: 8s;
+}
+.blob-3 {
+  bottom: -10%;
+  right: -10%;
+  width: 500px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+  animation-delay: -5s;
+  animation-duration: 12s;
+}
+h1, h2, h3, h4, h5, h6 {
+  color: var(--fg);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.display-text {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+.h1 {
+  font-size: clamp(2rem, 3.5vw, 3rem);
+}
+.h2 {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+}
+.h3 {
+  font-size: 1.25rem;
+}
+.body {
+  font-size: clamp(0.875rem, 1vw, 1rem);
+}
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-muted);
+}
+.gradient-text {
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.7) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+.accent-text {
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-bright) 50%, var(--accent) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5vw;
+  background: rgba(5, 5, 6, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  transition: var(--transition-normal);
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--fg);
+  text-decoration: none;
+}
+.nav-brand svg {
+  width: 24px;
+  height: 24px;
+  color: var(--accent);
+}
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+.nav-link {
+  color: var(--fg-muted);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--fg);
+}
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--fg-muted);
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--fg-muted);
+  transition: var(--transition-normal);
+}
+.status-dot.online {
+  background: #10B981;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+  animation: pulse 2s infinite;
+}
+.status-dot.offline {
+  background: #EF4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+}
+.status-dot.alert {
+  background: #F59E0B;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+  animation: pulse 1s infinite;
+}
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--fg);
+  cursor: pointer;
+  padding: 0.5rem;
+}
+.hamburger svg {
+  width: 24px;
+  height: 24px;
+}
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 72px;
+  left: 0;
+  right: 0;
+  background: rgba(5, 5, 6, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 1rem 5vw 2rem;
+  border-bottom: 1px solid var(--border);
+  flex-direction: column;
+  gap: 1rem;
+  transform: translateY(-10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: var(--transition-normal);
+}
+.mobile-menu.active {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 5vw;
+}
+main.container {
+  padding-top: 120px;
+  padding-bottom: 120px;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.section {
+  margin-bottom: 6rem;
+}
+.section-header {
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
+  margin-bottom: 3rem;
+}
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.5rem;
+}
+.col-span-1 {
+  grid-column: span 1;
+}
+.col-span-2 {
+  grid-column: span 2;
+}
+.col-span-3 {
+  grid-column: span 3;
+}
+.col-span-4 {
+  grid-column: span 4;
+}
+.col-span-5 {
+  grid-column: span 5;
+}
+.col-span-6 {
+  grid-column: span 6;
+}
+.row-span-1 {
+  grid-row: span 1;
+}
+.row-span-2 {
+  grid-row: span 2;
+}
+.card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-normal);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.02), 0 2px 20px rgba(0,0,0,0.4), 0 0 40px rgba(0,0,0,0.2);
+}
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), rgba(94, 106, 210, 0.3), rgba(255,255,255,0.1), transparent);
+  opacity: 0.5;
+  transition: var(--transition-normal);
+}
+.card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 8px 30px rgba(0,0,0,0.5), 0 0 60px var(--accent-glow);
+}
+.card:hover::after {
+  opacity: 1;
+}
+.card-spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient( 800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.06), transparent 40% );
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 1;
+}
+.card:hover.card-spotlight::before {
+  opacity: 1;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 2;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  border: 1px solid transparent;
+  outline: none;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+.btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-deep), 0 0 0 4px var(--accent);
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.btn-primary:hover {
+  background: var(--accent-bright);
+  box-shadow: 0 0 30px rgba(104, 114, 217, 0.5);
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: skewX(-20deg);
+  transition: var(--transition-normal);
+}
+.btn-primary:hover::after {
+  left: 200%;
+  transition: left 0.7s ease-in-out;
+}
+.btn-secondary {
+  background: var(--surface);
+  color: var(--fg);
+  border-color: var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.btn-secondary:hover, .btn-secondary.active {
+  background: var(--surface-hover);
+  border-color: var(--border-hover);
+}
+.btn-secondary.active {
+  color: var(--accent-bright);
+  border-color: var(--border-accent);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--fg-muted);
+}
+.btn-ghost:hover {
+  background: var(--surface);
+  color: var(--fg);
+}
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255,255,255,0.1);
+  transition: .2s var(--ease-out);
+  border-radius: 26px;
+  border: 1px solid var(--border);
+}
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--fg-muted);
+  transition: .2s var(--ease-out);
+  border-radius: 50%;
+}
+input:checked + .toggle-slider {
+  background-color: var(--accent);
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 15px var(--accent-glow);
+}
+input:checked + .toggle-slider:before {
+  transform: translateX(22px);
+  background-color: #fff;
+}
+input:focus-visible + .toggle-slider {
+  box-shadow: 0 0 0 2px var(--bg-deep), 0 0 0 4px var(--accent);
+}
+.range-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.1);
+  outline: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transition: var(--transition-fast);
+}
+.range-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transition: var(--transition-fast);
+}
+.range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px var(--accent-bright);
+}
+.gauge-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gauge-svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+.gauge-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.05);
+  stroke-width: 12;
+}
+.gauge-arc {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-dasharray: var(--gauge-circumference);
+  stroke-dashoffset: var(--gauge-offset);
+  transition: stroke-dashoffset 1s var(--ease-out), stroke 0.5s;
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+.gauge-arc.danger {
+  stroke: #EF4444;
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.4));
+}
+.gauge-arc.warning {
+  stroke: #F59E0B;
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4));
+}
+.gauge-arc.safe {
+  stroke: #10B981;
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.4));
+}
+.gauge-text-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.gauge-value {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+  font-family: var(--font-mono);
+  letter-spacing: -0.05em;
+}
+.gauge-unit {
+  font-size: 1rem;
+  color: var(--fg-muted);
+  margin-top: 0.25rem;
+}
+.level-bar-container {
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border);
+}
+.level-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B, #FCD34D);
+  width: 0%;
+  border-radius: var(--radius-full);
+  transition: width 0.5s var(--ease-out);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+.led-indicator {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border);
+  transition: all 0.5s var(--ease-out);
+}
+.led-indicator svg {
+  width: 40px;
+  height: 40px;
+  color: var(--fg-muted);
+  transition: all 0.5s;
+}
+.led-indicator.on {
+  background: rgba(250, 204, 21, 0.1);
+  border-color: #FACC15;
+  box-shadow: 0 0 40px rgba(250, 204, 21, 0.4), inset 0 0 20px rgba(250, 204, 21, 0.2);
+}
+.led-indicator.on svg {
+  color: #FACC15;
+  filter: drop-shadow(0 0 5px rgba(250, 204, 21, 0.8));
+}
+.alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+.alert-list::-webkit-scrollbar {
+  width: 6px;
+}
+.alert-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.alert-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.alert-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-md);
+  border-left: 3px solid #EF4444;
+  animation: slideUp 0.3s var(--ease-out);
+}
+.alert-item.flash {
+  animation: flashAlert 2s var(--ease-out);
+}
+.alert-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.alert-time {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+}
+.alert-desc {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.alert-empty {
+  text-align: center;
+  color: var(--fg-muted);
+  padding: 2rem;
+  font-style: italic;
+}
+.toast-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  pointer-events: none;
+}
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 2, 3, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease-out);
+}
+.login-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+.login-modal {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transform: translateY(20px) scale(0.95);
+  transition: all 0.4s var(--ease-out);
+}
+.login-overlay.active .login-modal {
+  transform: translateY(0) scale(1);
+}
+.login-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--fg);
+  font-family: var(--font-main);
+  font-size: 0.875rem;
+  outline: none;
+  transition: var(--transition-fast);
+  margin-bottom: 1rem;
+}
+.login-input:focus {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+.toast {
+  background: rgba(10, 10, 12, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  animation: slideUp 0.3s var(--ease-out);
+  pointer-events: all;
+  min-width: 300px;
+}
+.toast.fade-out {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.toast-icon {
+  flex-shrink: 0;
+}
+.toast-info {
+  color: var(--accent);
+}
+.toast-success {
+  color: #10B981;
+}
+.toast-warning {
+  color: #F59E0B;
+}
+.toast-alert {
+  color: #EF4444;
+}
+.toast-message {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.view-section {
+  display: none;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: slideUpFade 0.4s var(--ease-out) forwards;
+}
+.view-section.active {
+  display: block;
+}
+@keyframes slideUpFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 5vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(5, 5, 6, 0.85);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+.footer-text {
+  font-size: 0.875rem;
+  color: var(--fg-muted);
+}
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(1deg);
+  }
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+@keyframes flashAlert {
+  0% {
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+  100% {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+}
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+}
+.fade-in-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.stagger-1 {
+  transition-delay: 0.08s;
+}
+.stagger-2 {
+  transition-delay: 0.16s;
+}
+.stagger-3 {
+  transition-delay: 0.24s;
+}
+.stagger-4 {
+  transition-delay: 0.32s;
+}
+.stagger-5 {
+  transition-delay: 0.40s;
+}
+.stagger-6 {
+  transition-delay: 0.48s;
+}
+@media (max-width: 1024px) {
+  .bento-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .col-span-1, .col-span-2, .col-span-3, .col-span-4, .col-span-5, .col-span-6 {
+    grid-column: span 2;
+  }
+  main {
+    padding-top: 100px;
+  }
+}
+@media (max-width: 768px) {
+  .nav-links, .nav-actions .btn {
+    display: none;
+  }
+  .hamburger {
+    display: block;
+  }
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .col-span-1, .col-span-2, .col-span-3, .col-span-4, .col-span-5, .col-span-6 {
+    grid-column: span 1;
+  }
+  .row-span-2 {
+    grid-row: span 1;
+  }
+  .footer {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  .display-text {
+    font-size: 2.5rem;
+  }
+  .card {
+    padding: 1.25rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .bg-blob {
+    display: none;
+  }
+}
+@property --tw-rotate-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-z {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-space-y-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-gradient-position {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-from {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-via {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-to {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-stops {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-via-stops {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-from-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+@property --tw-gradient-via-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+@property --tw-gradient-to-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-inset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-ring-inset {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-offset-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --tw-ring-offset-color {
+  syntax: "*";
+  inherits: false;
+  initial-value: #fff;
+}
+@property --tw-ring-offset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-outline-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-blur {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-brightness {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-contrast {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-grayscale {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-hue-rotate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-invert {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-opacity {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-saturate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-sepia {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-drop-shadow-size {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-blur {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-brightness {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-contrast {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-grayscale {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-hue-rotate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-invert {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-opacity {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-saturate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-sepia {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-duration {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ease {
+  syntax: "*";
+  inherits: false;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-rotate-x: initial;
+      --tw-rotate-y: initial;
+      --tw-rotate-z: initial;
+      --tw-skew-x: initial;
+      --tw-skew-y: initial;
+      --tw-space-y-reverse: 0;
+      --tw-border-style: solid;
+      --tw-gradient-position: initial;
+      --tw-gradient-from: #0000;
+      --tw-gradient-via: #0000;
+      --tw-gradient-to: #0000;
+      --tw-gradient-stops: initial;
+      --tw-gradient-via-stops: initial;
+      --tw-gradient-from-position: 0%;
+      --tw-gradient-via-position: 50%;
+      --tw-gradient-to-position: 100%;
+      --tw-font-weight: initial;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-color: initial;
+      --tw-shadow-alpha: 100%;
+      --tw-inset-shadow: 0 0 #0000;
+      --tw-inset-shadow-color: initial;
+      --tw-inset-shadow-alpha: 100%;
+      --tw-ring-color: initial;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-inset-ring-color: initial;
+      --tw-inset-ring-shadow: 0 0 #0000;
+      --tw-ring-inset: initial;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-offset-shadow: 0 0 #0000;
+      --tw-outline-style: solid;
+      --tw-blur: initial;
+      --tw-brightness: initial;
+      --tw-contrast: initial;
+      --tw-grayscale: initial;
+      --tw-hue-rotate: initial;
+      --tw-invert: initial;
+      --tw-opacity: initial;
+      --tw-saturate: initial;
+      --tw-sepia: initial;
+      --tw-drop-shadow: initial;
+      --tw-drop-shadow-color: initial;
+      --tw-drop-shadow-alpha: 100%;
+      --tw-drop-shadow-size: initial;
+      --tw-backdrop-blur: initial;
+      --tw-backdrop-brightness: initial;
+      --tw-backdrop-contrast: initial;
+      --tw-backdrop-grayscale: initial;
+      --tw-backdrop-hue-rotate: initial;
+      --tw-backdrop-invert: initial;
+      --tw-backdrop-opacity: initial;
+      --tw-backdrop-saturate: initial;
+      --tw-backdrop-sepia: initial;
+      --tw-duration: initial;
+      --tw-ease: initial;
+    }
+  }
+}
+
+</style>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-noise"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div style="display: flex; align-items: center;">
+            <a href="#" class="nav-brand" data-view="dashboard">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                SmartGarage
+            </a>
+            <select id="deviceSelect" style="margin-left: 1rem; background: rgba(255,255,255,0.1); border: 1px solid var(--border); color: white; padding: 4px 8px; border-radius: 4px; outline: none; font-family: var(--font-body); font-size: 0.875rem;">
+                <option value="garage_001" style="background: #0a0a0c; color: white;">Garage 001</option>
+                <option value="garage_002" style="background: #0a0a0c; color: white;">Garage 002</option>
+            </select>
+        </div>
+        <div class="nav-links">
+            <a class="nav-link active" data-view="dashboard" data-i18n="nav_dashboard">Dashboard</a>
+            <a class="nav-link" data-view="analytics" data-i18n="nav_analytics">Analytics</a>
+            <a class="nav-link" data-view="settings" data-i18n="nav_settings">Settings</a>
+        </div>
+        <div class="nav-actions">
+            <div class="status-indicator">
+                <div id="navStatusDot" class="status-dot"></div>
+                <span id="navStatusText">Connecting...</span>
+            </div>
+            <button id="langToggleBtn" class="btn btn-ghost" style="margin-right: 0.5rem; font-family: 'Prompt', sans-serif;" type="button">TH/EN</button>
+            <button id="authBtn" class="btn btn-secondary" type="button">Sign in</button>
+            <button class="hamburger" id="mobileMenuBtn" aria-label="Toggle menu">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a class="nav-link active" data-view="dashboard" data-i18n="nav_dashboard">Dashboard</a>
+        <a class="nav-link" data-view="analytics" data-i18n="nav_analytics">Analytics</a>
+        <a class="nav-link" data-view="settings" data-i18n="nav_settings">Settings</a>
+    </div>
+
+    <main class="container">
+        
+        <!-- ================= VIEW: DASHBOARD ================= -->
+        <div id="view-dashboard" class="view-section active">
+            <!-- Hero Section -->
+            <section class="section fade-in-up stagger-1">
+                <div style="text-align: center; max-width: 800px; margin: 0 auto 4rem;">
+                    <h1 class="display-text gradient-text" style="margin-bottom: 0.5rem;" data-i18n="hero_title1">Smart Security</h1>
+                    <h1 class="display-text accent-text" style="margin-bottom: 1.5rem;" data-i18n="hero_title2">& Garage Monitor</h1>
+                    <p class="body" style="color: var(--color-fg-muted); font-size: 1.25rem; margin-bottom: 2.5rem;">
+                        Real-time edge computing with sensor fusion for intelligent detection and automated control.
+                    </p>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <div class="card" style="padding: 1rem 1.5rem; flex-direction: row; align-items: center; gap: 1rem;">
+                        <div style="color: var(--color-fg-muted);"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                        <div>
+                            <div class="label" data-i18n="stat_uptime">System Uptime</div>
+                            <div id="uptimeDisplay" class="h3" style="margin-top: 0.25rem;">00:00:00</div>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 1rem 1.5rem; flex-direction: row; align-items: center; gap: 1rem;">
+                        <div style="color: var(--color-fg-muted);"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
+                        <div>
+                            <div class="label" data-i18n="stat_last_update">Last Update</div>
+                            <div id="lastUpdateDisplay" class="h3" style="margin-top: 0.25rem;">Just now</div>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 1rem 1.5rem; flex-direction: row; align-items: center; gap: 1rem;">
+                        <div style="color: var(--color-fg-muted);"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg></div>
+                        <div>
+                            <div class="label" data-i18n="stat_firmware">Firmware</div>
+                            <div id="firmwareDisplay" class="h3" style="margin-top: 0.25rem;">v2.1.0-RTOS</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Live Telemetry Section -->
+            <section class="section">
+                <div class="section-header fade-in-up stagger-2">
+                    <span class="label" data-i18n="lbl_live_telemetry">Live Telemetry</span>
+                    <h2 class="h2" data-i18n="title_live_telemetry">Real-Time Sensor Data</h2>
+                </div>
+                
+                <div class="bento-grid fade-in-up stagger-3">
+                    <!-- Distance Sensor Card -->
+                    <div class="card card-spotlight col-span-3 row-span-2">
+                        <div class="card-header">
+                            <span class="label" data-i18n="lbl_ultrasonic">Ultrasonic Sensor</span>
+                            <div class="status-indicator">
+                                <div id="distanceStatusDot" class="status-dot"></div>
+                                <span id="distanceStatusText">Clear</span>
+                            </div>
+                        </div>
+                        <div class="card-content" style="justify-content: center;">
+                            <div class="gauge-container">
+                                <svg class="gauge-svg" viewBox="0 0 200 200">
+                                    <circle class="gauge-bg" cx="100" cy="100" r="90" />
+                                    <circle id="distanceGaugeArc" class="gauge-arc safe" cx="100" cy="100" r="90" />
+                                </svg>
+                                <div class="gauge-text-container">
+                                    <div id="distanceValue" class="gauge-value">--</div>
+                                    <div class="gauge-unit">cm</div>
+                                </div>
+                            </div>
+                            <div style="text-align: center; margin-top: 2rem; color: var(--color-fg-muted); font-size: 0.875rem;">
+                                Monitoring object proximity in real-time
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ambient Light Card -->
+                    <div class="card card-spotlight col-span-3">
+                        <div class="card-header">
+                            <span class="label" data-i18n="lbl_ambient_light">Ambient Light</span>
+                            <svg id="lightIcon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        </div>
+                        <div class="card-content" style="justify-content: center;">
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem;">
+                                <span id="lightLevelText" class="h2">--%</span>
+                                <span id="lightRawText" class="label" style="color: var(--color-fg-muted);">Raw: --</span>
+                            </div>
+                            <div class="level-bar-container">
+                                <div id="lightLevelBar" class="level-bar-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lighting Status Card -->
+                    <div class="card card-spotlight col-span-2">
+                        <div class="card-header">
+                            <span class="label" data-i18n="lbl_lighting_status">Lighting Status</span>
+                        </div>
+                        <div class="card-content" style="text-align: center;">
+                            <div id="ledIndicator" class="led-indicator">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                            </div>
+                            <div id="ledStateText" class="h3" style="margin-bottom: 0.25rem;">OFF</div>
+                            <div id="ledModeText" class="label" style="color: var(--color-accent);">AUTO MODE</div>
+                        </div>
+                    </div>
+
+                    <!-- Threshold Status Card -->
+                    <div class="card card-spotlight col-span-2">
+                        <div class="card-header">
+                            <span class="label" data-i18n="lbl_detection_threshold">Detection Threshold</span>
+                        </div>
+                        <div class="card-content" style="justify-content: center; text-align: center;">
+                            <div class="h2" style="margin-bottom: 0.5rem;"><span id="thresholdValueDisplay">--</span> <span style="font-size: 1rem; color: var(--color-fg-muted);">cm</span></div>
+                            <div id="thresholdSourceText" class="label" style="color: var(--color-fg-muted);">Set by System</div>
+                            <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 1rem; overflow: hidden;">
+                                <div id="thresholdVisualBar" style="height: 100%; width: 0%; background: var(--color-accent); transition: width 0.3s;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Status Card -->
+                    <div class="card card-spotlight col-span-2">
+                        <div class="card-header">
+                            <span class="label" data-i18n="lbl_network_memory">Network & Memory</span>
+                        </div>
+                        <div class="card-content" style="gap: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--color-fg-muted); font-size: 0.875rem;" data-i18n="lbl_wifi_status">WiFi Status</span>
+                                <div class="status-indicator">
+                                    <div id="wifiStatusDot" class="status-dot"></div>
+                                    <span id="wifiStatusText">--</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--color-fg-muted); font-size: 0.875rem;" data-i18n="lbl_ip_address">IP Address</span>
+                                <span id="ipAddressText" style="font-family: var(--font-mono); font-size: 0.875rem;">--.--.--.--</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--color-fg-muted); font-size: 0.875rem;" data-i18n="lbl_free_heap">Free Heap</span>
+                                <span id="freeHeapText" style="font-family: var(--font-mono); font-size: 0.875rem;">-- KB</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Command Center Section -->
+            <section class="section">
+                <div class="section-header fade-in-up stagger-4">
+                    <span class="label" data-i18n="lbl_command_center">Command Center</span>
+                    <h2 class="h2" data-i18n="title_command_center">Remote Controls</h2>
+                </div>
+                
+                <div class="bento-grid fade-in-up stagger-5">
+                    <!-- Manual Override Control -->
+                    <div class="card card-spotlight col-span-2">
+                        <div class="card-header">
+                            <span class="label" data-i18n="lbl_system_override">System Override</span>
+                        </div>
+                        <div class="card-content" style="justify-content: space-between;">
+                            <p style="color: var(--color-fg-muted); font-size: 0.875rem; margin-bottom: 1.5rem;" data-i18n="desc_system_override">Enable manual control of lighting and threshold settings, bypassing physical hardware.</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid var(--color-border);">
+                                <span style="font-weight: 500;" data-i18n="lbl_manual_override">Manual Override</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="overrideToggle" disabled>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Distance Threshold Control -->
+                    <div class="card card-spotlight col-span-2">
+                        <div class="card-header">
+                            <span class="label" data-i18n="lbl_alert_threshold">Alert Threshold</span>
+                        </div>
+                        <div class="card-content" style="justify-content: space-between;">
+                            <p style="color: var(--color-fg-muted); font-size: 0.875rem; margin-bottom: 1rem;" data-i18n="desc_alert_threshold">Set the distance limit for intrusion alerts.</p>
+                            
+                            <div style="text-align: center; font-size: 1.5rem; font-weight: 600; font-family: var(--font-mono); margin-bottom: 0.5rem;" id="sliderValueText">
+                                50 cm
+                            </div>
+                            <input type="range" min="5" max="200" value="50" class="range-slider" id="thresholdSlider" disabled>
+                            
+                            <div style="display: flex; justify-content: space-between; color: var(--color-fg-muted); font-size: 0.75rem;">
+                                <span>5 cm</span>
+                                <span>200 cm</span>
+                            </div>
+                            
+                            <button id="applyThresholdBtn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;" disabled>
+                                Apply Setting
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lighting Control -->
+                    <div class="card card-spotlight col-span-2">
+                        <div class="card-header">
+                            <span class="label" data-i18n="lbl_lighting_command">Lighting Command</span>
+                        </div>
+                        <div class="card-content" style="justify-content: space-between;">
+                            <p style="color: var(--color-fg-muted); font-size: 0.875rem; margin-bottom: 1.5rem;" data-i18n="desc_lighting_command">Force lighting state or return to automated sensor-based operation.</p>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+                                <button class="btn btn-secondary led-cmd-btn active" data-cmd="auto" disabled data-i18n="btn_auto_mode">Auto Mode</button>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button class="btn btn-secondary led-cmd-btn" data-cmd="on" style="flex: 1;" disabled data-i18n="btn_force_on">Force ON</button>
+                                    <button class="btn btn-secondary led-cmd-btn" data-cmd="off" style="flex: 1;" disabled data-i18n="btn_force_off">Force OFF</button>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border); padding-top: 1rem;">
+                                <span style="font-weight: 500;" data-i18n="lbl_force_night">Force Night Mode</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="nightModeToggle" disabled>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div style="margin-top: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="font-weight: 500;" data-i18n="lbl_light_timer">Light Timer</span>
+                                    <span id="lightTimerText" style="color: var(--color-accent); font-weight: 600;">30s</span>
+                                </div>
+                                <input type="range" min="5" max="300" value="30" class="range-slider" id="lightTimerSlider" disabled>
+                                <button id="applyLightTimerBtn" class="btn btn-secondary" style="margin-top: 0.5rem; width: 100%;" disabled>
+                                    Apply Timer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Controls -->
+                    <div class="card card-spotlight col-span-2">
+                        <div class="card-header">
+                            <span class="label" data-i18n="lbl_security_mode">Security Mode</span>
+                        </div>
+                        <div class="card-content" style="justify-content: space-between; gap: 1rem;">
+                            <p style="color: var(--color-fg-muted); font-size: 0.875rem;" data-i18n="desc_security_mode">Disarm stops intrusion alerts. Maintenance mode keeps monitoring active while suppressing alerts temporarily.</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 500;" data-i18n="lbl_system_armed">System Armed</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="armedToggle" disabled checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 500;" data-i18n="lbl_maintenance_mode">Maintenance Mode</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="maintenanceToggle" disabled>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border); padding-top: 1rem;">
+                                <span style="font-weight: 500;" data-i18n="lbl_simulate_intrusion">Simulate Intrusion</span>
+                                <button id="testAlertBtn" class="btn btn-secondary" disabled data-i18n="btn_test_alert">Test Alert</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================= VIEW: ANALYTICS ================= -->
+        <div id="view-analytics" class="view-section">
+            <div class="section-header">
+                <span class="label" data-i18n="lbl_sys_intel">System Intelligence</span>
+                <h2 class="h2" data-i18n="title_analytics">Data Analytics & History</h2>
+                <p style="color: var(--color-fg-muted); margin-top: 0.5rem;" data-i18n="desc_analytics">Review security logs and system performance metrics.</p>
+            </div>
+            
+            <div class="bento-grid">
+                <!-- System Health Stats -->
+                <div class="card card-spotlight col-span-3">
+                    <div class="card-header">
+                        <span class="label" data-i18n="lbl_today_summary">Today's Summary</span>
+                    </div>
+                    <div class="card-content" style="gap: 1.5rem;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                <span class="h3" data-i18n="lbl_system_status">System Status</span>
+                                <span style="color: #10B981; font-weight: 500;">Optimal</span>
+                            </div>
+                            <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 0.5rem; overflow: hidden;">
+                                <div style="height: 100%; width: 100%; background: #10B981;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                <span class="h3" id="totalIntrusionsDisplay">0</span>
+                                <span class="label" style="color: var(--color-fg-muted);" data-i18n="lbl_total_intrusions">Total Intrusions</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                <span class="h3" id="closestDistDisplay">-- cm</span>
+                                <span class="label" style="color: var(--color-fg-muted);" data-i18n="lbl_closest_object">Closest Object</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Connection Graph (CSS simulated) -->
+                <div class="card card-spotlight col-span-3">
+                    <div class="card-header">
+                        <span class="label" data-i18n="lbl_activity_timeline">Activity Timeline</span>
+                    </div>
+                    <div class="card-content" style="justify-content: flex-end;">
+                        <div style="display: flex; gap: 4px; height: 120px; align-items: flex-end; opacity: 0.7;">
+                            <!-- Simulated CSS Bar Chart -->
+                            <div style="flex: 1; background: var(--color-accent); height: 20%; border-radius: 2px 2px 0 0;"></div>
+                            <div style="flex: 1; background: var(--color-accent); height: 40%; border-radius: 2px 2px 0 0;"></div>
+                            <div style="flex: 1; background: var(--color-accent); height: 15%; border-radius: 2px 2px 0 0;"></div>
+                            <div style="flex: 1; background: var(--color-accent); height: 60%; border-radius: 2px 2px 0 0;"></div>
+                            <div style="flex: 1; background: var(--color-accent); height: 30%; border-radius: 2px 2px 0 0;"></div>
+                            <div style="flex: 1; background: #EF4444; height: 90%; border-radius: 2px 2px 0 0; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);"></div>
+                            <div style="flex: 1; background: var(--color-accent); height: 45%; border-radius: 2px 2px 0 0;"></div>
+                            <div style="flex: 1; background: var(--color-accent); height: 25%; border-radius: 2px 2px 0 0;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; color: var(--color-fg-muted); font-size: 0.75rem; margin-top: 1rem;">
+                            <span>-8 Hours</span>
+                            <span>Now</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Log Section -->
+                <div class="card card-spotlight col-span-6">
+                    <div class="card-header">
+                        <span class="label" data-i18n="lbl_full_security_log">Full Security Log</span>
+                        <button id="exportEventsBtn" class="btn btn-secondary" type="button" disabled data-i18n="btn_export_csv">Export CSV</button>
+                    </div>
+                    <div class="card-content">
+                        <div id="alertList" class="alert-list" style="max-height: 400px;">
+                            <div id="emptyAlerts" class="alert-empty">
+                                No intrusions detected yet. System is secure.
+                            </div>
+                            <!-- Alerts will be populated here via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= VIEW: SETTINGS ================= -->
+        <div id="view-settings" class="view-section">
+            <div class="section-header">
+                <span class="label" data-i18n="lbl_configuration">Configuration</span>
+                <h2 class="h2" data-i18n="title_settings">System Settings</h2>
+                <p style="color: var(--color-fg-muted); margin-top: 0.5rem;" data-i18n="desc_settings">Manage device properties, network, and UI preferences.</p>
+            </div>
+
+            <div class="bento-grid">
+                <!-- UI Preferences -->
+                <div class="card card-spotlight col-span-3">
+                    <div class="card-header">
+                        <span class="label" data-i18n="lbl_user_interface">User Interface</span>
+                    </div>
+                    <div class="card-content" style="gap: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
+                            <div>
+                                <div style="font-weight: 500;" data-i18n="lbl_ui_animations">UI Animations</div>
+                                <div style="font-size: 0.875rem; color: var(--color-fg-muted);" data-i18n="desc_ui_animations">Enable visual effects and blobs</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="animToggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 500;" data-i18n="lbl_desktop_notif">Desktop Notifications</div>
+                                <div style="font-size: 0.875rem; color: var(--color-fg-muted);" data-i18n="desc_desktop_notif">Show browser alerts on intrusion</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notifToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hardware Info -->
+                <div class="card card-spotlight col-span-3">
+                    <div class="card-header">
+                        <span class="label" data-i18n="lbl_hardware_props">Hardware Properties</span>
+                    </div>
+                    <div class="card-content" style="gap: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--color-fg-muted);" data-i18n="lbl_device_id">Device ID</span>
+                            <span id="deviceIdDisplay" style="font-family: var(--font-mono); font-size: 0.875rem;">--</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--color-fg-muted);" data-i18n="lbl_mac_address">MAC Address</span>
+                            <span style="font-family: var(--font-mono); font-size: 0.875rem;">30:AE:A4:XX:XX:XX</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--color-fg-muted);" data-i18n="lbl_fw_version">Firmware Version</span>
+                            <span id="settingsFirmwareDisplay" class="accent-text" style="font-weight: 600;">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="card col-span-6" style="border-color: rgba(239, 68, 68, 0.3);">
+                    <div class="card-header">
+                        <span class="label" style="color: #EF4444;" data-i18n="lbl_danger_zone">Danger Zone</span>
+                    </div>
+                    <div class="card-content" style="flex-direction: row; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 class="h3" style="color: #EF4444; margin-bottom: 0.25rem;" data-i18n="lbl_reboot_esp32">Reboot ESP32</h3>
+                            <p style="color: var(--color-fg-muted); font-size: 0.875rem;" data-i18n="desc_reboot_esp32">Remotely restart the hardware device. System will be offline for ~5 seconds.</p>
+                        </div>
+                        <button id="rebootBtn" class="btn" style="background: rgba(239, 68, 68, 0.1); color: #EF4444; border-color: #EF4444;" data-i18n="btn_restart_device">Restart Device</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <div class="footer-text">ESP32 Smart Security & Garage Monitor System</div>
+        <div class="footer-text" style="display: flex; align-items: center; gap: 1rem;">
+            <span id="footerConnectionStatus">Waiting for connection...</span>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <!-- Login Modal Overlay -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-modal">
+            <h2 class="h2" style="margin-bottom: 0.5rem; text-align: center;">Welcome Back</h2>
+            <p style="color: var(--fg-muted); text-align: center; margin-bottom: 2rem; font-size: 0.875rem;">Sign in to access your Smart Garage dashboard.</p>
+            
+            <form id="loginForm" onsubmit="event.preventDefault();">
+                <div>
+                    <label class="label" style="display: block; margin-bottom: 0.5rem;">Email Address</label>
+                    <input type="email" id="loginEmail" class="login-input" placeholder="admin@example.com" required>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label class="label" style="display: block; margin-bottom: 0.5rem;">Password</label>
+                    <input type="password" id="loginPassword" class="login-input" placeholder="••••••••" required>
+                </div>
+                <button type="submit" id="loginSubmitBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.75rem;">Sign In</button>
+            </form>
+            <div id="loginError" style="color: #EF4444; font-size: 0.875rem; text-align: center; margin-top: 1rem; display: none;"></div>
+        </div>
+    </div>
+    
+    <!-- Application Script with Graceful Offline Degradation -->
+    <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js",
+        "firebase/database": "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js"
+      }
+    }
+    </script>
+    <script type="module">
+        // Firebase web API keys identify a project; Database Rules and Firebase
+        // Authentication are the actual protection. Fill these values at deploy time.
+        const firebaseConfig = window.SMART_GARAGE_FIREBASE_CONFIG || {
+            apiKey: "AIzaSyAF2Vyv4mQIbP2GK8xJLixZUaq_ZQBbYBU",
+            authDomain: "smart-garage-system-cabe9.firebaseapp.com",
+            databaseURL: "https://smart-garage-system-cabe9-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "smart-garage-system-cabe9",
+            appId: "1:112540812441:web:1c249ee600a9d395692408"
+        };
+        const urlParams = new URLSearchParams(window.location.search);
+        const DEVICE_ID = urlParams.get('device') || window.SMART_GARAGE_DEVICE_ID || "garage_001";
+        const devicePath = (path) => `devices/${DEVICE_ID}/${path}`;
+
+        // DOM ELEMENTS
+        const UI = {
+            navLinks: document.querySelectorAll('.nav-link'),
+            views: document.querySelectorAll('.view-section'),
+            mobileMenuBtn: document.getElementById('mobileMenuBtn'),
+            mobileMenu: document.getElementById('mobileMenu'),
+            
+            navStatusDot: document.getElementById('navStatusDot'),
+            navStatusText: document.getElementById('navStatusText'),
+            authBtn: document.getElementById('authBtn'),
+            uptimeDisplay: document.getElementById('uptimeDisplay'),
+            lastUpdateDisplay: document.getElementById('lastUpdateDisplay'),
+            
+            distanceGaugeArc: document.getElementById('distanceGaugeArc'),
+            distanceValue: document.getElementById('distanceValue'),
+            distanceStatusDot: document.getElementById('distanceStatusDot'),
+            distanceStatusText: document.getElementById('distanceStatusText'),
+            lightLevelBar: document.getElementById('lightLevelBar'),
+            lightLevelText: document.getElementById('lightLevelText'),
+            lightRawText: document.getElementById('lightRawText'),
+            lightIcon: document.getElementById('lightIcon'),
+            ledIndicator: document.getElementById('ledIndicator'),
+            ledStateText: document.getElementById('ledStateText'),
+            ledModeText: document.getElementById('ledModeText'),
+            
+            thresholdValueDisplay: document.getElementById('thresholdValueDisplay'),
+            thresholdSourceText: document.getElementById('thresholdSourceText'),
+            thresholdVisualBar: document.getElementById('thresholdVisualBar'),
+            
+            wifiStatusDot: document.getElementById('wifiStatusDot'),
+            wifiStatusText: document.getElementById('wifiStatusText'),
+            ipAddressText: document.getElementById('ipAddressText'),
+            freeHeapText: document.getElementById('freeHeapText'),
+            
+            overrideToggle: document.getElementById('overrideToggle'),
+            thresholdSlider: document.getElementById('thresholdSlider'),
+            sliderValueText: document.getElementById('sliderValueText'),
+            applyThresholdBtn: document.getElementById('applyThresholdBtn'),
+            ledCmdBtns: document.querySelectorAll('.led-cmd-btn'),
+            armedToggle: document.getElementById('armedToggle'),
+            maintenanceToggle: document.getElementById('maintenanceToggle'),
+            testAlertBtn: document.getElementById('testAlertBtn'),
+            nightModeToggle: document.getElementById('nightModeToggle'),
+            lightTimerSlider: document.getElementById('lightTimerSlider'),
+            lightTimerText: document.getElementById('lightTimerText'),
+            applyLightTimerBtn: document.getElementById('applyLightTimerBtn'),
+            
+            alertList: document.getElementById('alertList'),
+            emptyAlerts: document.getElementById('emptyAlerts'),
+            footerConnectionStatus: document.getElementById('footerConnectionStatus'),
+            toastContainer: document.getElementById('toastContainer'),
+            
+            // Analytics Stats
+            totalIntrusionsDisplay: document.getElementById('totalIntrusionsDisplay'),
+            closestDistDisplay: document.getElementById('closestDistDisplay'),
+            
+            // Settings
+            animToggle: document.getElementById('animToggle'),
+            notifToggle: document.getElementById('notifToggle'),
+            rebootBtn: document.getElementById('rebootBtn'),
+            exportEventsBtn: document.getElementById('exportEventsBtn'),
+            deviceIdDisplay: document.getElementById('deviceIdDisplay'),
+            firmwareDisplay: document.getElementById('firmwareDisplay'),
+            settingsFirmwareDisplay: document.getElementById('settingsFirmwareDisplay'),
+            
+            // Login Modal
+            loginOverlay: document.getElementById('loginOverlay'),
+            loginForm: document.getElementById('loginForm'),
+            loginEmail: document.getElementById('loginEmail'),
+            loginPassword: document.getElementById('loginPassword'),
+            loginSubmitBtn: document.getElementById('loginSubmitBtn'),
+            loginError: document.getElementById('loginError')
+        };
+
+        let isConnected = false;
+        let currentOverrideState = false;
+        let currentLedCommand = 'AUTO';
+        let alertCount = 0;
+        let closestDist = 999;
+        const MAX_ALERTS = 50; // Increased for analytics log
+        let events = [];
+        let db = null;
+        let firebaseDb = null;
+        let firebaseAuth = null;
+        let auth = null;
+        let listenersStarted = false;
+
+        // UTILITIES
+        const formatUptime = (seconds) => {
+            if (!seconds) return "00:00:00";
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        };
+        const formatTimestamp = (ms) => ms ? new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Waiting for time sync';
+        const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+        const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+
+        // VIRTUAL VIEWS (TAB SWITCHING)
+        const switchView = (viewId) => {
+            // Update active link
+            UI.navLinks.forEach(link => {
+                link.classList.toggle('active', link.dataset.view === viewId);
+            });
+            // Update active view
+            UI.views.forEach(view => {
+                if (view.id === `view-${viewId}`) {
+                    view.style.display = 'block';
+                    // Trigger reflow for animation
+                    void view.offsetWidth; 
+                    view.classList.add('active');
+                } else {
+                    view.classList.remove('active');
+                    view.style.display = 'none';
+                }
+            });
+            UI.mobileMenu.classList.remove('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        UI.navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchView(link.dataset.view);
+            });
+        });
+        document.querySelector('.nav-brand').addEventListener('click', (e) => {
+            e.preventDefault();
+            switchView('dashboard');
+        });
+        
+        const deviceSelect = document.getElementById('deviceSelect');
+        deviceSelect.value = DEVICE_ID;
+        deviceSelect.addEventListener('change', (e) => {
+            window.location.href = `?device=${e.target.value}`;
+        });
+
+        // UI UPDATES
+        const createToast = (message, type = 'info') => {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            let iconSvg = '';
+            if (type === 'success') {
+                iconSvg = `<svg class="toast-icon toast-success" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            } else if (type === 'alert') {
+                iconSvg = `<svg class="toast-icon toast-alert" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            } else {
+                iconSvg = `<svg class="toast-icon toast-info" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            }
+            toast.innerHTML = `${iconSvg}<div class="toast-message">${message}</div>`;
+            UI.toastContainer.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        };
+
+        const renderEvents = (records) => {
+            events = records.sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0)).slice(0, MAX_ALERTS);
+            UI.alertList.replaceChildren();
+            alertCount = events.length;
+            closestDist = events.reduce((closest, event) => event.distance_cm > 0 ? Math.min(closest, event.distance_cm) : closest, 999);
+            UI.totalIntrusionsDisplay.textContent = alertCount;
+            UI.closestDistDisplay.textContent = closestDist === 999 ? '-- cm' : `${closestDist} cm`;
+            UI.exportEventsBtn.disabled = events.length === 0;
+            if (events.length === 0) {
+                UI.alertList.appendChild(UI.emptyAlerts);
+                UI.emptyAlerts.style.display = 'block';
+                return;
+            }
+            events.forEach((event) => {
+                const item = document.createElement('div');
+                item.className = 'alert-item';
+                const type = escapeHtml(event.event_type || 'system_event').replace(/_/g, ' ');
+                const time = formatTimestamp(event.timestamp);
+                const distance = Number(event.distance_cm);
+                const light = Number(event.light_level);
+                item.innerHTML = `<div class="alert-info"><span class="alert-desc">${type}</span><span class="alert-time">${time} | Dist: ${Number.isFinite(distance) ? distance : '--'}cm | Light: ${Number.isFinite(light) ? Math.round((light / 4095) * 100) : '--'}%</span></div><span class="label" style="color:#EF4444;">${escapeHtml(event.severity || 'info')}</span>`;
+                UI.alertList.appendChild(item);
+            });
+        };
+
+        const updateDistanceGauge = (distanceCm, thresholdCm) => {
+            const maxRange = 200;
+            const clampedDistance = clamp(distanceCm, 0, maxRange);
+            const circumference = 565.48;
+            const percentage = clampedDistance / maxRange;
+            const offset = circumference - (percentage * circumference);
+            
+            UI.distanceGaugeArc.style.strokeDashoffset = offset;
+            UI.distanceValue.textContent = distanceCm;
+            UI.distanceGaugeArc.classList.remove('safe', 'warning', 'danger');
+            UI.distanceStatusDot.classList.remove('online', 'alert', 'offline');
+            
+            if (distanceCm <= thresholdCm) {
+                UI.distanceGaugeArc.classList.add('danger');
+                UI.distanceStatusDot.classList.add('alert');
+                UI.distanceStatusText.textContent = "Object Detected";
+                UI.distanceStatusText.style.color = "var(--color-danger, #EF4444)";
+            } else if (distanceCm <= thresholdCm + 20) {
+                UI.distanceGaugeArc.classList.add('warning');
+                UI.distanceStatusDot.classList.add('alert');
+                UI.distanceStatusText.textContent = "Approaching";
+                UI.distanceStatusText.style.color = "var(--color-warning, #F59E0B)";
+            } else {
+                UI.distanceGaugeArc.classList.add('safe');
+                UI.distanceStatusDot.classList.add('online');
+                UI.distanceStatusText.textContent = "Clear";
+                UI.distanceStatusText.style.color = "var(--color-fg-muted)";
+            }
+        };
+
+        const updateLightLevel = (rawLevel) => {
+            const percentage = Math.round((rawLevel / 4095) * 100);
+            UI.lightLevelBar.style.width = `${percentage}%`;
+            UI.lightLevelText.textContent = `${percentage}%`;
+            UI.lightRawText.textContent = `Raw: ${rawLevel}`;
+            if (percentage > 50) {
+                UI.lightIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>`;
+            } else {
+                UI.lightIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>`;
+            }
+        };
+
+        const updateLedIndicator = (isOn, manualOverride, ledCommand) => {
+            if (isOn) {
+                UI.ledIndicator.classList.add('on');
+                UI.ledStateText.textContent = "ON";
+            } else {
+                UI.ledIndicator.classList.remove('on');
+                UI.ledStateText.textContent = "OFF";
+            }
+            if (manualOverride) {
+                UI.ledModeText.textContent = `OVERRIDE: ${ledCommand.toUpperCase()}`;
+                UI.ledModeText.style.color = "var(--color-warning, #F59E0B)";
+            } else {
+                UI.ledModeText.textContent = "AUTO MODE";
+                UI.ledModeText.style.color = "var(--color-accent)";
+            }
+        };
+
+        const setControlsEnabled = (enabled) => {
+            UI.overrideToggle.disabled = !enabled;
+            UI.armedToggle.disabled = !enabled;
+            UI.maintenanceToggle.disabled = !enabled;
+            UI.testAlertBtn.disabled = !enabled;
+            UI.nightModeToggle.disabled = !enabled;
+            UI.thresholdSlider.disabled = !enabled || !currentOverrideState;
+            UI.applyThresholdBtn.disabled = !enabled || !currentOverrideState;
+            UI.lightTimerSlider.disabled = !enabled || !currentOverrideState;
+            UI.applyLightTimerBtn.disabled = !enabled || !currentOverrideState;
+            UI.ledCmdBtns.forEach(btn => btn.disabled = !enabled || !currentOverrideState);
+        };
+
+        const setConnectionState = (connected) => {
+            const changed = isConnected !== connected;
+            isConnected = connected;
+            if (connected) {
+                UI.navStatusDot.className = 'status-dot online';
+                UI.navStatusText.textContent = 'Connected';
+                UI.footerConnectionStatus.textContent = 'Connected to Firebase';
+                setControlsEnabled(true);
+                if (changed) createToast("System connected successfully", "success");
+            } else {
+                UI.navStatusDot.className = 'status-dot offline';
+                UI.navStatusText.textContent = 'Offline';
+                UI.footerConnectionStatus.textContent = 'System offline. Retrying...';
+                setControlsEnabled(false);
+                if (changed) createToast("System disconnected. Attempting to reconnect...", "alert");
+            }
+        };
+
+        
+        // --- TRANSLATION SYSTEM ---
+        const translations = {
+            en: {
+                nav_dashboard: "Dashboard",
+                nav_analytics: "Analytics",
+                nav_settings: "Settings",
+                hero_title1: "Smart Security",
+                hero_title2: "& Garage Monitor",
+                hero_subtitle: "Real-time edge computing with sensor fusion for intelligent detection and automated control.",
+                stat_uptime: "System Uptime",
+                stat_last_update: "Last Update",
+                stat_firmware: "Firmware",
+                lbl_live_telemetry: "Live Telemetry",
+                title_live_telemetry: "Real-Time Sensor Data",
+                lbl_ultrasonic: "Ultrasonic Sensor",
+                desc_ultrasonic: "Monitoring object proximity in real-time",
+                lbl_ambient_light: "Ambient Light",
+                lbl_lighting_status: "Lighting Status",
+                lbl_detection_threshold: "Detection Threshold",
+                lbl_network_memory: "Network & Memory",
+                lbl_wifi_status: "WiFi Status",
+                lbl_ip_address: "IP Address",
+                lbl_free_heap: "Free Heap",
+                lbl_command_center: "Command Center",
+                title_command_center: "Remote Controls",
+                lbl_system_override: "System Override",
+                desc_system_override: "Enable manual control of lighting and threshold settings, bypassing physical hardware.",
+                lbl_manual_override: "Manual Override",
+                lbl_alert_threshold: "Alert Threshold",
+                desc_alert_threshold: "Set the distance limit for intrusion alerts.",
+                btn_apply_setting: "Apply Setting",
+                lbl_lighting_command: "Lighting Command",
+                desc_lighting_command: "Force lighting state or return to automated sensor-based operation.",
+                btn_auto_mode: "Auto Mode",
+                btn_force_on: "Force ON",
+                btn_force_off: "Force OFF",
+                lbl_force_night: "Force Night Mode",
+                lbl_light_timer: "Light Timer",
+                btn_apply_timer: "Apply Timer",
+                lbl_security_mode: "Security Mode",
+                desc_security_mode: "Disarm stops intrusion alerts. Maintenance mode keeps monitoring active while suppressing alerts temporarily.",
+                lbl_system_armed: "System Armed",
+                lbl_maintenance_mode: "Maintenance Mode",
+                lbl_simulate_intrusion: "Simulate Intrusion",
+                btn_test_alert: "Test Alert",
+                lbl_sys_intel: "System Intelligence",
+                title_analytics: "Data Analytics & History",
+                desc_analytics: "Review security logs and system performance metrics.",
+                lbl_today_summary: "Today's Summary",
+                lbl_system_status: "System Status",
+                lbl_total_intrusions: "Total Intrusions",
+                lbl_closest_object: "Closest Object",
+                lbl_activity_timeline: "Activity Timeline",
+                lbl_full_security_log: "Full Security Log",
+                btn_export_csv: "Export CSV",
+                lbl_configuration: "Configuration",
+                title_settings: "System Settings",
+                desc_settings: "Manage device properties, network, and UI preferences.",
+                lbl_user_interface: "User Interface",
+                lbl_ui_animations: "UI Animations",
+                desc_ui_animations: "Enable visual effects and blobs",
+                lbl_desktop_notif: "Desktop Notifications",
+                desc_desktop_notif: "Show browser alerts on intrusion",
+                lbl_hardware_props: "Hardware Properties",
+                lbl_device_id: "Device ID",
+                lbl_mac_address: "MAC Address",
+                lbl_fw_version: "Firmware Version",
+                lbl_danger_zone: "Danger Zone",
+                lbl_reboot_esp32: "Reboot ESP32",
+                desc_reboot_esp32: "Remotely restart the hardware device. System will be offline for ~5 seconds.",
+                btn_restart_device: "Restart Device"
+            },
+            th: {
+                nav_dashboard: "แผงควบคุม",
+                nav_analytics: "วิเคราะห์ข้อมูล",
+                nav_settings: "ตั้งค่าระบบ",
+                hero_title1: "ระบบรักษาความปลอดภัย",
+                hero_title2: "และ ตรวจจับโรงรถอัจฉริยะ",
+                hero_subtitle: "ประมวลผลแบบเรียลไทม์พร้อมเซ็นเซอร์ขั้นสูง เพื่อการตรวจจับและสั่งการอัตโนมัติอย่างแม่นยำ",
+                stat_uptime: "ระยะเวลาทำงาน",
+                stat_last_update: "อัปเดตล่าสุด",
+                stat_firmware: "เฟิร์มแวร์",
+                lbl_live_telemetry: "ข้อมูลเซ็นเซอร์",
+                title_live_telemetry: "ข้อมูลแบบเรียลไทม์",
+                lbl_ultrasonic: "เซ็นเซอร์ระยะทาง",
+                desc_ultrasonic: "ตรวจสอบระยะห่างของวัตถุแบบเรียลไทม์",
+                lbl_ambient_light: "เซ็นเซอร์แสง",
+                lbl_lighting_status: "สถานะระบบไฟ",
+                lbl_detection_threshold: "ระยะแจ้งเตือนบุกรุก",
+                lbl_network_memory: "เครือข่ายและหน่วยความจำ",
+                lbl_wifi_status: "สถานะ WiFi",
+                lbl_ip_address: "หมายเลข IP",
+                lbl_free_heap: "หน่วยความจำคงเหลือ",
+                lbl_command_center: "ศูนย์ควบคุม",
+                title_command_center: "ควบคุมอุปกรณ์ระยะไกล",
+                lbl_system_override: "ควบคุมระบบด้วยตนเอง",
+                desc_system_override: "เปิดใช้งานการควบคุมไฟและตั้งค่าระยะห่างด้วยตนเอง โดยข้ามการประมวลผลอัตโนมัติของฮาร์ดแวร์",
+                lbl_manual_override: "เปิดใช้งานระบบแมนนวล",
+                lbl_alert_threshold: "ระยะแจ้งเตือนบุกรุก",
+                desc_alert_threshold: "ตั้งค่าระยะห่างสูงสุดสำหรับการแจ้งเตือนผู้บุกรุก",
+                btn_apply_setting: "บันทึกการตั้งค่า",
+                lbl_lighting_command: "คำสั่งระบบไฟ",
+                desc_lighting_command: "บังคับสถานะไฟหรือกลับไปใช้ระบบอัตโนมัติตามเซ็นเซอร์",
+                btn_auto_mode: "โหมดอัตโนมัติ",
+                btn_force_on: "บังคับเปิด",
+                btn_force_off: "บังคับปิด",
+                lbl_force_night: "บังคับโหมดกลางคืน",
+                lbl_light_timer: "หน่วงเวลาปิดไฟ",
+                btn_apply_timer: "ตั้งเวลา",
+                lbl_security_mode: "โหมดรักษาความปลอดภัย",
+                desc_security_mode: "การปลดล็อกระบบจะหยุดการแจ้งเตือน โหมดบำรุงรักษาจะยังคงบันทึกข้อมูลแต่ระงับการแจ้งเตือนชั่วคราว",
+                lbl_system_armed: "ล็อกระบบรักษาความปลอดภัย",
+                lbl_maintenance_mode: "โหมดบำรุงรักษา (ระงับแจ้งเตือน)",
+                lbl_simulate_intrusion: "จำลองการบุกรุก",
+                btn_test_alert: "ทดสอบแจ้งเตือน",
+                lbl_sys_intel: "วิเคราะห์ข้อมูล",
+                title_analytics: "ประวัติและสถิติการใช้งาน",
+                desc_analytics: "ตรวจสอบประวัติการรักษาความปลอดภัยและประสิทธิภาพของระบบ",
+                lbl_today_summary: "สรุปข้อมูลวันนี้",
+                lbl_system_status: "สถานะระบบ",
+                lbl_total_intrusions: "จำนวนครั้งการบุกรุก",
+                lbl_closest_object: "วัตถุที่ใกล้ที่สุด",
+                lbl_activity_timeline: "ไทม์ไลน์กิจกรรม",
+                lbl_full_security_log: "บันทึกความปลอดภัยทั้งหมด",
+                btn_export_csv: "ดาวน์โหลด CSV",
+                lbl_configuration: "การตั้งค่า",
+                title_settings: "ตั้งค่าระบบและฮาร์ดแวร์",
+                desc_settings: "จัดการคุณสมบัติอุปกรณ์ เครือข่าย และอินเทอร์เฟซผู้ใช้",
+                lbl_user_interface: "การแสดงผล",
+                lbl_ui_animations: "เอฟเฟกต์ภาพ",
+                desc_ui_animations: "เปิดใช้งานแอนิเมชันและเอฟเฟกต์ภาพ",
+                lbl_desktop_notif: "แจ้งเตือนผ่านเบราว์เซอร์",
+                desc_desktop_notif: "แสดงการแจ้งเตือนบนหน้าต่างเบราว์เซอร์เมื่อมีการบุกรุก",
+                lbl_hardware_props: "ข้อมูลฮาร์ดแวร์",
+                lbl_device_id: "รหัสอุปกรณ์",
+                lbl_mac_address: "หมายเลข MAC Address",
+                lbl_fw_version: "เวอร์ชันเฟิร์มแวร์",
+                lbl_danger_zone: "พื้นที่อันตราย",
+                lbl_reboot_esp32: "รีสตาร์ทอุปกรณ์",
+                desc_reboot_esp32: "สั่งรีสตาร์ทฮาร์ดแวร์ระยะไกล ระบบจะออฟไลน์ประมาณ 5 วินาที",
+                btn_restart_device: "รีสตาร์ทเดี๋ยวนี้"
+            }
+        };
+
+        let currentLang = localStorage.getItem('sg_language') || 'en';
+
+        const applyLanguage = () => {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+            document.documentElement.lang = currentLang;
+        };
+
+        const toggleLanguage = () => {
+            currentLang = currentLang === 'en' ? 'th' : 'en';
+            localStorage.setItem('sg_language', currentLang);
+            applyLanguage();
+        };
+
+        // --- END TRANSLATION SYSTEM ---
+
+        // FIREBASE SETUP
+        const setupFirebaseListeners = () => {
+            if (listenersStarted) return;
+            listenersStarted = true;
+            const { ref, onValue } = firebaseDb;
+            
+            onValue(ref(db, '.info/connected'), (snap) => setConnectionState(snap.val() === true));
+
+            onValue(ref(db, devicePath('telemetry/live')), (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+                const threshold = currentOverrideState ? Number(UI.thresholdSlider.value) : data.pot_threshold_cm;
+                updateDistanceGauge(data.distance_cm, threshold);
+                updateLightLevel(data.light_level);
+                updateLedIndicator(data.led_state, currentOverrideState, currentLedCommand);
+                UI.thresholdValueDisplay.textContent = threshold ?? '--';
+                UI.thresholdSourceText.textContent = currentOverrideState ? 'Set by Dashboard' : 'Set by Hardware Dial';
+                UI.thresholdVisualBar.style.width = `${(Number(threshold || 0) / 200) * 100}%`;
+                if (data.timestamp) UI.lastUpdateDisplay.textContent = formatTimestamp(data.timestamp);
+            });
+
+            onValue(ref(db, devicePath('commands')), (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+                currentOverrideState = !!data.manual_override;
+                currentLedCommand = data.led_command || 'AUTO';
+                UI.overrideToggle.checked = currentOverrideState;
+                UI.armedToggle.checked = data.armed !== false;
+                UI.maintenanceToggle.checked = !!data.maintenance_mode;
+                UI.nightModeToggle.checked = !!data.force_night_mode;
+                setControlsEnabled(isConnected);
+                
+                if (Number.isFinite(Number(data.distance_threshold))) {
+                    UI.thresholdSlider.value = data.distance_threshold;
+                    UI.sliderValueText.textContent = `${data.distance_threshold} cm`;
+                }
+                
+                if (Number.isFinite(Number(data.light_timer_seconds))) {
+                    UI.lightTimerSlider.value = data.light_timer_seconds;
+                    UI.lightTimerText.textContent = `${data.light_timer_seconds}s`;
+                }
+                
+                UI.ledCmdBtns.forEach(btn => {
+                    btn.classList.remove('active', 'btn-primary');
+                    btn.classList.add('btn-secondary');
+                    if (btn.dataset.cmd.toUpperCase() === currentLedCommand) btn.classList.add('active');
+                });
+            });
+
+            onValue(ref(db, devicePath('status')), (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+                if (data.uptime_seconds) UI.uptimeDisplay.textContent = formatUptime(data.uptime_seconds);
+                if (Number.isFinite(Number(data.wifi_rssi))) {
+                    UI.wifiStatusText.textContent = `${data.wifi_rssi} dBm`;
+                    UI.wifiStatusDot.className = 'status-dot';
+                    if (data.wifi_rssi > -60) UI.wifiStatusDot.classList.add('online');
+                    else if (data.wifi_rssi > -80) UI.wifiStatusDot.classList.add('alert');
+                    else UI.wifiStatusDot.classList.add('offline');
+                }
+                if (data.ip_address) UI.ipAddressText.textContent = data.ip_address;
+                if (data.free_heap) UI.freeHeapText.textContent = `${Math.round(data.free_heap / 1024)} KB`;
+                if (data.firmware_version) {
+                    UI.firmwareDisplay.textContent = data.firmware_version;
+                    UI.settingsFirmwareDisplay.textContent = data.firmware_version;
+                }
+                UI.deviceIdDisplay.textContent = DEVICE_ID;
+                if (data.online === false) UI.footerConnectionStatus.textContent = 'Firebase connected; device offline';
+            });
+
+            onValue(ref(db, devicePath('events')), (snapshot) => {
+                const data = snapshot.val() || {};
+                renderEvents(Object.values(data));
+            });
+        };
+
+        const toggleManualOverride = async (value) => {
+            if (!firebaseDb || !db) return;
+            try {
+                await firebaseDb.update(firebaseDb.ref(db, devicePath('commands')), { manual_override: value });
+                createToast(`Manual override ${value ? 'enabled' : 'disabled'}`, 'info');
+            } catch (e) { createToast("Failed to update", "alert"); }
+        };
+
+        const setDistanceThreshold = async (value) => {
+            if (!firebaseDb || !db) return;
+            try {
+                await firebaseDb.update(firebaseDb.ref(db, devicePath('commands')), { distance_threshold: clamp(parseInt(value, 10), 5, 200) });
+                createToast(`Threshold updated to ${value}cm`, 'success');
+            } catch (e) { createToast("Failed to update", "alert"); }
+        };
+
+        const setLedCommand = async (command) => {
+            if (!firebaseDb || !db) return;
+            try {
+                await firebaseDb.update(firebaseDb.ref(db, devicePath('commands')), { led_command: command.toUpperCase() });
+                createToast(`Command sent: ${command.toUpperCase()}`, 'success');
+            } catch (e) { createToast("Failed to send command", "alert"); }
+        };
+
+        const rebootSystem = async () => {
+            if (!firebaseDb || !db) return;
+            if(confirm("Are you sure you want to restart the ESP32 hardware?")) {
+                try {
+                    await firebaseDb.update(firebaseDb.ref(db, devicePath('commands')), { reboot_requested_at: Date.now() });
+                    createToast("Reboot command sent.", "success");
+                } catch (e) { createToast("Failed to send reboot command", "alert"); }
+            }
+        };
+
+        const showOfflineMode = () => {
+            UI.navStatusDot.className = 'status-dot alert';
+            UI.navStatusText.textContent = 'Local Mode';
+            UI.footerConnectionStatus.textContent = 'Operating in Offline Mode (Local Network)';
+            createToast("Network offline. Running in Local Mode.", "alert");
+            setControlsEnabled(false);
+            // In a real local mode, you would start polling the ESP32 directly via fetch('http://<esp32-ip>/api/sensors')
+        };
+
+        const updateSecuritySetting = async (field, value) => {
+            if (!firebaseDb || !db) return;
+            try {
+                await firebaseDb.update(firebaseDb.ref(db, devicePath('commands')), { [field]: value });
+                createToast(`${field === 'armed' ? 'Security mode' : 'Maintenance mode'} updated`, 'success');
+            } catch (error) {
+                createToast('Failed to update security mode', 'alert');
+            }
+        };
+
+        const triggerTestAlert = async () => {
+            if (!firebaseDb || !db) return;
+            try {
+                const eventId = `test_${Date.now()}_${Math.random().toString(36).substring(2,6)}`;
+                await firebaseDb.set(firebaseDb.ref(db, devicePath(`events/${eventId}`)), {
+                    id: eventId,
+                    event_type: "test_alert",
+                    severity: "info",
+                    timestamp: Date.now(),
+                    distance_cm: 0,
+                    light_level: 0
+                });
+                createToast('Test alert triggered successfully', 'success');
+            } catch (error) {
+                createToast('Failed to trigger test alert', 'alert');
+            }
+        };
+
+        const exportEvents = () => {
+            const header = ['id', 'event_type', 'severity', 'distance_cm', 'light_level', 'timestamp'];
+            const quote = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`;
+            const rows = events.map(event => header.map(key => quote(event[key])).join(','));
+            const blob = new Blob([[header.join(','), ...rows].join('\n')], { type: 'text/csv;charset=utf-8' });
+            const anchor = document.createElement('a');
+            anchor.href = URL.createObjectURL(blob);
+            anchor.download = `${DEVICE_ID}-events-${new Date().toISOString().slice(0, 10)}.csv`;
+            anchor.click();
+            URL.revokeObjectURL(anchor.href);
+        };
+
+        const signInOrOut = async () => {
+            if (!firebaseAuth || !auth) return;
+            if (auth.currentUser) {
+                await firebaseAuth.signOut(auth);
+                window.location.reload();
+                return;
+            }
+            UI.loginOverlay.classList.add('active');
+            UI.loginEmail.focus();
+        };
+
+        UI.loginForm.addEventListener('submit', async () => {
+            const email = UI.loginEmail.value.trim();
+            const password = UI.loginPassword.value;
+            if (!email || !password) return;
+            
+            UI.loginSubmitBtn.textContent = 'Signing in...';
+            UI.loginSubmitBtn.disabled = true;
+            UI.loginError.style.display = 'none';
+            
+            try {
+                await firebaseAuth.signInWithEmailAndPassword(auth, email, password);
+                UI.loginOverlay.classList.remove('active');
+            } catch (error) {
+                console.error(error);
+                UI.loginError.textContent = 'Sign in failed. Please check your credentials.';
+                UI.loginError.style.display = 'block';
+                createToast('Sign in failed.', 'alert');
+            } finally {
+                UI.loginSubmitBtn.textContent = 'Sign In';
+                UI.loginSubmitBtn.disabled = false;
+            }
+        });
+
+        const initializeFirebase = async () => {
+            const firebaseApp = await import('firebase/app');
+            firebaseDb = await import('firebase/database');
+            firebaseAuth = await import('firebase/auth');
+            const app = firebaseApp.initializeApp(firebaseConfig);
+            db = firebaseDb.getDatabase(app);
+            auth = firebaseAuth.getAuth(app);
+            firebaseAuth.onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    UI.authBtn.textContent = 'Sign in';
+                    UI.navStatusDot.className = 'status-dot offline';
+                    UI.navStatusText.textContent = 'Sign in required';
+                    UI.footerConnectionStatus.textContent = 'Sign in to access this device';
+                    setControlsEnabled(false);
+                    return;
+                }
+                UI.authBtn.textContent = 'Sign out';
+                setupFirebaseListeners();
+            });
+        };
+
+        // INIT
+        document.addEventListener('DOMContentLoaded', () => {
+            UI.deviceIdDisplay.textContent = DEVICE_ID;
+            renderEvents([]);
+            applyLanguage();
+            document.getElementById('langToggleBtn').addEventListener('click', toggleLanguage);
+            UI.overrideToggle.addEventListener('change', (e) => toggleManualOverride(e.target.checked));
+            UI.thresholdSlider.addEventListener('input', (e) => UI.sliderValueText.textContent = `${e.target.value} cm`);
+            UI.applyThresholdBtn.addEventListener('click', () => setDistanceThreshold(UI.thresholdSlider.value));
+            
+            UI.lightTimerSlider.addEventListener('input', (e) => UI.lightTimerText.textContent = `${e.target.value}s`);
+            UI.applyLightTimerBtn.addEventListener('click', () => updateSecuritySetting('light_timer_seconds', Number(UI.lightTimerSlider.value)));
+            
+            UI.ledCmdBtns.forEach(btn => btn.addEventListener('click', (e) => setLedCommand(e.target.dataset.cmd)));
+            UI.armedToggle.addEventListener('change', (e) => updateSecuritySetting('armed', e.target.checked));
+            UI.maintenanceToggle.addEventListener('change', (e) => updateSecuritySetting('maintenance_mode', e.target.checked));
+            UI.nightModeToggle.addEventListener('change', (e) => updateSecuritySetting('force_night_mode', e.target.checked));
+            UI.testAlertBtn.addEventListener('click', triggerTestAlert);
+            UI.mobileMenuBtn.addEventListener('click', () => UI.mobileMenu.classList.toggle('active'));
+            UI.rebootBtn.addEventListener('click', rebootSystem);
+            UI.authBtn.addEventListener('click', signInOrOut);
+            UI.exportEventsBtn.addEventListener('click', exportEvents);
+            
+            UI.animToggle.addEventListener('change', (e) => {
+                document.querySelectorAll('.bg-blob').forEach(b => b.style.display = e.target.checked ? 'block' : 'none');
+            });
+            UI.notifToggle.addEventListener('change', (e) => {
+                if (e.target.checked && Notification.permission !== "granted") Notification.requestPermission();
+            });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+
+            initializeFirebase().catch(err => {
+                console.warn('Failed to load Firebase (Offline Mode):', err);
+                showOfflineMode();
+            });
+        });
+    </script>
+</body>
+</html>
