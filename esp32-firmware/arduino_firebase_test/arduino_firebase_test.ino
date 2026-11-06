@@ -47,6 +47,7 @@ uint64_t lastServoCommandId = 0;
 uint64_t lastServoPowerCommandId = 0;
 uint64_t lastMotionSystemCommandId = 0;
 uint64_t lastAnnouncementCommandId = 0;
+uint64_t lastBuzzerCommandId = 0;
 bool hasDhtRead = false;
 bool hasCommandBaseline = false;
 bool ledIsOn = false;
@@ -224,19 +225,53 @@ void setMotionLed(bool enabled) {
   digitalWrite(PIN_MOTION_LED, enabled ? HIGH : LOW);
 }
 
-void testBuzzer() {
+void playBuzzerTone(uint32_t freqHz, uint32_t durationMs) {
 #if ESP_ARDUINO_VERSION_MAJOR >= 3
-  ledcWriteTone(PIN_TEST_BUZZER, BUZZER_TEST_FREQ_HZ);
-  delay(300);
+  ledcWriteTone(PIN_TEST_BUZZER, freqHz);
+  delay(durationMs);
   ledcWriteTone(PIN_TEST_BUZZER, 0);
   ledcWrite(PIN_TEST_BUZZER, 0);
 #else
-  ledcWriteTone(BUZZER_TEST_CHANNEL, BUZZER_TEST_FREQ_HZ);
-  delay(300);
+  ledcWriteTone(BUZZER_TEST_CHANNEL, freqHz);
+  delay(durationMs);
   ledcWriteTone(BUZZER_TEST_CHANNEL, 0);
   ledcWrite(BUZZER_TEST_CHANNEL, 0);
 #endif
-  Serial.println(F("Buzzer test finished"));
+}
+
+void playChimeOfficial() {
+  Serial.println(F("[SPEAKER] Playing Official Announcement Chime on GPIO 27..."));
+  playBuzzerTone(523, 130); // C5
+  delay(40);
+  playBuzzerTone(659, 130); // E5
+  delay(40);
+  playBuzzerTone(784, 260); // G5
+}
+
+void playChimeWeather() {
+  Serial.println(F("[SPEAKER] Playing Weather Alert Chime on GPIO 27..."));
+  playBuzzerTone(659, 120); // E5
+  delay(30);
+  playBuzzerTone(880, 200); // A5
+}
+
+void playSirenAlarm() {
+  Serial.println(F("[SPEAKER] Playing Emergency Siren on GPIO 27..."));
+  for (int j = 0; j < 2; j++) {
+    for (int f = 1200; f <= 2600; f += 140) {
+      playBuzzerTone(f, 15);
+    }
+    for (int f = 2600; f >= 1200; f -= 140) {
+      playBuzzerTone(f, 15);
+    }
+  }
+}
+
+void testBuzzer() {
+  Serial.println(F("[SPEAKER] Double beep test on GPIO 27"));
+  playBuzzerTone(BUZZER_TEST_FREQ_HZ, 150);
+  delay(60);
+  playBuzzerTone(BUZZER_TEST_FREQ_HZ, 200);
 }
 
 void setServoPulseUs(uint32_t pulseUs) {
@@ -387,6 +422,8 @@ void pollLedCommand() {
   const uint64_t motionRequestId = doc["motion_system_command_id"] | static_cast<uint64_t>(0);
   const String announcementCommand = doc["announcement_command"] | "";
   const uint64_t announcementRequestId = doc["announcement_command_id"] | static_cast<uint64_t>(0);
+  const String buzzerCommand = doc["buzzer_command"] | "";
+  const uint64_t buzzerRequestId = doc["buzzer_command_id"] | static_cast<uint64_t>(0);
 
   if (!hasCommandBaseline) {
     // Ignore commands left in the database before this firmware started.
@@ -396,6 +433,7 @@ void pollLedCommand() {
     lastServoPowerCommandId = servoPowerRequestId;
     lastMotionSystemCommandId = motionRequestId;
     lastAnnouncementCommandId = announcementRequestId;
+    lastBuzzerCommandId = buzzerRequestId;
     syncLedState(lastCommandId);
     syncServoState(lastServoCommandId);
     syncServoPowerState(lastServoPowerCommandId);
@@ -433,17 +471,29 @@ void pollLedCommand() {
     syncMotionSystemState(motionRequestId);
     Serial.println(motionSystemEnabled ? F("Motion alert system ON") : F("Motion alert system OFF"));
   }
-  if (announcementRequestId > lastAnnouncementCommandId) {
-    lastAnnouncementCommandId = announcementRequestId;
-    Serial.println(F("Announcement audio command received from Firebase: Beeping buzzer!"));
-    for (int i = 0; i < 3; i++) {
+  if (announcementRequestId > lastAnnouncementCommandId || buzzerRequestId > lastBuzzerCommandId) {
+    if (announcementRequestId > lastAnnouncementCommandId) lastAnnouncementCommandId = announcementRequestId;
+    if (buzzerRequestId > lastBuzzerCommandId) lastBuzzerCommandId = buzzerRequestId;
+
+    String trigger = buzzerCommand.length() > 0 ? buzzerCommand : announcementCommand;
+    trigger.toUpperCase();
+    Serial.printf("[SPEAKER] Sound command from Web: '%s' (announcementId=%llu, buzzerId=%llu)\n", trigger.c_str(), announcementRequestId, buzzerRequestId);
+
+    if (trigger.indexOf("OFFICIAL") >= 0 || trigger.indexOf("DDPM") >= 0) {
+      playChimeOfficial();
+    } else if (trigger.indexOf("SIREN") >= 0 || trigger.indexOf("ALARM") >= 0 || trigger.indexOf("CRITICAL") >= 0) {
+      playSirenAlarm();
+    } else if (trigger.indexOf("WEATHER") >= 0) {
+      playChimeWeather();
+    } else {
       testBuzzer();
-      delay(80);
     }
+
     JsonDocument stateDoc;
-    stateDoc["request_id"] = announcementRequestId;
+    stateDoc["request_id"] = max(announcementRequestId, buzzerRequestId);
     stateDoc["state"] = "PLAYING";
     stateDoc["result"] = "OK";
+    stateDoc["played_at"][".sv"] = "timestamp";
     String payload;
     serializeJson(stateDoc, payload);
     firebaseRequest(devicePath("commands/announcement_state"), "PUT", &payload, nullptr);

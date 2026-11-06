@@ -3,6 +3,7 @@ import { domBatcher } from './performance';
 import { evaluateHumidityAlert } from './humidity_alert';
 import { assessWeatherHazards } from './hazard_assessment';
 import { buildWeatherNarration as createWeatherNarration } from './weather_narration';
+import { requestEsp32Announcement } from './firebase_client';
 
 export const PROVINCES_MAP: Record<string, { lat: number; lon: number; en: string }> = {
     "กรุงเทพมหานคร": { lat: 13.7563, lon: 100.5018, en: "Bangkok" },
@@ -373,32 +374,58 @@ export const setAlertToneVolume = (volume: number) => {
     return true;
 };
 
+export type AudioDestination = 'hardware' | 'browser' | 'dual';
+const isTestEnv = typeof process !== 'undefined' && (process.env?.NODE_ENV === 'test' || Boolean((process.env as any)?.VITEST));
+let audioDestination: AudioDestination = isTestEnv
+    ? 'browser'
+    : ((localStorage.getItem('sbc_audio_destination') as AudioDestination) || 'hardware');
+
+export const setAudioDestination = (dest: AudioDestination) => {
+    audioDestination = dest;
+    try { localStorage.setItem('sbc_audio_destination', dest); } catch { /* ignore */ }
+};
+
+export const getAudioDestination = (): AudioDestination => audioDestination;
+
 export const playAlertTone = async (kind: 'official' | 'weather') => {
     if (isAudioMuted()) return;
-    const context = getAlertAudioContext();
-    if (!context) return;
-    if (context.state === 'suspended') {
-        try { await context.resume(); } catch { return; }
+
+    // 1. Trigger hardware ESP32 speaker cue if hardware or dual
+    if (audioDestination === 'hardware' || audioDestination === 'dual') {
+        void requestEsp32Announcement(kind === 'official' ? 'OFFICIAL_CHIME' : 'WEATHER_CHIME', kind === 'official' ? 'OFFICIAL' : 'WEATHER').then(() => {
+            if (UI.ttsStatus) UI.ttsStatus.textContent = '🔊 ส่งเสียงที่ลำโพง ESP32 แล้ว';
+        }).catch((err) => {
+            console.warn('[AUDIO] ESP32 buzzer trigger notice:', err);
+        });
     }
-    const volume = getAlertToneVolume();
-    const notes = kind === 'official'
-        ? [{ frequency: 1046, at: 0 }, { frequency: 784, at: 0.2 }, { frequency: 1046, at: 0.46 }]
-        : [{ frequency: 740, at: 0 }, { frequency: 740, at: 0.34 }];
-    const now = context.currentTime;
-    for (const note of notes) {
-        const oscillator = context.createOscillator();
-        const gain = context.createGain();
-        const start = now + note.at;
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(note.frequency, start);
-        gain.gain.setValueAtTime(0.0001, start);
-        gain.gain.linearRampToValueAtTime(volume * 0.65, start + 0.025);
-        gain.gain.setValueAtTime(volume * 0.65, start + 0.12);
-        gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.19);
-        oscillator.connect(gain);
-        gain.connect(context.destination);
-        oscillator.start(start);
-        oscillator.stop(start + 0.2);
+
+    // 2. Play browser Web Audio if browser or dual
+    if (audioDestination === 'browser' || audioDestination === 'dual') {
+        const context = getAlertAudioContext();
+        if (!context) return;
+        if (context.state === 'suspended') {
+            try { await context.resume(); } catch { return; }
+        }
+        const volume = getAlertToneVolume();
+        const notes = kind === 'official'
+            ? [{ frequency: 1046, at: 0 }, { frequency: 784, at: 0.2 }, { frequency: 1046, at: 0.46 }]
+            : [{ frequency: 740, at: 0 }, { frequency: 740, at: 0.34 }];
+        const now = context.currentTime;
+        for (const note of notes) {
+            const oscillator = context.createOscillator();
+            const gain = context.createGain();
+            const start = now + note.at;
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(note.frequency, start);
+            gain.gain.setValueAtTime(0.0001, start);
+            gain.gain.linearRampToValueAtTime(volume * 0.65, start + 0.025);
+            gain.gain.setValueAtTime(volume * 0.65, start + 0.12);
+            gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.19);
+            oscillator.connect(gain);
+            gain.connect(context.destination);
+            oscillator.start(start);
+            oscillator.stop(start + 0.2);
+        }
     }
 };
 
@@ -461,7 +488,9 @@ export const enableAutomaticSpeech = () => {
 
 export const isAutomaticSpeechEnabled = () => automaticSpeechEnabled;
 
-export const speakWeatherSummary = () => speakText(latestWeatherNarration);
+export const speakWeatherSummary = () => {
+    speakText(latestWeatherNarration, 'WEATHER');
+};
 
 if ('speechSynthesis' in window) {
     window.speechSynthesis.addEventListener?.('voiceschanged', () => {
@@ -538,9 +567,23 @@ const speakNextQueueItem = (sequenceId = speechSequence) => {
     window.speechSynthesis.speak(utterance);
 };
 
-export const speakText = (text: string) => {
+export const speakText = (text: string, cueType: 'ANNOUNCEMENT' | 'WEATHER' | 'OFFICIAL' | 'TEST' = 'ANNOUNCEMENT') => {
     const cleanText = text?.trim();
     if (!cleanText || isAudioMuted()) return;
+
+    // 1. If hardware or dual, trigger physical ESP32 speaker
+    if (audioDestination === 'hardware' || audioDestination === 'dual') {
+        void requestEsp32Announcement(cleanText, cueType).then(() => {
+            if (UI.ttsStatus) UI.ttsStatus.textContent = '🔊 ส่งเสียงออกลำโพง ESP32 แล้ว';
+        }).catch(() => undefined);
+    }
+
+    // 2. If hardware-only, keep computer silent!
+    if (audioDestination === 'hardware') {
+        if (UI.ttsStatus) UI.ttsStatus.textContent = '🔊 ส่งเสียงออกลำโพง ESP32 แล้ว';
+        return;
+    }
+
     if (!('speechSynthesis' in window)) return;
 
     // Wake up AudioContext on user action so speaker is active

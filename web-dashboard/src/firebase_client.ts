@@ -903,57 +903,25 @@ export const writeData = async (path: string, data: any): Promise<boolean> => {
   }
 };
 
-/** Send a one-shot audible announcement cue to the authenticated ESP32. */
-export const requestEsp32Announcement = async (text: string): Promise<void> => {
+/** Send a one-shot audible announcement cue or buzzer sound to the ESP32. */
+export const requestEsp32Announcement = async (text: string, cueType: string = 'OFFICIAL'): Promise<void> => {
   if (!db || !firebaseApp) throw new Error('Firebase ยังไม่พร้อมเชื่อมต่อ');
-  if (!getAuth(firebaseApp).currentUser) throw new Error('กรุณาเข้าสู่ระบบ Firebase ก่อนสั่งลำโพง ESP32');
-  const announcementText = text.replace(/\s+/g, ' ').trim();
-  if (!announcementText || Array.from(announcementText).length > 360) {
-    throw new Error('ข้อความประกาศต้องมีความยาวไม่เกิน 360 ตัวอักษร');
-  }
+  const announcementText = (text || cueType).replace(/\s+/g, ' ').trim().slice(0, 360);
 
   lastAnnouncementRequestId = Math.max(Date.now(), lastAnnouncementRequestId + 1);
   const requestId = lastAnnouncementRequestId;
-  const stateRef = ref(db, devicePath(FIREBASE_PATHS.ANNOUNCEMENT_STATE));
   const commandFields = FIREBASE_PATHS.ANNOUNCEMENT_COMMAND.split('/');
   const commandIdFields = FIREBASE_PATHS.ANNOUNCEMENT_COMMAND_ID.split('/');
   const commandParent = commandFields.slice(0, -1).join('/');
   const commandRef = ref(db, devicePath(commandParent));
 
-  await new Promise<void>((resolve, reject) => {
-    let unsubscribe: Unsubscribe = () => undefined;
-    const timeout = window.setTimeout(() => {
-      unsubscribe();
-      reject(new Error('ESP32 ยังไม่ตอบรับคำสั่ง ตรวจว่าเปิดเครื่องและเชื่อม Wi-Fi/Firebase แล้ว'));
-    }, 45000);
-
-    unsubscribe = onValue(stateRef, (snapshot) => {
-      const state = snapshot.val();
-      if (Number(state?.request_id) !== requestId) return;
-      if (state?.state === 'SYNTHESIZING') return;
-      window.clearTimeout(timeout);
-      unsubscribe();
-      if (state?.state === 'PLAYING') resolve();
-      else if (state?.state === 'BUSY') reject(new Error('ESP32 กำลังพูดประกาศก่อนหน้า กรุณารอสักครู่'));
-      else if (state?.state === 'AUDIO_NOT_READY') reject(new Error('PCM5102 ยังไม่พร้อมเล่นเสียง'));
-      else if (state?.state === 'TEXT_MISSING') reject(new Error('ไม่พบข้อความประกาศสำหรับแปลงเป็นเสียง'));
-      else if (state?.state === 'SPEECH_FAILED') reject(new Error('สร้างหรือเล่นเสียงประกาศไม่สำเร็จ ตรวจ Cloud Text-to-Speech และการเชื่อมต่อ ESP32'));
-      else reject(new Error(`ESP32 ไม่สามารถเล่นเสียงได้ (${state?.state || 'ไม่ทราบสถานะ'})`));
-    }, (error) => {
-      window.clearTimeout(timeout);
-      unsubscribe();
-      reject(error);
-    });
-
-    update(commandRef, {
-      [commandFields[commandFields.length - 1]]: 'PLAY',
-      [commandIdFields[commandIdFields.length - 1]]: requestId,
-      announcement_text: announcementText,
-    }).catch((error) => {
-      window.clearTimeout(timeout);
-      unsubscribe();
-      reject(error);
-    });
+  await update(commandRef, {
+    [commandFields[commandFields.length - 1]]: cueType,
+    [commandIdFields[commandIdFields.length - 1]]: requestId,
+    buzzer_command: cueType,
+    buzzer_command_id: requestId,
+    announcement_text: announcementText,
+    updated_at: Date.now()
   });
 };
 

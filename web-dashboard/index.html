@@ -610,7 +610,15 @@
                                 <span id="ttsStatus" class="voice-status-pill" role="status" aria-live="off">พร้อมพูด</span>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.85rem; margin-top: 0.5rem;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.85rem; margin-top: 0.5rem;">
+                                <div class="voice-speed-control" style="max-width: 100%;">
+                                    <label for="audioDestinationSelect">อุปกรณ์ขับเสียง (Audio Output)</label>
+                                    <select id="audioDestinationSelect" aria-label="เลือกอุปกรณ์ขับเสียง">
+                                        <option value="hardware" selected>📢 ลำโพงฮาร์ดแวร์ ESP32 (GPIO 27)</option>
+                                        <option value="browser">💻 ลำโพงคอมพิวเตอร์ / เบราว์เซอร์</option>
+                                        <option value="dual">📡 ทั้ง 2 ช่องทาง (ESP32 + คอมพิวเตอร์)</option>
+                                    </select>
+                                </div>
                                 <div class="voice-speed-control" style="max-width: 100%;">
                                     <label for="speechRateSelect">ความเร็วเสียง</label>
                                     <select id="speechRateSelect" aria-label="เลือกความเร็วเสียงภาษาไทย">
@@ -630,11 +638,14 @@
                             </div>
 
                             <div class="voice-actions" style="margin-top: 0.5rem;">
-                                <button id="speechTestBtn" class="btn btn-secondary voice-control-button" type="button" aria-label="ทดลองฟังเสียงภาษาไทย">
-                                    ทดลองเสียง
+                                <button id="esp32BuzzerTestBtn" class="btn btn-secondary voice-control-button" type="button" aria-label="ส่งสัญญาณทดสอบไปยังลำโพง ESP32">
+                                    📢 ทดสอบลำโพง ESP32
                                 </button>
                                 <button id="officialToneTestBtn" class="btn btn-secondary voice-control-button" type="button">ทดสอบเสียง ปภ.</button>
                                 <button id="weatherToneTestBtn" class="btn btn-secondary voice-control-button" type="button">ทดสอบเสียงอากาศ</button>
+                                <button id="speechTestBtn" class="btn btn-secondary voice-control-button" type="button" aria-label="ทดลองฟังเสียงภาษาไทย">
+                                    ทดลองเสียงพูด
+                                </button>
                                 <button id="weatherRepeatBtn" class="btn btn-secondary voice-control-button" type="button" aria-label="ฟังสรุปสภาพอากาศซ้ำ">
                                     ฟังซ้ำ
                                 </button>

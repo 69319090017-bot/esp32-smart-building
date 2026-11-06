@@ -309,8 +309,8 @@ export const testAudioSiren = async () => {
     }, 600);
 
     try {
-        await requestEsp32Announcement('ทดสอบเสียงลำโพง ESP32 ผ่าน PCM5102');
-        createToast("ESP32 กำลังส่งเสียงออกลำโพง PCM5102 แล้ว", "success");
+        await requestEsp32Announcement('ทดสอบเสียงลำโพง ESP32 (GPIO 27)', 'TEST');
+        createToast("ESP32 กำลังส่งเสียงออกลำโพง (GPIO 27) แล้ว", "success");
         setTimeout(() => {
             if (sirenPill) {
                 sirenPill.textContent = "NORMAL (SILENT)";

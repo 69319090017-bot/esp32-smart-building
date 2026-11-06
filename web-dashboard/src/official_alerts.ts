@@ -268,14 +268,13 @@ function announceOfficialAlert(alert: OfficialAlert): void {
     speak?.(text);
   }, 650);
 
-  // 2. Also trigger ESP32 hardware announcement via Firebase
-  void requestEsp32Announcement(text).then(() => {
-    if (pnaOfficialStatus) pnaOfficialStatus.textContent = 'กำลังเล่นเสียงประกาศเตือนภัยผ่านลำโพงและ ESP32 เรียบร้อย';
-  }).catch(() => {
-    if (pnaOfficialStatus) pnaOfficialStatus.textContent = 'กำลังเล่นเสียงประกาศผ่านลำโพงเรียบร้อย';
-  }).finally(() => {
-    if (button?.isConnected) button.disabled = false;
-  });
+  // 2. Status confirmation
+  if (pnaOfficialStatus) {
+    pnaOfficialStatus.textContent = 'ส่งสัญญาณเสียงประกาศเรียบร้อย';
+  }
+  if (button?.isConnected) {
+    setTimeout(() => { button.disabled = false; }, 1200);
+  }
 }
 
 function renderWeatherView() {

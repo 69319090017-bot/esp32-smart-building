@@ -26,6 +26,9 @@ import {
     getAlertToneVolume,
     setAlertToneVolume,
     playAlertTone,
+    getAudioDestination,
+    setAudioDestination,
+    AudioDestination,
     createToast,
     triggerActionWithOptions,
     historyLogs,
@@ -462,6 +465,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
+    const audioDestSelect = document.getElementById('audioDestinationSelect') as HTMLSelectElement | null;
+    if (audioDestSelect) {
+        audioDestSelect.value = getAudioDestination();
+        audioDestSelect.addEventListener('change', () => {
+            const dest = audioDestSelect.value as AudioDestination;
+            setAudioDestination(dest);
+            const label = audioDestSelect.options[audioDestSelect.selectedIndex]?.text || dest;
+            createToast(`ช่องทางเสียง: ${label}`, 'info');
+        });
+    }
+
+    document.getElementById('esp32BuzzerTestBtn')?.addEventListener('click', async () => {
+        try {
+            await requestEsp32Announcement('ทดสอบลำโพง ESP32 (GPIO 27)', 'TEST');
+            createToast('ส่งสัญญาณทดสอบไปยังลำโพง ESP32 (GPIO 27) แล้ว', 'success');
+        } catch (err: any) {
+            createToast(`สั่งลำโพงไม่สำเร็จ: ${err?.message || err}`, 'alert');
+        }
+    });
+
     document.getElementById('officialToneTestBtn')?.addEventListener('click', () => void playAlertTone('official'));
     document.getElementById('weatherToneTestBtn')?.addEventListener('click', () => void playAlertTone('weather'));
 
