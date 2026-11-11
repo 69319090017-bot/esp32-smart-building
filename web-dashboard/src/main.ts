@@ -5,7 +5,6 @@ import Chart from 'chart.js/auto';
 import { initializeFirebase, requestEsp32Announcement } from './firebase_client';
 import { initializeIndoorHome } from './smart_home/indoor_home';
 import { initElectricityCalculator } from './electricity_calculator';
-import { initializeHeatRiskPage } from './heat-risk-page';
 import { getCommunicationManager, CommunicationMode } from './communication_manager';
 import { 
     UI, 
@@ -50,11 +49,8 @@ import {
     reconnectWebSocket
 } from './device_controller';
 import {
-    RadarChartComponent,
     TimeSeriesChartComponent,
-    GaugeChartComponent,
     SparklineComponent,
-    HeatmapComponent,
     chartManager
 } from './chart_components';
 import { type HazardData, type HistoricalDataPoint } from './charts';
@@ -67,14 +63,6 @@ import { eventBus, eventFactory } from './event_bus';
 import { logger, setupGlobalErrorHandlers } from './logger';
 import { errorBoundary, injectErrorStyles, ErrorCategory } from './error_boundary';
 import { validateUserInput } from './validators';
-
-const DEMO_SCENARIO_MODE = new URLSearchParams(window.location.search).get('demo') === '1';
-
-if (DEMO_SCENARIO_MODE) {
-    document.querySelector('[data-view="simulator"]')?.removeAttribute('hidden');
-    document.getElementById('view-simulator')?.removeAttribute('hidden');
-    document.getElementById('simulatorDemoNotice')?.removeAttribute('hidden');
-}
 
 // Expose injectScenario globally so buttons can call it
 (window as any).onProvinceChange = async (val: string) => {
@@ -94,117 +82,7 @@ if (DEMO_SCENARIO_MODE) {
     await fetchOpenMeteoWeather(activeProvince);
 };
 
-(window as any).injectScenario = async (type: string) => {
-    const prov = UI.provinceSelect.value || "กรุงเทพมหานคร";
-
-    if (type === 'live') {
-        createToast("กำลังดึงข้อมูลดาวเทียมสดจาก Open-Meteo...", "info");
-        await fetchOpenMeteoWeather(prov);
-        return;
-    }
-
-    if (!DEMO_SCENARIO_MODE) {
-        createToast('ปิดการจำลองไว้ ข้อมูลตัวอย่างจะไม่ถูกนำไปแสดงเป็นข้อมูลจริง', 'info');
-        return;
-    }
-
-    let fakeWeather: any = {};
-    let sev = "NORMAL";
-    let alertMsg = "";
-
-    if (type === 'uv') {
-        fakeWeather = {
-            uv_index: 12.5,
-            apparent_temperature: 39.0,
-            temperature_2m: 35.0,
-            weather_code: 0,
-            wind_gusts_10m: 18.0,
-            wind_speed_10m: 10.0,
-            precipitation: 0.0,
-            river_discharge: 50.0
-        };
-        sev = "CRITICAL";
-        alertMsg = `เตือนภัยดัชนี UV สูงจัด (12.5) เสี่ยงผิวไหม้รุนแรงในไม่กี่นาที จ.${prov}`;
-    } else if (type === 'heat') {
-        fakeWeather = {
-            uv_index: 9.0,
-            apparent_temperature: 43.5,
-            temperature_2m: 39.5,
-            weather_code: 1,
-            wind_gusts_10m: 15.0,
-            wind_speed_10m: 8.0,
-            precipitation: 0.0,
-            river_discharge: 45.0
-        };
-        sev = "CRITICAL";
-        alertMsg = `เตือนภัยอากาศร้อนจัด รู้สึกเหมือน 43.5°C เสี่ยงโรคลมแดด (Heatstroke) จ.${prov}`;
-    } else if (type === 'storm') {
-        fakeWeather = {
-            uv_index: 1.0,
-            apparent_temperature: 28.0,
-            temperature_2m: 26.0,
-            weather_code: 96,
-            wind_gusts_10m: 85.0,
-            wind_speed_10m: 45.0,
-            precipitation: 32.0,
-            river_discharge: 220.0
-        };
-        sev = "CRITICAL";
-        alertMsg = `เตือนภัยพายุฝนฟ้าคะนองรุนแรงพร้อมลูกเห็บ (WMO 96) จ.${prov}`;
-    } else if (type === 'gust') {
-        fakeWeather = {
-            uv_index: 3.0,
-            apparent_temperature: 30.0,
-            temperature_2m: 28.0,
-            weather_code: 82,
-            wind_gusts_10m: 95.0,
-            wind_speed_10m: 60.0,
-            precipitation: 5.0,
-            river_discharge: 110.0
-        };
-        sev = "CRITICAL";
-        alertMsg = `เตือนภัยลมกระโชกรุนแรง 95.0 กม./ชม. จ.${prov}`;
-    } else if (type === 'flood') {
-        fakeWeather = {
-            uv_index: 0.5,
-            apparent_temperature: 26.0,
-            temperature_2m: 25.0,
-            weather_code: 65,
-            wind_gusts_10m: 55.0,
-            wind_speed_10m: 30.0,
-            precipitation: 48.0,
-            river_discharge: 680.0
-        };
-        sev = "CRITICAL";
-        alertMsg = `เตือนภัยฝนตกหนักมาก 48 มม./ชม. ระวังน้ำท่วมฉับพลันและน้ำในแม่น้ำล้นตลิ่ง จ.${prov}`;
-    } else if (type === 'clear') {
-        fakeWeather = {
-            uv_index: 4.5,
-            apparent_temperature: 31.0,
-            temperature_2m: 29.0,
-            weather_code: 1,
-            wind_gusts_10m: 18.0,
-            wind_speed_10m: 12.0,
-            precipitation: 0.0,
-            river_discharge: 85.0
-        };
-        sev = "NORMAL";
-        createToast("รีเซ็ตสถานะเป็นปกติ (All Hazards Safe)", "success");
-    }
-
-    updateDashboardUI(fakeWeather, sev, prov);
-
-    if (sev === "CRITICAL") {
-        const demoMessage = `นี่คือข้อมูลตัวอย่าง ${alertMsg}`;
-        speakText(demoMessage);
-        createToast(demoMessage, "alert");
-        // Keep the former notification path visible, but never transmit simulated data.
-        if (!DEMO_SCENARIO_MODE) sendTelegramAlert(alertMsg, sev, prov);
-    }
-};
-
 document.addEventListener('DOMContentLoaded', async () => {
-    initializeHeatRiskPage();
     // ============================================================================
     // NEW ARCHITECTURE INITIALIZATION
     // ============================================================================
@@ -819,12 +697,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 // CHARTS SYSTEM INITIALIZATION
 // ============================================================================
 
-let radarChart: RadarChartComponent | null = null;
-let heatmapChart: HeatmapComponent | null = null;
-let gaugeUV: GaugeChartComponent | null = null;
-let gaugeHeat: GaugeChartComponent | null = null;
-let gaugeWind: GaugeChartComponent | null = null;
-
 let sparklineUV: SparklineComponent | null = null;
 let sparklineHeat: SparklineComponent | null = null;
 let sparklineWind: SparklineComponent | null = null;
@@ -1072,88 +944,6 @@ function initializeCharts(): void {
     }
 }
 
-function initializeChartsView(): void {
-    try {
-        // Initialize Radar Chart
-        radarChart = new RadarChartComponent(
-            { 
-                containerId: 'radar-chart-container', 
-                canvasId: 'radar-chart-canvas',
-                title: '6-Hazard Overview',
-                showExport: true
-            }
-        );
-        chartManager.registerComponent('radar', radarChart);
-
-        // Initialize Heatmap
-        const provinces = Object.keys(PROVINCES_MAP);
-        const initialHazardLevels = provinces.map(() => Math.random() * 30);
-        heatmapChart = new HeatmapComponent(
-            { 
-                containerId: 'heatmap-chart-container', 
-                canvasId: 'heatmap-chart-canvas',
-                title: 'Province Hazard Levels',
-                showExport: true
-            },
-            provinces,
-            initialHazardLevels
-        );
-        chartManager.registerComponent('heatmap', heatmapChart);
-
-        // Initialize Gauge Charts
-        gaugeUV = new GaugeChartComponent(
-            { 
-                containerId: 'gauge-uv-container', 
-                canvasId: 'gauge-uv-canvas',
-                title: 'UV Index Gauge'
-            },
-            15,
-            '#00f3ff',
-            ''
-        );
-        chartManager.registerComponent('gauge-uv', gaugeUV);
-
-        gaugeHeat = new GaugeChartComponent(
-            { 
-                containerId: 'gauge-heat-container', 
-                canvasId: 'gauge-heat-canvas',
-                title: 'Heat Index Gauge'
-            },
-            50,
-            '#ff0055',
-            '°C'
-        );
-        chartManager.registerComponent('gauge-heat', gaugeHeat);
-
-        gaugeWind = new GaugeChartComponent(
-            { 
-                containerId: 'gauge-wind-container', 
-                canvasId: 'gauge-wind-canvas',
-                title: 'Wind Gusts Gauge'
-            },
-            100,
-            '#3b82f6',
-            ' km/h'
-        );
-        chartManager.registerComponent('gauge-wind', gaugeWind);
-
-        createToast("Advanced charts view initialized", "success");
-    } catch (error) {
-        console.error("Failed to initialize charts view:", error);
-        createToast("Charts view initialization failed", "alert");
-    }
-}
-
-// Hook into view switching to initialize charts view when needed
-const originalSwitchView = (window as any).switchView || switchView;
-(window as any).switchView = (view: string) => {
-    originalSwitchView(view);
-    
-    if (view === 'charts' && !radarChart) {
-        initializeChartsView();
-    }
-};
-
 // Update charts with new data
 function updateCharts(data: HazardData, province: string): void {
     if (!historicalDataStore.has(province)) {
@@ -1221,31 +1011,6 @@ function updateCharts(data: HazardData, province: string): void {
         dewHistoryChart.data.labels = labels;
         dewHistoryChart.data.datasets[0].data = dewValues;
         dewHistoryChart.update();
-    }
-
-    // Update radar chart if charts view is active
-    if (radarChart) {
-        radarChart.render(data);
-    }
-
-    // Update gauges if charts view is active
-    if (gaugeUV) gaugeUV.render(data.uv_index);
-    if (gaugeHeat) gaugeHeat.render(data.apparent_temperature);
-    if (gaugeWind) gaugeWind.render(data.wind_gusts_10m);
-
-    // Update heatmap with simulated hazard levels
-    if (heatmapChart) {
-        const hazardLevels = Object.keys(PROVINCES_MAP).map(() => {
-            const maxHazard = Math.max(
-                data.uv_index / 15,
-                data.apparent_temperature / 50,
-                data.wind_gusts_10m / 100,
-                data.precipitation / 50,
-                data.river_discharge / 700
-            );
-            return maxHazard * 100;
-        });
-        heatmapChart.render(hazardLevels);
     }
 }
 
