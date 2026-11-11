@@ -40,9 +40,18 @@ constexpr uint8_t BUZZER_TEST_CHANNEL = 1;    // ESP32 Arduino core 2.x fallback
 constexpr uint8_t SERVO_TEST_CHANNEL = 2;     // ESP32 Arduino core 2.x fallback
 constexpr uint32_t BUZZER_TEST_FREQ_HZ = 2000;
 constexpr uint32_t SERVO_TEST_FREQ_HZ = 50;
-constexpr uint32_t SERVO_CLOSED_PULSE_US = 1000;
-constexpr uint32_t SERVO_OPEN_PULSE_US = 2000;
 constexpr uint32_t SERVO_TEST_PERIOD_US = 20000;
+
+// ==========================================
+// SERVO MOTOR CALIBRATION (SG90 / SG92R 180-DEGREE DOOR LOCK)
+// ==========================================
+// SG92R PWM: 0 deg (Left / CCW) = ~550 us, 180 deg (Right / CW) = ~2450 us
+// User requirement:
+// - ตอนปิด (CLOSED): 550 us (0 deg / จุดเริ่มต้นกลอนล็อก)
+// - ตอนเปิด (OPEN): 2450 us (หมุนไปทางขวา 180 องศาเต็มช่วง)
+// สามารถพิมพ์ 'I' ใน Serial Monitor เพื่อสลับทิศทาง (Invert) ได้ทันที
+uint32_t servoClosedPulseUs = 550;   // 0 deg (Closed / Lock position)
+uint32_t servoOpenPulseUs = 2450;    // 180 deg (Open / Rotated 180 deg to the right)
 
 constexpr uint32_t PIR_WARMUP_MS = 60000;
 constexpr uint32_t MOTION_LIGHT_HOLD_MS = 30000;
@@ -478,8 +487,11 @@ void setServoPosition(bool open, bool speakNotice) {
     setServoPower(true);
   }
   servoIsOpen = open;
-  setServoPulseUs(open ? SERVO_OPEN_PULSE_US : SERVO_CLOSED_PULSE_US);
-  Serial.println(open ? F("Servo OPEN") : F("Servo CLOSED"));
+  const uint32_t targetPulse = open ? servoOpenPulseUs : servoClosedPulseUs;
+  setServoPulseUs(targetPulse);
+  Serial.print(open ? F("Servo OPEN (") : F("Servo CLOSED ("));
+  Serial.print(targetPulse);
+  Serial.println(F(" us)"));
 
   if (speakNotice && i2sInitialized) {
     if (open) {
@@ -578,18 +590,22 @@ void checkButtons() {
 }
 
 void testServo() {
-  Serial.println(F("Servo test: CLOSED, OPEN (~90 deg), then CLOSED."));
+  Serial.print(F("Servo test: CLOSED ("));
+  Serial.print(servoClosedPulseUs);
+  Serial.print(F("us), OPEN ("));
+  Serial.print(servoOpenPulseUs);
+  Serial.println(F("us - 180 deg right), then CLOSED."));
   setServoPosition(false, false);
-  delay(700);
+  delay(1000);
   setServoPosition(true, false);
-  delay(700);
+  delay(1200);
   setServoPosition(false, false);
-  delay(700);
+  delay(1000);
   Serial.println(F("Servo test finished; servo remains CLOSED."));
 }
 
 void printTestHelp() {
-  Serial.println(F("Commands: 1=LED ON, 0=LED OFF, T=LED blink, B=buzzer beep, P=read PIR, S=servo test, V=voice test, N=toggle night mode, Q=status inquiry, X=stop speech, ?=help"));
+  Serial.println(F("Commands: 1=LED ON, 0=LED OFF, T=LED blink, B=buzzer beep, P=read PIR, S=servo test 180, O=open door, C=close door, I=invert servo, V=voice test, N=toggle night mode, Q=status inquiry, X=stop speech, ?=help"));
   Serial.println(F("Tip: You can press the physical BOOT button on the ESP32 board to hear status or to STOP speech instantly!"));
 }
 
@@ -615,6 +631,22 @@ void processSerialCommands() {
       testBuzzer();
     } else if (command == 'S' || command == 's') {
       testServo();
+    } else if (command == 'O' || command == 'o') {
+      Serial.println(F("[SERIAL] Command: Open door (180 deg right)"));
+      setServoPosition(true);
+    } else if (command == 'C' || command == 'c') {
+      Serial.println(F("[SERIAL] Command: Close door"));
+      setServoPosition(false);
+    } else if (command == 'I' || command == 'i') {
+      const uint32_t tmp = servoClosedPulseUs;
+      servoClosedPulseUs = servoOpenPulseUs;
+      servoOpenPulseUs = tmp;
+      Serial.print(F("[SERVO] Inverted! CLOSED="));
+      Serial.print(servoClosedPulseUs);
+      Serial.print(F("us, OPEN="));
+      Serial.print(servoOpenPulseUs);
+      Serial.println(F("us"));
+      setServoPosition(servoIsOpen, false);
     } else if (command == 'P' || command == 'p') {
       if (millis() - bootAt < PIR_WARMUP_MS) {
         Serial.println(F("PIR warming up; wait about 60 seconds after power-on."));
