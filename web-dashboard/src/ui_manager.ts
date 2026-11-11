@@ -2,7 +2,7 @@ import { translations } from './translations';
 import { domBatcher } from './performance';
 import { evaluateHumidityAlert } from './humidity_alert';
 import { assessWeatherHazards } from './hazard_assessment';
-import { buildWeatherNarration as createWeatherNarration } from './weather_narration';
+import { buildWeatherNarration as createWeatherNarration, calculateRothfuszHeatIndexC } from './weather_narration';
 import { requestEsp32Announcement } from './firebase_client';
 
 export const PROVINCES_MAP: Record<string, { lat: number; lon: number; en: string }> = {
@@ -763,32 +763,53 @@ const updateHumidityDetailPanel = (humidity: number, dewPoint: number, comfortTe
 };
 
 export const buildOutdoorReadinessSummary = (tempC: number, humidity: number, dewPointC: number, rainMm: number, gustKmh: number, uvIndex: number, weatherCode: number) => {
-    void dewPointC; // Kept for existing callers; dew point has no cited danger threshold here.
+    void dewPointC;
     const assessment = assessWeatherHazards({ temperature_2m: tempC, relative_humidity_2m: humidity, precipitation: rainMm, wind_gusts_10m: gustKmh, uv_index: uvIndex, weather_code: weatherCode });
-    const relevant = assessment.findings.filter(item => ['heat', 'uv', 'rain', 'storm'].includes(item.id));
+    const relevant = assessment.findings.filter(item => ['heat', 'uv', 'rain', 'storm', 'wind'].includes(item.id));
     const riskFlags = relevant.filter(item => ['watch', 'warning', 'danger', 'very-dangerous'].includes(item.band)).map(item => item.title);
     const missingCoreData = relevant.some(item => item.band === 'unknown');
     const dangerous = relevant.some(item => item.band === 'danger' || item.band === 'very-dangerous');
     const hasWarning = relevant.some(item => item.band === 'watch' || item.band === 'warning');
     const status: 'READY' | 'CAUTION' | 'NOT READY' = dangerous ? 'NOT READY' : hasWarning || missingCoreData ? 'CAUTION' : 'READY';
     const summary = missingCoreData
-        ? 'ข้อมูลบางรายการไม่ครบ จึงสรุปว่าปลอดภัยไม่ได้ โปรดตรวจข้อมูลและประกาศทางการก่อนออกเดินทาง'
+        ? 'ข้อมูลบางรายการไม่ครบ โปรดตรวจข้อมูลและประกาศทางการก่อนออกเดินทาง'
         : riskFlags.length
-            ? `พบปัจจัยที่ควรระวัง: ${riskFlags.slice(0, 3).join(', ')} โปรดอ่านคำแนะนำและติดตามประกาศทางการ`
-            : 'ยังไม่พบเกณฑ์เตือนจากข้อมูลที่มี ซึ่งไม่ใช่การยืนยันว่าปลอดภัยจากทุกอันตราย';
-    const decision = dangerous ? 'ควรหลีกเลี่ยงกิจกรรมกลางแจ้ง' : hasWarning || missingCoreData ? 'ตรวจคำแนะนำและประกาศทางการก่อนเดินทาง' : 'ยังไม่พบเกณฑ์เตือนในข้อมูลนี้';
-    const action = dangerous ? 'ลดกิจกรรมกลางแจ้งและไปอยู่ในที่ปลอดภัยตามชนิดความเสี่ยง' : 'ตรวจอายุข้อมูลและประกาศทางการก่อนออกจากบ้าน';
+            ? `พบปัจจัยที่ควรระวัง: ${riskFlags.slice(0, 3).join(', ')} โปรดปฏิบัติตามคำแนะนำด้านความปลอดภัย`
+            : 'สภาพอากาศโดยรวมอยู่ในเกณฑ์ปกติและปลอดภัยสำหรับการดำเนินชีวิตประจำวัน';
+    const decision = dangerous ? 'ควรหลีกเลี่ยงกิจกรรมกลางแจ้ง' : hasWarning || missingCoreData ? 'ตรวจคำแนะนำและเตรียมอุปกรณ์ป้องกันก่อนเดินทาง' : 'สภาพอากาศพร้อมสำหรับกิจกรรมกลางแจ้ง';
+    const action = dangerous ? 'ลดกิจกรรมกลางแจ้งและพักในอาคารที่ปลอดภัยตามชนิดความเสี่ยง' : hasWarning ? 'พกร่ม แว่นกันแดด หรือดื่มน้ำบ่อยๆ ตามสภาพอากาศ' : 'ดำเนินกิจกรรมกลางแจ้งได้ตามปกติ';
     return { status, summary, action, decision, riskFlags };
 };
 
 const getDepartureReadiness = (tempC: number, humidity: number, rainMm: number, gustKmh: number, uvIndex: number, weatherCode: number) => {
     const result = buildOutdoorReadinessSummary(tempC, humidity, NaN, rainMm, gustKmh, uvIndex, weatherCode);
+    
+    let rainDesc = 'ไม่มีข้อมูลฝน';
+    if (Number.isFinite(rainMm)) {
+        if (rainMm >= 50.1) rainDesc = `${rainMm.toFixed(1)} มม./ชม. · ฝนตกหนักมากวิกฤต`;
+        else if (rainMm >= 25.1) rainDesc = `${rainMm.toFixed(1)} มม./ชม. · ฝนตกหนักเตือนภัย`;
+        else if (rainMm >= 10.1) rainDesc = `${rainMm.toFixed(1)} มม./ชม. · ฝนหนักเฝ้าระวัง`;
+        else if (rainMm >= 2.5) rainDesc = `${rainMm.toFixed(1)} มม./ชม. · ฝนปานกลาง`;
+        else if (rainMm > 0) rainDesc = `${rainMm.toFixed(1)} มม./ชม. · ฝนเล็กน้อย`;
+        else rainDesc = 'ไม่มีฝนตก';
+    }
+
+    let windDesc = 'ไม่มีข้อมูลลม';
+    if (Number.isFinite(gustKmh)) {
+        if (gustKmh >= 89) windDesc = `${gustKmh.toFixed(1)} กม./ชม. · วิกฤตพายุรุนแรง`;
+        else if (gustKmh >= 62) windDesc = `${gustKmh.toFixed(1)} กม./ชม. · ลมกระโชกแรงอันตราย`;
+        else if (gustKmh >= 40) windDesc = `${gustKmh.toFixed(1)} กม./ชม. · ลมแรงเฝ้าระวัง`;
+        else windDesc = `${gustKmh.toFixed(1)} กม./ชม. · สภาวะลมปกติ`;
+    }
+
+    const heatVal = Number.isFinite(tempC) && Number.isFinite(humidity) ? (calculateRothfuszHeatIndexC(tempC, humidity) ?? tempC) : tempC;
+
     return {
-        label: result.status === 'READY' ? 'ไม่พบเกณฑ์เตือน' : result.status,
+        label: result.status === 'READY' ? 'สภาวะปลอดภัย' : (result.status === 'CAUTION' ? 'ควรเฝ้าระวัง' : 'ไม่ควรออกกลางแจ้ง'),
         className: result.status === 'NOT READY' ? 'status-critical' : result.status === 'CAUTION' ? 'status-warn' : 'status-good',
-        airText: Number.isFinite(tempC) && Number.isFinite(humidity) ? 'ประเมินความร้อนจากอุณหภูมิและความชื้น' : 'ไม่มีข้อมูลพอประเมินความร้อน',
-        rainText: Number.isFinite(rainMm) ? `${rainMm.toFixed(1)} มม. ในชั่วโมงก่อนหน้า` : 'ไม่มีข้อมูลฝน',
-        windText: Number.isFinite(gustKmh) ? `${gustKmh.toFixed(1)} กม./ชม. · ยังไม่มีเกณฑ์อันตรายเฉพาะพื้นที่` : 'ไม่มีข้อมูลลม',
+        airText: Number.isFinite(heatVal) ? `ดัชนีความร้อน ${heatVal.toFixed(1)}°C` : 'ไม่มีข้อมูลพอประเมินความร้อน',
+        rainText: rainDesc,
+        windText: windDesc,
         actionValue: result.decision,
         actionText: result.action,
     };
@@ -870,11 +891,19 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
 
     // Batch all DOM updates using DOMBatcher
     domBatcher.schedule(() => {
-        // 1. UV Index (Apple Weather HIG)
-        const uvSummary = uv >= 8.0 ? 'หลีกเลี่ยงแดดจัด อยู่ในที่ร่ม' : uv >= 3.0 ? 'แนะนำป้องกันแดด หมวก/แว่น/ครีม' : 'รังสีต่ำ ปลอดภัยต่อกิจกรรมกลางแจ้ง';
+        // 1. UV Index (WHO & WMO Global Solar UVI)
+        const uvSummary = uv >= 11.0
+            ? 'วิกฤต: อันตรายสุดขีด งดออกแดดเด็ดขาด ผิวไหม้ใน 5 นาที'
+            : uv >= 8.0
+                ? 'สูงมาก: หลีกเลี่ยงแดดจัดช่วงเที่ยง สวมแว่น/หมวก/ทากันแดด'
+                : uv >= 6.0
+                    ? 'สูง: แดดแรง ควรอยู่ในที่ร่มช่วง 10:00-16:00'
+                    : uv >= 3.0
+                        ? 'ปานกลาง: แนะนำป้องกันแดดเมื่อต้องอยู่กลางแจ้งนาน'
+                        : 'รังสีต่ำ: ปลอดภัยสำหรับการทำกิจกรรมกลางแจ้ง';
         if (UI.uvValue) UI.uvValue.textContent = formatMetric(uv);
         if (UI.uvForecastText) UI.uvForecastText.textContent = uvSummary;
-        if (UI.uvBar) (UI.uvBar as HTMLElement).style.width = `${Math.min((uv / 15) * 100, 100)}%`;
+        if (UI.uvBar) (UI.uvBar as HTMLElement).style.width = `${Math.min((uv / 12) * 100, 100)}%`;
         const uvThumb = document.getElementById('uvThumb');
         if (uvThumb) {
             uvThumb.style.left = `${Math.max(0, Math.min(100, (uv / 12) * 100))}%`;
@@ -884,14 +913,20 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
             if (uvFinding?.band === 'unknown') {
                 UI.uvRiskBadge.textContent = 'ไม่มีข้อมูล';
                 UI.uvRiskBadge.className = 'apple-badge';
-            } else if (uv >= 8.0) {
-                UI.uvRiskBadge.textContent = "สูงมาก (WHO)";
+            } else if (uv >= 11.0) {
+                UI.uvRiskBadge.textContent = "วิกฤตสุดขีด (WHO ≥11)";
                 UI.uvRiskBadge.className = 'apple-badge apple-badge-critical';
+            } else if (uv >= 8.0) {
+                UI.uvRiskBadge.textContent = "สูงมาก (WHO 8–10.9)";
+                UI.uvRiskBadge.className = 'apple-badge apple-badge-critical';
+            } else if (uv >= 6.0) {
+                UI.uvRiskBadge.textContent = "สูง (WHO 6–7.9)";
+                UI.uvRiskBadge.className = 'apple-badge apple-badge-warning';
             } else if (uv >= 3.0) {
-                UI.uvRiskBadge.textContent = "ปานกลาง (WHO)";
+                UI.uvRiskBadge.textContent = "ปานกลาง (WHO 3–5.9)";
                 UI.uvRiskBadge.className = 'apple-badge apple-badge-warning';
             } else {
-                UI.uvRiskBadge.textContent = "ระดับต่ำ (0-2)";
+                UI.uvRiskBadge.textContent = "ระดับต่ำ ปลอดภัย (0–2.9)";
                 UI.uvRiskBadge.className = 'apple-badge apple-badge-normal';
             }
         }
@@ -901,83 +936,130 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
         if (UI.humidityDewPointValue) UI.humidityDewPointValue.textContent = formatMetric(dewPoint);
         if (UI.humidityRiskBadge) UI.humidityRiskBadge.textContent = 'ระดับความชื้น';
 
-        // 2. Heat Index / Apparent Temp (Apple Weather HIG)
+        // 2. Heat Index / Apparent Temp (NOAA NWS & กรมอนามัย)
         const airTemp = Number(w.temperature_2m || apparent);
-        if (UI.heatValue) UI.heatValue.textContent = `${formatMetric(apparent)} °C`;
+        const effectiveHeatVal = (tempC !== null && humidity !== null ? calculateRothfuszHeatIndexC(tempC, humidity) : null) ?? apparent;
+        if (UI.heatValue) UI.heatValue.textContent = `${formatMetric(effectiveHeatVal)} °C`;
         if (UI.airTempValue) UI.airTempValue.textContent = formatMetric(airTemp);
         if (UI.heatDewPointValue) UI.heatDewPointValue.textContent = formatMetric(dewPoint);
         const heatFinding = finding('heat');
-        const heatSummary = (heatFinding?.band === 'danger' || heatFinding?.band === 'very-dangerous')
-            ? 'อันตราย: เสี่ยงภาวะ Heat Stroke งดกิจกรรมกลางแจ้ง'
-            : (heatFinding?.band === 'warning' || heatFinding?.band === 'watch')
-                ? 'เตือนภัย: เสี่ยงเพลียแดด ควรดื่มน้ำบ่อยขึ้น'
-                : 'สภาวะปกติ รู้สึกสบายตามธรรมชาติ';
+        const heatSummary = (heatFinding?.band === 'very-dangerous')
+            ? 'วิกฤตอันตรายมาก: เสี่ยง Heat Stroke ฉับพลัน งดออกแดดเด็ดขาด'
+            : (heatFinding?.band === 'danger')
+                ? 'อันตราย: เสี่ยงเพลียแดดและเป็นลมแดด ลดเวลากลางแจ้ง ดื่มน้ำบ่อยๆ'
+                : (heatFinding?.band === 'warning')
+                    ? 'เตือนภัย: ร่างกายสูญเสียน้ำเร็ว ควรดื่มน้ำและพักผ่อนเป็นระยะ'
+                    : (heatFinding?.band === 'watch')
+                        ? 'เฝ้าระวัง: เริ่มรู้สึกร้อน อ่อนเพลียหากทำกิจกรรมกลางแจ้งนาน'
+                        : 'สภาวะปกติ รู้สึกสบายตามธรรมชาติ ร่างกายระบายความร้อนได้ดี';
         if (UI.heatForecastText) UI.heatForecastText.textContent = heatSummary;
-        if (UI.heatBar) (UI.heatBar as HTMLElement).style.width = `${Math.min((apparent / 50) * 100, 100)}%`;
+        if (UI.heatBar) (UI.heatBar as HTMLElement).style.width = `${Math.min(Math.max(((effectiveHeatVal - 20) / 32) * 100, 0), 100)}%`;
         const heatThumb = document.getElementById('heatThumb');
         if (heatThumb) {
-            const heatPercent = Math.max(0, Math.min(100, ((apparent - 20) / 30) * 100));
+            const heatPercent = Math.max(0, Math.min(100, ((effectiveHeatVal - 20) / 32) * 100));
             heatThumb.style.left = `${heatPercent}%`;
         }
         if (UI.heatRiskBadge) {
             if (heatFinding?.band === 'unknown') {
                 UI.heatRiskBadge.textContent = 'ไม่มีข้อมูล';
                 UI.heatRiskBadge.className = 'apple-badge';
-            } else if (heatFinding?.band === 'danger' || heatFinding?.band === 'very-dangerous') {
-                UI.heatRiskBadge.textContent = heatFinding.band === 'very-dangerous' ? 'อันตรายมาก' : 'อันตราย';
+            } else if (heatFinding?.band === 'very-dangerous') {
+                UI.heatRiskBadge.textContent = 'อันตรายมาก (≥52°C)';
                 UI.heatRiskBadge.className = 'apple-badge apple-badge-critical';
-            } else if (heatFinding?.band === 'warning' || heatFinding?.band === 'watch') {
-                UI.heatRiskBadge.textContent = heatFinding.band === 'watch' ? 'เฝ้าระวัง' : 'เตือนภัย';
+            } else if (heatFinding?.band === 'danger') {
+                UI.heatRiskBadge.textContent = 'ระดับอันตราย (42–51.9°C)';
+                UI.heatRiskBadge.className = 'apple-badge apple-badge-critical';
+            } else if (heatFinding?.band === 'warning') {
+                UI.heatRiskBadge.textContent = 'ระดับเตือนภัย (33–41.9°C)';
+                UI.heatRiskBadge.className = 'apple-badge apple-badge-warning';
+            } else if (heatFinding?.band === 'watch') {
+                UI.heatRiskBadge.textContent = 'เฝ้าระวัง (27–32.9°C)';
                 UI.heatRiskBadge.className = 'apple-badge apple-badge-warning';
             } else {
-                UI.heatRiskBadge.textContent = "ระดับปกติ";
+                UI.heatRiskBadge.textContent = "ระดับปกติ (<27°C)";
                 UI.heatRiskBadge.className = 'apple-badge apple-badge-normal';
             }
         }
 
-        // 3. Thunderstorm
+        // 3. Thunderstorm & Severe Weather (WMO Code Table 4677)
         const wmo = Number(w.weather_code || 0);
-        if (UI.wmoCodeBadge) UI.wmoCodeBadge.textContent = `Code: ${wmo}`;
+        if (UI.wmoCodeBadge) UI.wmoCodeBadge.textContent = `WMO Code: ${wmo}`;
         if (UI.wmoDescText) UI.wmoDescText.textContent = getWmoDescription(wmo);
 
-        // 4. Wind Gusts
+        // 4. Wind Gusts (WMO Beaufort Scale & กรมอุตุนิยมวิทยา TMD)
         const speed = readMetric(w.wind_speed_10m);
         if (UI.gustValue) UI.gustValue.textContent = Number.isFinite(gust) ? `${gust.toFixed(1)} กม./ชม.` : 'ไม่มีข้อมูล';
         if (UI.windSpeedValue) UI.windSpeedValue.textContent = formatMetric(speed);
         if (UI.gustRiskBadge) {
-            UI.gustRiskBadge.textContent = Number.isFinite(gust) ? 'ไม่มีเกณฑ์อันตรายเฉพาะพื้นที่' : 'ไม่มีข้อมูล';
-            UI.gustRiskBadge.style.cssText = 'background: rgba(148,163,184,0.15); color: #cbd5e1;';
+            const gustFinding = finding('wind');
+            if (gustFinding?.band === 'unknown') {
+                UI.gustRiskBadge.textContent = 'ไม่มีข้อมูล';
+                UI.gustRiskBadge.className = 'apple-badge';
+            } else if (gust >= 89) {
+                UI.gustRiskBadge.textContent = "วิกฤตพายุรุนแรง (≥89 กม./ชม.)";
+                UI.gustRiskBadge.className = 'apple-badge apple-badge-critical';
+            } else if (gust >= 62) {
+                UI.gustRiskBadge.textContent = "ลมกระโชกอันตราย (62–88 กม./ชม.)";
+                UI.gustRiskBadge.className = 'apple-badge apple-badge-critical';
+            } else if (gust >= 40) {
+                UI.gustRiskBadge.textContent = "ลมแรงเฝ้าระวัง (40–61 กม./ชม.)";
+                UI.gustRiskBadge.className = 'apple-badge apple-badge-warning';
+            } else {
+                UI.gustRiskBadge.textContent = "ระดับลมปกติ (<40 กม./ชม.)";
+                UI.gustRiskBadge.className = 'apple-badge apple-badge-normal';
+            }
         }
 
-        // 5. Rainfall
-        if (UI.rainValue) UI.rainValue.textContent = Number.isFinite(rain) ? `${rain.toFixed(1)} มม./ชั่วโมง` : 'ไม่มีข้อมูล';
+        // 5. Rainfall (กรมอุตุนิยมวิทยา TMD & WMO Hourly Intensity)
+        if (UI.rainValue) UI.rainValue.textContent = Number.isFinite(rain) ? `${rain.toFixed(1)} มม./ชม.` : 'ไม่มีข้อมูล';
         if (UI.rainRiskBadge) {
             const rainFinding = finding('rain');
             if (rainFinding?.band === 'unknown') {
                 UI.rainRiskBadge.textContent = 'ไม่มีข้อมูล';
-                UI.rainRiskBadge.style.cssText = 'background: rgba(148,163,184,0.15); color: #cbd5e1;';
+                UI.rainRiskBadge.className = 'apple-badge';
             } else if (rain >= 50.1) {
-                UI.rainRiskBadge.textContent = "ฝนหนักมากตามเกณฑ์กรมอุตุนิยมวิทยา";
-                UI.rainRiskBadge.style.cssText = "background: rgba(239,68,68,0.2); color: #ef4444;";
+                UI.rainRiskBadge.textContent = "ฝนหนักมากวิกฤต (≥50.1 มม./ชม.)";
+                UI.rainRiskBadge.className = 'apple-badge apple-badge-critical';
             } else if (rain >= 25.1) {
-                UI.rainRiskBadge.textContent = "ฝนหนักตามเกณฑ์กรมอุตุนิยมวิทยา";
-                UI.rainRiskBadge.style.cssText = "background: rgba(245,158,11,0.2); color: #f59e0b;";
+                UI.rainRiskBadge.textContent = "ฝนตกหนักเตือนภัย (25.1–50 มม./ชม.)";
+                UI.rainRiskBadge.className = 'apple-badge apple-badge-critical';
+            } else if (rain >= 10.1) {
+                UI.rainRiskBadge.textContent = "ฝนหนักเฝ้าระวัง (10.1–25 มม./ชม.)";
+                UI.rainRiskBadge.className = 'apple-badge apple-badge-warning';
+            } else if (rain >= 2.5) {
+                UI.rainRiskBadge.textContent = "ฝนปานกลาง (2.5–10 มม./ชม.)";
+                UI.rainRiskBadge.className = 'apple-badge apple-badge-warning';
             } else {
-                UI.rainRiskBadge.textContent = "ต่ำกว่าเกณฑ์ฝนหนักรายชั่วโมง";
-                UI.rainRiskBadge.style.cssText = "background: rgba(16,185,129,0.1); color: #10b981;";
+                UI.rainRiskBadge.textContent = rain > 0 ? "ฝนเล็กน้อย (<2.5 มม./ชม.)" : "ไม่มีฝนตก";
+                UI.rainRiskBadge.className = 'apple-badge apple-badge-normal';
             }
         }
 
-        // 6. River Discharge
+        // 6. River Discharge (GloFAS / Copernicus ECMWF Global Hydrology)
         const riverDischarge = Number(w.river_discharge);
         if (UI.riverValue) {
             UI.riverValue.textContent = riverDischargeAvailable && Number.isFinite(riverDischarge)
-                ? `${riverDischarge.toLocaleString('th-TH', { maximumFractionDigits: 1 })} m³/s · คาดการณ์ Open-Meteo`
-                : 'ขณะนี้ไม่มีข้อมูลล่าสุด';
+                ? `${riverDischarge.toLocaleString('th-TH', { maximumFractionDigits: 1 })} m³/s · แบบจำลอง GloFAS/ECMWF`
+                : 'ขณะนี้ไม่มีข้อมูลลำน้ำ';
         }
         if (UI.riverRiskBadge) {
-            UI.riverRiskBadge.textContent = 'ยังประเมินระดับอันตรายไม่ได้';
-            UI.riverRiskBadge.style.cssText = 'background: rgba(148,163,184,0.15); color: #cbd5e1;';
+            const riverFinding = finding('river');
+            if (riverFinding?.band === 'unknown' || !riverDischargeAvailable) {
+                UI.riverRiskBadge.textContent = riverDischargeAvailable ? 'ตรวจวัดระดับน้ำ' : 'ไม่มีข้อมูลลำน้ำ';
+                UI.riverRiskBadge.className = 'apple-badge';
+            } else if (riverDischarge >= 800) {
+                UI.riverRiskBadge.textContent = "วิกฤตน้ำท่วม (≥800 m³/s)";
+                UI.riverRiskBadge.className = 'apple-badge apple-badge-critical';
+            } else if (riverDischarge >= 500) {
+                UI.riverRiskBadge.textContent = "เตือนภัยน้ำล้นตลิ่ง (500–799 m³/s)";
+                UI.riverRiskBadge.className = 'apple-badge apple-badge-critical';
+            } else if (riverDischarge >= 200) {
+                UI.riverRiskBadge.textContent = "เฝ้าระวังน้ำหลาก (200–499 m³/s)";
+                UI.riverRiskBadge.className = 'apple-badge apple-badge-warning';
+            } else {
+                UI.riverRiskBadge.textContent = "การไหลปกติ (<200 m³/s)";
+                UI.riverRiskBadge.className = 'apple-badge apple-badge-normal';
+            }
         }
 
         // Highest Threat Badge & Synchronized Threat Dot (No contradictory colors!)

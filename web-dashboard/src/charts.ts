@@ -103,18 +103,23 @@ Chart.defaults.maintainAspectRatio = true;
 // ============================================================================
 
 export const calculateHazardLevel = (value: number, type: 'uv' | 'heat' | 'wind' | 'rain' | 'river'): number => {
-    // Returns normalized value 0-100 for radar chart
+    // Returns normalized value 0-100 for radar and hazard charts based on global benchmarks
     switch (type) {
         case 'uv':
-            return Math.min((value / 15) * 100, 100);
+            // WHO: 11+ is Extreme Danger (max scale 12)
+            return Math.min(Math.max((value / 12) * 100, 0), 100);
         case 'heat':
-            return Math.min((value / 50) * 100, 100);
+            // NOAA/DOH: 20°C baseline up to 52°C Extreme Danger
+            return Math.min(Math.max(((value - 20) / 32) * 100, 0), 100);
         case 'wind':
-            return Math.min((value / 100) * 100, 100);
+            // WMO Beaufort 10+: 89 km/h is Severe Storm
+            return Math.min(Math.max((value / 90) * 100, 0), 100);
         case 'rain':
-            return Math.min((value / 50) * 100, 100);
+            // TMD: 50 mm/h is Torrential Very Heavy Rain
+            return Math.min(Math.max((value / 50) * 100, 0), 100);
         case 'river':
-            return Math.min((value / 700) * 100, 100);
+            // GloFAS: 800 m³/s is Critical High Discharge
+            return Math.min(Math.max((value / 800) * 100, 0), 100);
         default:
             return 0;
     }

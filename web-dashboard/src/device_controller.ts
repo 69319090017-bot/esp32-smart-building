@@ -70,7 +70,7 @@ export const fetchOpenMeteoWeather = async (provinceName: string) => {
     weatherLogger.info(`Fetching weather data for ${provinceName}`, { province: provinceName });
 
     const info = PROVINCES_MAP[provinceName] || PROVINCES_MAP["กรุงเทพมหานคร"];
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${info.lat}&longitude=${info.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,uv_index&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,uv_index&past_days=1&forecast_days=1&wind_speed_unit=kmh&timezone=Asia%2FBangkok`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${info.lat}&longitude=${info.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,uv_index&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,uv_index&past_days=1&forecast_days=1&models=best_match&wind_speed_unit=kmh&timezone=Asia%2FBangkok`;
 
     store.dispatch(actions.fetchWeatherStart(provinceName));
 
