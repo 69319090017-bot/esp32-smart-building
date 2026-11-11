@@ -150,7 +150,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     UI.navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            switchView(link.dataset.view as string);
+            const view = link.dataset.view as string;
+            switchView(view);
+            if (view === 'analytics') {
+                const currentProv = UI.provinceSelect?.value || "กรุงเทพมหานคร";
+                const history = historicalDataStore.get(currentProv) || [];
+                timeSeriesCharts.forEach((chart) => {
+                    chart.render(history);
+                    chart.resize();
+                });
+            }
         });
     });
 
@@ -674,9 +683,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 6. Initialize Charts System
     initializeCharts();
+    const provinceForInitialWeather = UI.provinceSelect?.value || store.getState().weather.province || 'กรุงเทพมหานคร';
+    const initialCachedHistory = historicalDataStore.get(provinceForInitialWeather) || [];
+    if (initialCachedHistory.length > 0) {
+        timeSeriesCharts.forEach((chart) => {
+            chart.render(initialCachedHistory);
+        });
+    }
 
     // 7. Initial Weather Fetch (use the selected monitored province)
-    const provinceForInitialWeather = UI.provinceSelect?.value || store.getState().weather.province || 'กรุงเทพมหานคร';
     createToast(`ดึงข้อมูลสภาพอากาศสดสำหรับ จ.${provinceForInitialWeather}...`, "info");
     await fetchOpenMeteoWeather(provinceForInitialWeather);
 
@@ -1013,6 +1028,63 @@ function updateCharts(data: HazardData, province: string): void {
         dewHistoryChart.update();
     }
 }
+
+// Update charts with batch historical telemetry from Open-Meteo
+function setHistoricalData(province: string, points: HistoricalDataPoint[]): void {
+    if (!Array.isArray(points) || points.length === 0) return;
+    
+    // Seed historical data store with real chronological data
+    historicalDataStore.set(province, points.slice(-MAX_CHART_POINTS_PER_PROVINCE));
+    persistHistoricalData();
+
+    const provinceHistory = historicalDataStore.get(province)!;
+
+    // Update sparklines
+    const uvHistory = provinceHistory.map(d => d.data.uv_index);
+    const heatHistory = provinceHistory.map(d => d.data.apparent_temperature);
+    const windHistory = provinceHistory.map(d => d.data.wind_gusts_10m);
+    const rainHistory = provinceHistory.map(d => d.data.precipitation);
+    const riverHistory = provinceHistory.map(d => d.data.river_discharge);
+
+    sparklineUV?.render(uvHistory);
+    sparklineHeat?.render(heatHistory);
+    sparklineWind?.render(windHistory);
+    sparklineRain?.render(rainHistory);
+    sparklineRiver?.render(riverHistory);
+
+    // Update time series charts
+    timeSeriesCharts.forEach((chart) => {
+        chart.render(provinceHistory);
+        chart.resize();
+    });
+
+    if (humidityHistoryChart) {
+        const humidityValues = provinceHistory.map(item => Number(item.data.relative_humidity_2m ?? 0));
+        const labels = provinceHistory.map(item => item.timestamp.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }));
+        humidityHistoryChart.data.labels = labels;
+        humidityHistoryChart.data.datasets[0].data = humidityValues;
+        humidityHistoryChart.update();
+    }
+
+    if (dewHistoryChart) {
+        const dewValues = provinceHistory.map((item) => {
+            const tempC = Number(item.data.temperature_2m ?? item.data.apparent_temperature ?? 0);
+            const humidity = Number(item.data.relative_humidity_2m ?? 0);
+            if (!Number.isFinite(tempC) || !Number.isFinite(humidity)) return 0;
+            const a = 17.27;
+            const b = 237.7;
+            const alpha = ((a * tempC) / (b + tempC)) + Math.log(humidity / 100);
+            return (b * alpha) / (a - alpha);
+        });
+        const labels = provinceHistory.map(item => item.timestamp.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }));
+        dewHistoryChart.data.labels = labels;
+        dewHistoryChart.data.datasets[0].data = dewValues;
+        dewHistoryChart.update();
+    }
+}
+
+(window as any).updateCharts = updateCharts;
+(window as any).setHistoricalData = setHistoricalData;
 
 /**
  * Update connection status UI indicators

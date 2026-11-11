@@ -70,7 +70,7 @@ export const fetchOpenMeteoWeather = async (provinceName: string) => {
     weatherLogger.info(`Fetching weather data for ${provinceName}`, { province: provinceName });
 
     const info = PROVINCES_MAP[provinceName] || PROVINCES_MAP["กรุงเทพมหานคร"];
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${info.lat}&longitude=${info.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,uv_index&wind_speed_unit=kmh&timezone=Asia%2FBangkok`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${info.lat}&longitude=${info.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,uv_index&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,uv_index&past_days=1&forecast_days=1&wind_speed_unit=kmh&timezone=Asia%2FBangkok`;
 
     store.dispatch(actions.fetchWeatherStart(provinceName));
 
@@ -83,7 +83,7 @@ export const fetchOpenMeteoWeather = async (provinceName: string) => {
 
         let riverDischarge: number | null = null;
         try {
-            const floodUrl = `https://flood-api.open-meteo.com/v1/flood?latitude=${info.lat}&longitude=${info.lon}&daily=river_discharge&forecast_days=1`;
+            const floodUrl = `https://flood-api.open-meteo.com/v1/flood?latitude=${info.lat}&longitude=${info.lon}&daily=river_discharge&past_days=1&forecast_days=1`;
             const floodPayload = await requestCache.fetch(floodUrl, {
                 headers: { Accept: 'application/json' }
             }, 60000);
@@ -172,6 +172,39 @@ export const fetchOpenMeteoWeather = async (provinceName: string) => {
         }
 
         updateDashboardUI(cur, severity, provinceName, riverDischarge !== null);
+
+        // Process authentic past 24-hour meteorological history from Open-Meteo
+        const hourly = weatherPayload?.hourly;
+        const historicalPoints: any[] = [];
+        if (hourly && Array.isArray(hourly.time)) {
+            const times: string[] = hourly.time;
+            const nowLimit = Date.now() + 3600000;
+            for (let i = 0; i < times.length; i++) {
+                const ptDate = new Date(times[i]);
+                if (ptDate.getTime() <= nowLimit) {
+                    historicalPoints.push({
+                        timestamp: ptDate,
+                        province: provinceName,
+                        data: {
+                            uv_index: Number(hourly.uv_index?.[i] ?? 0),
+                            apparent_temperature: Number(hourly.apparent_temperature?.[i] ?? hourly.temperature_2m?.[i] ?? 0),
+                            temperature_2m: Number(hourly.temperature_2m?.[i] ?? 0),
+                            weather_code: Number(hourly.weather_code?.[i] ?? 0),
+                            wind_gusts_10m: Number(hourly.wind_gusts_10m?.[i] ?? 0),
+                            wind_speed_10m: Number(hourly.wind_speed_10m?.[i] ?? 0),
+                            precipitation: Number(hourly.precipitation?.[i] ?? 0),
+                            river_discharge: riverDischarge ?? 0,
+                            relative_humidity_2m: Number(hourly.relative_humidity_2m?.[i] ?? 0)
+                        }
+                    });
+                }
+            }
+        }
+
+        if (historicalPoints.length > 0 && typeof (window as any).setHistoricalData === 'function') {
+            (window as any).setHistoricalData(provinceName, historicalPoints);
+        }
+
         store.dispatch(actions.fetchWeatherSuccess(cur, severity, provinceName));
         eventBus.publish(eventFactory.weatherUpdated(cur, severity, provinceName, 'open-meteo-api'));
 

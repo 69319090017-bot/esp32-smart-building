@@ -289,6 +289,19 @@ export class TimeSeriesChartComponent {
                 exportChartAsImage(this.config.canvasId, `${this.label.toLowerCase()}_chart`);
             });
         }
+
+        // Eagerly initialize chart instance so the canvas axes and labels render immediately
+        try {
+            this.chartInstance = createTimeSeriesChart(
+                this.config.canvasId,
+                this.metric,
+                this.label,
+                this.color,
+                this.unit
+            );
+        } catch {
+            // Context or DOM may not be ready in headless test environments
+        }
     }
 
     private setTimeRange(range: '1h' | '6h' | '24h' | '7d'): void {
@@ -338,6 +351,12 @@ export class TimeSeriesChartComponent {
         if (this.chartInstance) {
             this.chartInstance.destroy();
             this.chartInstance = null;
+        }
+    }
+
+    public resize(): void {
+        if (this.chartInstance?.chart) {
+            this.chartInstance.chart.resize();
         }
     }
 

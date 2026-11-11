@@ -41,6 +41,30 @@ export interface ChartInstance {
 // COLOR THEME CONFIGURATION
 // ============================================================================
 
+export const hexToRgba = (color: string, alpha = 0.15): string => {
+    if (!color) return `rgba(0, 243, 255, ${alpha})`;
+    if (color.startsWith('#')) {
+        let hex = color.slice(1);
+        if (hex.length === 3) {
+            hex = hex.split('').map(c => c + c).join('');
+        }
+        const num = parseInt(hex, 16);
+        if (Number.isFinite(num)) {
+            const r = (num >> 16) & 255;
+            const g = (num >> 8) & 255;
+            const b = num & 255;
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+    }
+    if (color.startsWith('rgb(')) {
+        return color.replace('rgb(', 'rgba(').replace(')', `, ${alpha})`);
+    }
+    if (color.startsWith('rgba(')) {
+        return color;
+    }
+    return color;
+};
+
 export const CHART_COLORS = {
     cyan: '#00f3ff',
     magenta: '#ff0055',
@@ -248,7 +272,7 @@ export const createTimeSeriesChart = (
                 label: label,
                 data: [],
                 borderColor: color,
-                backgroundColor: color.replace(')', ', 0.1)').replace('rgb', 'rgba').replace('#', 'rgba('),
+                backgroundColor: hexToRgba(color, 0.15),
                 borderWidth: 2,
                 fill: true,
                 tension: 0.4,
@@ -540,7 +564,7 @@ export const createHeatmapChart = (
                     y: Math.floor(i / 7) * 100 + Math.random() * 50,
                     r: hazardLevels[i] / 5 + 10
                 })),
-                backgroundColor: colors.map(c => c.replace(')', ', 0.6)').replace('#', 'rgba(')),
+                backgroundColor: colors.map(c => hexToRgba(c, 0.6)),
                 borderColor: colors,
                 borderWidth: 2
             }]
@@ -603,7 +627,7 @@ export const createHeatmapChart = (
                 y: Math.floor(i / 7) * 100 + Math.random() * 50,
                 r: newHazardLevels[i] / 5 + 10
             }));
-            chart.data.datasets[0].backgroundColor = newColors.map(c => c.replace(')', ', 0.6)').replace('#', 'rgba('));
+            chart.data.datasets[0].backgroundColor = newColors.map(c => hexToRgba(c, 0.6));
             chart.data.datasets[0].borderColor = newColors;
             chart.update('active');
         }
@@ -692,7 +716,14 @@ export const aggregateHistoricalData = (
             return data;
     }
 
-    const filtered = data.filter(d => d.timestamp >= cutoffTime);
+    let filtered = data.filter(d => d.timestamp >= cutoffTime);
+
+    // If filtering left too few points to render a meaningful curve, fallback to the latest points
+    if (filtered.length < 2 && data.length >= 2) {
+        filtered = data.slice(-Math.min(data.length, interval === '1h' ? 6 : (interval === '6h' ? 12 : 24)));
+    } else if (filtered.length === 0 && data.length > 0) {
+        filtered = data.slice(-Math.min(data.length, 24));
+    }
     
     if (filtered.length <= 50) return filtered;
 
