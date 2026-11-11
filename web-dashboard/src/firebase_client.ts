@@ -375,7 +375,9 @@ const setCache = <T>(key: string, data: T, isOffline = false): void => {
   // Limit cache size
   if (localCache.size > 100) {
     const oldestKey = localCache.keys().next().value;
-    localCache.delete(oldestKey);
+    if (oldestKey !== undefined) {
+      localCache.delete(oldestKey);
+    }
   }
 };
 
@@ -772,9 +774,10 @@ export const initializeFirebase = async (): Promise<boolean> => {
     // Auto sign-in anonymously so auth != null for database security rules
     try {
       const auth = getAuth(firebaseApp);
-      if (!auth.currentUser) {
-        await signInAnonymously(auth);
-        logConnection(`Firebase authenticated anonymously as ${auth.currentUser?.uid}`);
+      const user = auth.currentUser;
+      if (!user) {
+        const cred = await signInAnonymously(auth);
+        logConnection(`Firebase authenticated anonymously as ${cred.user.uid}`);
       }
     } catch (authErr: any) {
       console.warn("[FIREBASE] Anonymous auth notice:", authErr?.message);
@@ -879,7 +882,7 @@ export const writeData = async (path: string, data: any): Promise<boolean> => {
     
     await retryOperation(
       async () => {
-        const dataRef = ref(db, path);
+        const dataRef = ref(db!, path);
         await set(dataRef, data);
       },
       RETRY_CONFIG,
@@ -905,7 +908,7 @@ export const writeData = async (path: string, data: any): Promise<boolean> => {
 
 /** Send a one-shot audible announcement cue or buzzer sound to the ESP32. */
 export const requestEsp32Announcement = async (text: string, cueType: string = 'OFFICIAL'): Promise<void> => {
-  if (!db || !firebaseApp) throw new Error('Firebase ยังไม่พร้อมเชื่อมต่อ');
+  if (!db || !firebaseApp) return;
   const announcementText = (text || cueType).replace(/\s+/g, ' ').trim().slice(0, 360);
 
   lastAnnouncementRequestId = Math.max(Date.now(), lastAnnouncementRequestId + 1);
@@ -918,9 +921,48 @@ export const requestEsp32Announcement = async (text: string, cueType: string = '
   await update(commandRef, {
     [commandFields[commandFields.length - 1]]: cueType,
     [commandIdFields[commandIdFields.length - 1]]: requestId,
+    cue_type: cueType,
     buzzer_command: cueType,
     buzzer_command_id: requestId,
     announcement_text: announcementText,
+    updated_at: Date.now()
+  });
+};
+
+/** Send LED (light / pathway) command to the ESP32 */
+export const requestEsp32Led = async (enabled: boolean): Promise<void> => {
+  if (!db || !firebaseApp) return;
+  const requestId = Date.now();
+  const commandRef = ref(db, devicePath('commands'));
+  await update(commandRef, {
+    led_command: enabled ? 'ON' : 'OFF',
+    led_command_id: requestId,
+    updated_at: Date.now()
+  });
+};
+
+/** Send Servo (door lock) command to the ESP32 */
+export const requestEsp32Door = async (open: boolean): Promise<void> => {
+  if (!db || !firebaseApp) return;
+  const requestId = Date.now();
+  const commandRef = ref(db, devicePath('commands'));
+  await update(commandRef, {
+    servo_command: open ? 'OPEN' : 'CLOSED',
+    servo_command_id: requestId,
+    servo_power_enabled: true,
+    servo_power_command_id: requestId,
+    updated_at: Date.now()
+  });
+};
+
+/** Send Night Mode toggle command to the ESP32 */
+export const requestEsp32NightMode = async (enabled: boolean): Promise<void> => {
+  if (!db || !firebaseApp) return;
+  const requestId = Date.now();
+  const commandRef = ref(db, devicePath('commands'));
+  await update(commandRef, {
+    night_mode_enabled: enabled,
+    night_mode_command_id: requestId,
     updated_at: Date.now()
   });
 };
@@ -944,7 +986,7 @@ export const updateData = async (path: string, data: any): Promise<boolean> => {
     
     await retryOperation(
       async () => {
-        const dataRef = ref(db, path);
+        const dataRef = ref(db!, path);
         await update(dataRef, data);
       },
       RETRY_CONFIG,
@@ -987,7 +1029,7 @@ export const readData = async <T>(path: string): Promise<T | null> => {
     
     const result = await retryOperation(
       async () => {
-        const dataRef = ref(db, path);
+        const dataRef = ref(db!, path);
         const snapshot = await get(dataRef);
         return snapshot.val();
       },

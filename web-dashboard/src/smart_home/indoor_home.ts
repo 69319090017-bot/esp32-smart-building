@@ -18,7 +18,7 @@ import { speakText } from '../ui_manager';
 const STALE_AFTER_MS = 15000;
 const CHART_SAMPLE_INTERVAL_MS = 5000;
 
-const byId = <T extends HTMLElement>(id: string): T | null => document.getElementById(id) as T | null;
+const byId = <T extends Element = HTMLElement>(id: string): T | null => document.getElementById(id) as T | null;
 
 export const initializeIndoorHome = async (): Promise<void> => {
   const connectionText = byId('homeConnectionStatus');

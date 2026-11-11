@@ -177,7 +177,7 @@ class ErrorBoundary {
   }
 
   // Attempt to recover from an error
-  private async attemptRecovery(error: AppError): Promise<void> {
+  public async attemptRecovery(error: AppError): Promise<void> {
     if (this.isRecovering) {
       logger.warn('Recovery already in progress', 'error-boundary');
       return;

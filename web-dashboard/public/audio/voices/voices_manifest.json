@@ -1,0 +1,98 @@
+[
+  {
+    "id": "voice_boot",
+    "label": "ระบบดูแลความปลอดภัย เริ่มทำงานค่ะ",
+    "filename": "voice_boot.wav",
+    "duration": 3.48
+  },
+  {
+    "id": "voice_wifi_ok",
+    "label": "เชื่อมต่ออินเทอร์เน็ตและระบบคลาวด์แล้วค่ะ",
+    "filename": "voice_wifi_ok.wav",
+    "duration": 3.33
+  },
+  {
+    "id": "voice_wifi_lost",
+    "label": "อินเทอร์เน็ตขัดข้อง กำลังเชื่อมต่อใหม่ค่ะ",
+    "filename": "voice_wifi_lost.wav",
+    "duration": 3.18
+  },
+  {
+    "id": "voice_door_open",
+    "label": "ประตูเปิดแล้วค่ะ",
+    "filename": "voice_door_open.wav",
+    "duration": 1.61
+  },
+  {
+    "id": "voice_door_locked",
+    "label": "ประตูปิดล็อกเรียบร้อยแล้วค่ะ",
+    "filename": "voice_door_locked.wav",
+    "duration": 2.49
+  },
+  {
+    "id": "voice_night_walk",
+    "label": "ไฟเปิดแล้วค่ะ ระวังสะดุดนะคะ",
+    "filename": "voice_night_walk.wav",
+    "duration": 3.39
+  },
+  {
+    "id": "voice_intrusion",
+    "label": "แจ้งเตือน ตรวจพบความเคลื่อนไหวผิดปกติค่ะ",
+    "filename": "voice_intrusion.wav",
+    "duration": 3.47
+  },
+  {
+    "id": "voice_heat_warn",
+    "label": "ข้างนอกร้อนจัด อย่าลืมดื่มน้ำนะคะ",
+    "filename": "voice_heat_warn.wav",
+    "duration": 3.19
+  },
+  {
+    "id": "voice_rain_warn",
+    "label": "ข้างนอกฝนจะตก อย่าลืมพกร่มนะคะ",
+    "filename": "voice_rain_warn.wav",
+    "duration": 3.26
+  },
+  {
+    "id": "voice_safe_out",
+    "label": "อากาศดี เดินทางปลอดภัยค่ะ",
+    "filename": "voice_safe_out.wav",
+    "duration": 2.73
+  },
+  {
+    "id": "voice_storm_warn",
+    "label": "อันตราย ลมพายุแรง อยู่ในบ้านก่อนนะคะ",
+    "filename": "voice_storm_warn.wav",
+    "duration": 3.67
+  },
+  {
+    "id": "voice_fire_temp",
+    "label": "ระวัง อุณหภูมิในห้องสูงผิดปกติค่ะ",
+    "filename": "voice_fire_temp.wav",
+    "duration": 3.38
+  },
+  {
+    "id": "voice_flood_warn",
+    "label": "แจ้งเตือน เฝ้าระวังระดับน้ำเพิ่มสูงขึ้นค่ะ",
+    "filename": "voice_flood_warn.wav",
+    "duration": 3.88
+  },
+  {
+    "id": "voice_night_mode",
+    "label": "เข้าสู่โหมดกลางคืน ล็อกประตูแล้วค่ะ",
+    "filename": "voice_night_mode.wav",
+    "duration": 3.18
+  },
+  {
+    "id": "voice_day_mode",
+    "label": "อรุณสวัสดิ์ค่ะ เริ่มต้นวันใหม่อย่างปลอดภัยนะคะ",
+    "filename": "voice_day_mode.wav",
+    "duration": 4.3
+  },
+  {
+    "id": "voice_status_ok",
+    "label": "ระบบปกติ สภาพอากาศปลอดภัยดีค่ะ",
+    "filename": "voice_status_ok.wav",
+    "duration": 3.55
+  }
+]

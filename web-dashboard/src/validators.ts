@@ -211,8 +211,8 @@ export const weatherDataSchema: ValidationSchema<WeatherData> = {
       wind_speed_10m: Math.max(0, Math.min(200, data.wind_speed_10m)),
       precipitation: Math.max(0, Math.min(500, data.precipitation)),
       river_discharge: Math.max(0, Math.min(10000, data.river_discharge)),
-      relative_humidity: data.relative_humidity !== undefined
-        ? Math.max(0, Math.min(100, data.relative_humidity))
+      relative_humidity_2m: (data as any).relative_humidity_2m !== undefined
+        ? Math.max(0, Math.min(100, (data as any).relative_humidity_2m))
         : undefined
     };
   }

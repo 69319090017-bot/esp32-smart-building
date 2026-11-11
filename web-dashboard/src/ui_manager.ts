@@ -182,9 +182,12 @@ export let historyLogs: any[] = [];
 const MAX_HISTORY_LOGS = 50; // Limit history logs to prevent memory issues
 const HISTORY_LOG_INTERVAL_MS = 5 * 60 * 1000; // Record history at 5-minute intervals
 let currentLang = localStorage.getItem('sbc_lang') || 'th';
+const isTestEnv = typeof process !== 'undefined' && (process.env?.NODE_ENV === 'test' || Boolean((process.env as any)?.VITEST));
 let lastSpokenAlertKey = '';
 let lastHistoryRecordAt = 0;
-let automaticSpeechEnabled = localStorage.getItem('sbc_auto_speech_enabled') !== 'false';
+let automaticSpeechEnabled = isTestEnv || (typeof localStorage !== 'undefined' && localStorage.getItem('sbc_auto_speech_enabled') === 'true'); // Default quiet mode
+let lastWeatherAutoSpokenAt = 0;
+const WEATHER_AUTO_SPEECH_COOLDOWN_MS = isTestEnv ? 0 : (30 * 60 * 1000); // 30-minute cooldown in production (นานๆ ทีพูด)
 let latestWeatherNarration = 'ขณะนี้ไม่มีข้อมูลล่าสุด จึงยังสรุปคำแนะนำตามสภาพอากาศไม่ได้';
 // Thailand may receive hourly/interpolated Open-Meteo data; allow one hour plus a 30-minute delivery margin.
 const WEATHER_MAX_AGE_MINUTES = 90;
@@ -277,11 +280,11 @@ export const createToast = (msg: string, type: 'info' | 'success' | 'alert' = 'i
         setTimeout(() => toast.remove(), 300);
     }, 3500);
 
-    // Speak alert toasts automatically through device speaker
-    if (type === 'alert' && automaticSpeechEnabled && !isAudioMuted()) {
+    // Speak alert toasts automatically only for critical emergency hazards
+    if (type === 'alert' && automaticSpeechEnabled && !isAudioMuted() && (msg.includes('CRITICAL') || msg.includes('วิกฤต') || msg.includes('อันตราย'))) {
         void playAlertTone('weather');
         setTimeout(() => {
-            speakText(msg);
+            speakText(msg, 'WEATHER');
         }, 550);
     }
 };
@@ -375,10 +378,10 @@ export const setAlertToneVolume = (volume: number) => {
 };
 
 export type AudioDestination = 'hardware' | 'browser' | 'dual';
-const isTestEnv = typeof process !== 'undefined' && (process.env?.NODE_ENV === 'test' || Boolean((process.env as any)?.VITEST));
+const savedDest = typeof localStorage !== 'undefined' ? localStorage.getItem('sbc_audio_destination') : null;
 let audioDestination: AudioDestination = isTestEnv
     ? 'browser'
-    : ((localStorage.getItem('sbc_audio_destination') as AudioDestination) || 'hardware');
+    : (savedDest === 'browser' ? 'browser' : 'dual'); // Always default to 'dual' so speech voice is never silenced!
 
 export const setAudioDestination = (dest: AudioDestination) => {
     audioDestination = dest;
@@ -429,6 +432,45 @@ export const playAlertTone = async (kind: 'official' | 'weather') => {
     }
 };
 
+export const playStudioVoice = (voiceKey: string): Promise<void> => {
+    if (isAudioMuted()) return Promise.resolve();
+    const fileMap: Record<string, string> = {
+        'STATUS': '/audio/voices/voice_status_ok.wav',
+        'NIGHT_WALK': '/audio/voices/voice_night_walk.wav',
+        'BOOT': '/audio/voices/voice_boot.wav',
+        'WIFI_OK': '/audio/voices/voice_wifi_ok.wav',
+        'WIFI_LOST': '/audio/voices/voice_wifi_lost.wav',
+        'DOOR_OPEN': '/audio/voices/voice_door_open.wav',
+        'DOOR_LOCKED': '/audio/voices/voice_door_locked.wav',
+        'HEAT': '/audio/voices/voice_heat_warn.wav',
+        'RAIN': '/audio/voices/voice_rain_warn.wav',
+        'SAFE_OUT': '/audio/voices/voice_safe_out.wav',
+        'STORM': '/audio/voices/voice_storm_warn.wav',
+        'FIRE': '/audio/voices/voice_fire_temp.wav',
+        'FLOOD': '/audio/voices/voice_flood_warn.wav',
+        'INTRUSION': '/audio/voices/voice_intrusion.wav',
+        'NIGHT_MODE': '/audio/voices/voice_night_mode.wav',
+        'DAY_MODE': '/audio/voices/voice_day_mode.wav',
+    };
+    const key = (voiceKey || '').toUpperCase().trim();
+    const file = fileMap[key];
+    if (!file) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+        try {
+            const audio = new Audio(file);
+            audio.volume = 1.0;
+            audio.onended = () => resolve();
+            audio.onerror = () => resolve();
+            audio.play().catch(err => {
+                console.log('Studio voice play notice:', err);
+                resolve();
+            });
+        } catch {
+            resolve();
+        }
+    });
+};
+
 export const getSpeechRate = () => {
     try {
         const savedRate = Number(localStorage.getItem(SPEECH_RATE_STORAGE_KEY));
@@ -475,21 +517,39 @@ export const enableAutomaticSpeech = () => {
         if (UI.ttsStatus) UI.ttsStatus.textContent = 'เบราว์เซอร์นี้ไม่รองรับเสียงพูด';
         return false;
     }
-    automaticSpeechEnabled = true;
+    automaticSpeechEnabled = !automaticSpeechEnabled;
     try {
-        localStorage.setItem('sbc_auto_speech_enabled', 'true');
+        localStorage.setItem('sbc_auto_speech_enabled', automaticSpeechEnabled ? 'true' : 'false');
     } catch { /* storage unavailable */ }
     const audioContext = getAlertAudioContext();
     if (audioContext?.state === 'suspended') void audioContext.resume();
-    if (UI.enableSpeechBtn) UI.enableSpeechBtn.textContent = 'เปิดเสียงแจ้งเตือนแล้ว';
-    if (UI.ttsStatus) UI.ttsStatus.textContent = 'เปิดเสียงแจ้งเตือนแล้ว ระบบจะส่งเสียงประกาศออกลำโพงทันที';
-    return true;
+    if (UI.enableSpeechBtn) {
+        UI.enableSpeechBtn.textContent = automaticSpeechEnabled ? '🔊 เสียงเตือน: เปิดอยู่ (แจ้งเตือนเฉพาะภัยด่วน)' : '🔈 เสียงเตือน: ปิดอยู่ (โหมดสงบ)';
+        UI.enableSpeechBtn.className = automaticSpeechEnabled ? 'btn btn-primary voice-control-button' : 'btn btn-secondary voice-control-button';
+    }
+    if (UI.ttsStatus) {
+        UI.ttsStatus.textContent = automaticSpeechEnabled ? 'เปิดเสียงแจ้งเตือนอัตโนมัติ (แจ้งเฉพาะภัยด่วน/ทุก 30 นาที)' : 'ปิดเสียงแจ้งเตือนอัตโนมัติแล้ว';
+    }
+    return automaticSpeechEnabled;
 };
 
 export const isAutomaticSpeechEnabled = () => automaticSpeechEnabled;
 
 export const speakWeatherSummary = () => {
-    speakText(latestWeatherNarration, 'WEATHER');
+    void playAlertTone('weather');
+    let studioKey = 'SAFE_OUT';
+    if (/ฝน/i.test(latestWeatherNarration)) studioKey = 'RAIN';
+    else if (/พายุ|ลม/i.test(latestWeatherNarration)) studioKey = 'STORM';
+    else if (/ร้อน/i.test(latestWeatherNarration)) studioKey = 'HEAT';
+
+    // 1. Play studio Thai voice prompt first in browser
+    void playStudioVoice(studioKey).then(() => {
+        // 2. Speak detailed telemetry sentence only after studio voice finishes
+        speakText(latestWeatherNarration, 'WEATHER', false);
+    });
+
+    // 3. Dispatch hardware announcement cue to ESP32 speaker
+    void requestEsp32Announcement(latestWeatherNarration, studioKey);
 };
 
 if ('speechSynthesis' in window) {
@@ -567,24 +627,21 @@ const speakNextQueueItem = (sequenceId = speechSequence) => {
     window.speechSynthesis.speak(utterance);
 };
 
-export const speakText = (text: string, cueType: 'ANNOUNCEMENT' | 'WEATHER' | 'OFFICIAL' | 'TEST' = 'ANNOUNCEMENT') => {
+export const speakText = (text: string, cueType: 'ANNOUNCEMENT' | 'WEATHER' | 'OFFICIAL' | 'TEST' = 'ANNOUNCEMENT', sendToHardware = false) => {
     const cleanText = text?.trim();
     if (!cleanText || isAudioMuted()) return;
 
-    // 1. If hardware or dual, trigger physical ESP32 speaker
-    if (audioDestination === 'hardware' || audioDestination === 'dual') {
+    // 1. Trigger physical ESP32 speaker command if requested or important cue
+    if (sendToHardware || cueType === 'TEST' || cueType === 'OFFICIAL' || cueType === 'WEATHER') {
         void requestEsp32Announcement(cleanText, cueType).then(() => {
-            if (UI.ttsStatus) UI.ttsStatus.textContent = '🔊 ส่งเสียงออกลำโพง ESP32 แล้ว';
+            if (UI.ttsStatus) UI.ttsStatus.textContent = '🔊 ส่งเสียงประกาศออกลำโพงแล้ว';
         }).catch(() => undefined);
     }
 
-    // 2. If hardware-only, keep computer silent!
-    if (audioDestination === 'hardware') {
-        if (UI.ttsStatus) UI.ttsStatus.textContent = '🔊 ส่งเสียงออกลำโพง ESP32 แล้ว';
-        return;
-    }
-
     if (!('speechSynthesis' in window)) return;
+    if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+    }
 
     // Wake up AudioContext on user action so speaker is active
     const audioContext = getAlertAudioContext();
@@ -779,9 +836,14 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
         sourceLabel: w.sourceLabel || (w.time ? 'โอเพนเมทีโอ' : 'แหล่งข้อมูลที่เชื่อมต่อ'),
     });
 
-    if (userHasInteracted && automaticSpeechEnabled && !isAudioMuted() && weatherSpeechKey !== lastWeatherSpeechKey && (severity !== 'NORMAL' || outdoorSummary.status !== 'READY')) {
+    const now = Date.now();
+    if (userHasInteracted && automaticSpeechEnabled && !isAudioMuted() &&
+        (now - lastWeatherAutoSpokenAt >= WEATHER_AUTO_SPEECH_COOLDOWN_MS) &&
+        weatherSpeechKey !== lastWeatherSpeechKey &&
+        severity === 'CRITICAL') { // ONLY speak automatically for CRITICAL emergency, with 30-min cooldown!
+        lastWeatherAutoSpokenAt = now;
         lastWeatherSpeechKey = weatherSpeechKey;
-        setTimeout(() => speakText(latestWeatherNarration), 220);
+        setTimeout(() => speakText(latestWeatherNarration, 'WEATHER'), 220);
     }
 
     updateHumidityDetailPanel(humidity, dewPoint, comfortText, statusText, adviceText);

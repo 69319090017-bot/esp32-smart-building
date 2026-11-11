@@ -234,7 +234,7 @@ export interface DebouncedCallback<T> {
  */
 export interface ErrorContext {
   /** Error type/category */
-  type: 'connection' | 'read' | 'write' | 'validation' | 'unknown';
+  type: 'connection' | 'read' | 'write' | 'validation' | 'unknown' | 'error' | 'info';
   /** Error message */
   message: string;
   /** Timestamp (ISO 8601) */

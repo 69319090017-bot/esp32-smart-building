@@ -23,6 +23,7 @@ import {
     getSpeechRate,
     setSpeechRate,
     speakWeatherSummary,
+    playStudioVoice,
     getAlertToneVolume,
     setAlertToneVolume,
     playAlertTone,
@@ -54,10 +55,9 @@ import {
     GaugeChartComponent,
     SparklineComponent,
     HeatmapComponent,
-    chartManager,
-    type HazardData,
-    type HistoricalDataPoint
+    chartManager
 } from './chart_components';
+import { type HazardData, type HistoricalDataPoint } from './charts';
 
 // ============================================================================
 // NEW ARCHITECTURE IMPORTS
@@ -256,8 +256,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Publish weather updated event
         eventBus.publish(eventFactory.weatherUpdated(
-            data,
-            data.severity || 'NORMAL',
+            data as any,
+            (data.severity || 'NORMAL') as any,
             province,
             'communication-manager'
         ));
@@ -488,6 +488,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('officialToneTestBtn')?.addEventListener('click', () => void playAlertTone('official'));
     document.getElementById('weatherToneTestBtn')?.addEventListener('click', () => void playAlertTone('weather'));
 
+    (window as any).testVoice = async (voiceKey: string = 'STATUS') => {
+        // 1. Play studio Thai voice immediately in browser/PC speakers
+        const voiceFileMap: Record<string, string> = {
+            'STATUS': '/audio/voices/voice_status_ok.wav',
+            'NIGHT_WALK': '/audio/voices/voice_night_walk.wav',
+            'BOOT': '/audio/voices/voice_boot.wav',
+            'WIFI_OK': '/audio/voices/voice_wifi_ok.wav',
+            'WIFI_LOST': '/audio/voices/voice_wifi_lost.wav',
+            'DOOR_OPEN': '/audio/voices/voice_door_open.wav',
+            'DOOR_LOCKED': '/audio/voices/voice_door_locked.wav',
+            'HEAT': '/audio/voices/voice_heat_warn.wav',
+            'RAIN': '/audio/voices/voice_rain_warn.wav',
+            'SAFE_OUT': '/audio/voices/voice_safe_out.wav',
+            'STORM': '/audio/voices/voice_storm_warn.wav',
+            'FIRE': '/audio/voices/voice_fire_temp.wav',
+            'FLOOD': '/audio/voices/voice_flood_warn.wav',
+            'INTRUSION': '/audio/voices/voice_intrusion.wav',
+            'NIGHT_MODE': '/audio/voices/voice_night_mode.wav',
+            'DAY_MODE': '/audio/voices/voice_day_mode.wav',
+        };
+        const wavPath = voiceFileMap[voiceKey] || '/audio/voices/voice_status_ok.wav';
+        try {
+            const audio = new Audio(wavPath);
+            audio.volume = 1.0;
+            audio.play().catch(e => console.log('Audio autoplay policy:', e));
+        } catch (e) {
+            console.warn('Local audio playback error:', e);
+        }
+
+        // 2. Also send real-time command to physical ESP32 speaker via Firebase
+        try {
+            await requestEsp32Announcement(`ทดสอบเสียง ${voiceKey}`, voiceKey);
+            createToast(`กำลังเล่นเสียง '${voiceKey}' บนเว็บและส่งสัญญาณไปยัง ESP32 แล้ว`, 'success');
+        } catch (err: any) {
+            console.warn('Firebase announcement error:', err);
+        }
+    };
+
     document.getElementById('speechTestBtn')?.addEventListener('click', () => {
         speakText('ทดสอบเสียงภาษาไทย หนึ่ง สอง สาม. ถ้าฟังชัดแล้ว กดฟังสรุปตอนนี้');
     });
@@ -624,14 +662,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderPnaTestAlert(localStorage.getItem(PNA_TEST_ALERT_KEY));
     renderPnaTestHistory();
 
+    const broadcastVoicePrompt = (text: string) => {
+        let voiceKey: string | null = null;
+        if (/ไฟ|ควัน|อุณหภูมิ/i.test(text)) voiceKey = 'FIRE';
+        else if (/น้ำ|ท่วม/i.test(text)) voiceKey = 'FLOOD';
+        else if (/พายุ|ลม/i.test(text)) voiceKey = 'STORM';
+        else if (/ฝน/i.test(text)) voiceKey = 'RAIN';
+        else if (/ร้อน/i.test(text)) voiceKey = 'HEAT';
+        else if (/ขโมย|บุกรุก|อันตราย|ผู้บุกรุก/i.test(text)) voiceKey = 'INTRUSION';
+        else if (/ไฟเปิด|ทางเดิน|สะดุด/i.test(text)) voiceKey = 'NIGHT_WALK';
+        else if (/ประตูเปิด/i.test(text)) voiceKey = 'DOOR_OPEN';
+        else if (/ประตูปิด/i.test(text)) voiceKey = 'DOOR_LOCKED';
+        else if (/ปกติ|เรียบร้อย|สถานะ/i.test(text)) voiceKey = 'STATUS';
+
+        if (voiceKey) {
+            void playStudioVoice(voiceKey).then(() => {
+                speakText(text, 'TEST', false);
+            });
+            void requestEsp32Announcement(text, voiceKey);
+        } else {
+            void playAlertTone('official');
+            speakText(text, 'TEST', true);
+        }
+    };
+
     pnaTestSpeak?.addEventListener('click', () => {
         const message = pnaTestAlertMessage?.textContent?.trim();
         if (message) {
-            void playAlertTone('official');
-            setTimeout(() => {
-                speakText(`ข้อความแจ้งเตือน: ${message}`);
-            }, 600);
-            void requestEsp32Announcement(message);
+            broadcastVoicePrompt(message);
         }
     });
     pnaTestStop?.addEventListener('click', stopSpeech);
@@ -665,6 +723,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderPnaTestAlert(JSON.stringify(alert), true);
         createToast(`กระจายเสียงแจ้งเตือนออกลำโพงเรียบร้อย`, 'success');
         if (pnaQuickMessageInput) pnaQuickMessageInput.value = '';
+
+        void playAlertTone('official');
+        setTimeout(() => {
+            broadcastVoicePrompt(text);
+        }, 500);
     };
 
     pnaQuickSendBtn?.addEventListener('click', () => triggerQuickAlert());
@@ -714,15 +777,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 5. Initialize Firebase (if configured)
     void initializeFirebase().then(() => initializeIndoorHome());
     initElectricityCalculator();
+    let lastIncomingNoticeSpokenAt = 0;
+    const INCOMING_NOTICE_COOLDOWN_MS = 15 * 60 * 1000; // 15-minute cooldown between auto speech
+
     initializeOfficialAlerts((text) => {
         // Direct manual click announcement - always play tone & speak immediately!
         void playAlertTone('official');
-        setTimeout(() => speakText(text), 600);
+        speakText(text, 'OFFICIAL', true);
     }, (text) => {
-        // New incoming notices - automatically chime & announce if automatic speech enabled
-        if (isAutomaticSpeechEnabled()) {
+        // New incoming notices - automatically chime & announce ONLY if enabled and cooldown has passed
+        const now = Date.now();
+        if (isAutomaticSpeechEnabled() && (now - lastIncomingNoticeSpokenAt >= INCOMING_NOTICE_COOLDOWN_MS)) {
+            lastIncomingNoticeSpokenAt = now;
             void playAlertTone('official');
-            setTimeout(() => speakText(text), 600);
+            speakText(text, 'OFFICIAL', true);
         }
     });
 

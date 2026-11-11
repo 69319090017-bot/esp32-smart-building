@@ -4,6 +4,7 @@
  */
 
 import {
+  BaseEvent,
   AppEvent,
   EventType,
   EventListener,

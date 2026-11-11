@@ -1,6 +1,6 @@
-import { createToast, PROVINCES_MAP, updateDashboardUI, historyLogs, playAlertTone, speakText } from './ui_manager';
+import { createToast, PROVINCES_MAP, updateDashboardUI, historyLogs, playAlertTone, speakText, getAudioDestination } from './ui_manager';
 import { requestCache } from './performance';
-import { requestEsp32Announcement } from './firebase_client';
+import { requestEsp32Announcement, requestEsp32Led, requestEsp32Door, requestEsp32NightMode } from './firebase_client';
 
 // ============================================================================
 // NEW ARCHITECTURE IMPORTS
@@ -208,122 +208,151 @@ export const fetchOpenMeteoWeather = async (provinceName: string) => {
 };
 
 export const toggleStrobe = async () => {
-    // Try to send via WebSocket if available
-    if (commManager.isWebSocketConnected()) {
+    currentStrobeState = !currentStrobeState;
+
+    // 1. Play real studio Thai voice immediately when light turns ON
+    if (currentStrobeState) {
         try {
-            const result = await deviceCommands.toggleStrobe();
-            if (result.success) {
-                currentStrobeState = !currentStrobeState;
-                createToast(`Strobe Relay: ${currentStrobeState ? 'ON' : 'OFF'} (via WebSocket)`, "success");
-            } else {
-                createToast(`Strobe command failed: ${result.error}`, "alert");
-                return;
-            }
-        } catch (error) {
-            console.error('WebSocket command error:', error);
-            // Fallback to local state
-            currentStrobeState = !currentStrobeState;
-            createToast(`Strobe Relay: ${currentStrobeState ? 'ON' : 'OFF'} (local mode)`, "info");
+            const audio = new Audio('/audio/voices/voice_night_walk.wav');
+            audio.volume = 1.0;
+            audio.play().catch(e => console.log('Light audio play notice:', e));
+        } catch (e) {
+            console.warn('Light audio play error:', e);
         }
+        createToast("💡 เปิดไฟส่องสว่างแล้วค่ะ (ระวังสะดุดนะคะ)", "success");
     } else {
-        // Fallback to local state management
-        currentStrobeState = !currentStrobeState;
-        createToast(`Strobe Relay: ${currentStrobeState ? 'ON' : 'OFF'} (local mode)`, "info");
+        createToast("💡 ปิดไฟส่องสว่างเรียบร้อยแล้ว", "info");
     }
 
-    // Update UI
+    // 2. Update UI
     const pill = document.getElementById('strobeStatusPill');
     if (pill) {
         pill.textContent = currentStrobeState ? "ON (MANUAL)" : "OFF";
         pill.style.cssText = currentStrobeState ? "background: rgba(239,68,68,0.2); color: #ef4444;" : "background: rgba(148,163,184,0.1); color: var(--color-fg-muted);";
     }
+
+    // 3. Send command to physical ESP32 via Firebase
+    try {
+        await requestEsp32Led(currentStrobeState);
+    } catch (error) {
+        console.warn('Firebase LED command notice:', error);
+    }
+
+    // 4. Also try WebSocket if connected
+    if (commManager.isWebSocketConnected()) {
+        try {
+            await deviceCommands.toggleStrobe();
+        } catch (error) {
+            console.warn('WebSocket command error:', error);
+        }
+    }
 };
 
 export const toggleEmergencyDoor = async () => {
-    // Try to send via WebSocket if available
-    if (commManager.isWebSocketConnected()) {
+    currentDoorState = !currentDoorState;
+
+    // 1. Play real studio Thai voice on browser ONLY if destination is browser-only to prevent overlapping with ESP32
+    if (getAudioDestination() === 'browser') {
         try {
-            const result = await deviceCommands.toggleDoor();
-            if (result.success) {
-                currentDoorState = !currentDoorState;
-                createToast(`Emergency Doors: ${currentDoorState ? 'UNLOCKED' : 'LOCKED'} (via WebSocket)`, "success");
-            } else {
-                createToast(`Door command failed: ${result.error}`, "alert");
-                return;
-            }
-        } catch (error) {
-            console.error('WebSocket command error:', error);
-            // Fallback to local state
-            currentDoorState = !currentDoorState;
-            createToast(`Emergency Doors: ${currentDoorState ? 'UNLOCKED' : 'LOCKED'} (local mode)`, "info");
+            const wavPath = currentDoorState ? '/audio/voices/voice_door_open.wav' : '/audio/voices/voice_door_locked.wav';
+            const audio = new Audio(wavPath);
+            audio.volume = 1.0;
+            audio.play().catch(e => console.log('Door audio play notice:', e));
+        } catch (e) {
+            console.warn('Door audio play error:', e);
         }
-    } else {
-        // Fallback to local state management
-        currentDoorState = !currentDoorState;
-        createToast(`Emergency Doors: ${currentDoorState ? 'UNLOCKED' : 'LOCKED'} (local mode)`, "info");
     }
 
-    // Update UI
+    if (currentDoorState) {
+        createToast("🔓 ปลดล็อกและเปิดประตูเรียบร้อยแล้วค่ะ", "success");
+    } else {
+        createToast("🔒 ปิดล็อกประตูเรียบร้อยแล้วค่ะ", "info");
+    }
+
+    // 2. Update UI
     const pill = document.getElementById('doorStatusPill');
     if (pill) {
         pill.textContent = currentDoorState ? "UNLOCKED (MANUAL)" : "LOCKED";
         pill.style.cssText = currentDoorState ? "background: rgba(239,68,68,0.2); color: #ef4444;" : "background: rgba(148,163,184,0.1); color: var(--color-fg-muted);";
     }
+
+    // 3. Send command to physical ESP32 Servo via Firebase
+    try {
+        await requestEsp32Door(currentDoorState);
+    } catch (error) {
+        console.warn('Firebase Door command notice:', error);
+    }
+
+    // 4. Also try WebSocket if connected
+    if (commManager.isWebSocketConnected()) {
+        try {
+            await deviceCommands.toggleDoor();
+        } catch (error) {
+            console.warn('WebSocket command error:', error);
+        }
+    }
 };
 
 export const silenceAlarm = async () => {
-    // Try to send via WebSocket if available
-    if (commManager.isWebSocketConnected()) {
-        try {
-            const result = await deviceCommands.silenceAlarm();
-            if (!result.success) {
-                createToast(`Silence alarm command failed: ${result.error}`, "alert");
-                return;
-            }
-        } catch (error) {
-            console.error('WebSocket command error:', error);
-        }
+    // 1. Stop web browser audio & speech synthesis
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
     }
 
-    // Update UI
+    // 2. Update UI
     const sirenPill = document.getElementById('sirenStatusPill');
     if (sirenPill) {
         sirenPill.textContent = "MUTED";
         sirenPill.style.cssText = "background: rgba(148,163,184,0.1); color: var(--color-fg-muted);";
     }
-    createToast("สัญญาณเสียงไซเรนถูกปิดชั่วคราว (Silenced)", "info");
+    createToast("สัญญาณเสียงไซเรนถูกปิดแล้ว (Silenced)", "info");
+
+    // 3. Send silence cue to ESP32 via Firebase
+    try {
+        await requestEsp32Announcement('OFF', 'OFF');
+    } catch (error) {
+        console.warn('Firebase silence error:', error);
+    }
+
+    // 4. Also try WebSocket if connected
+    if (commManager.isWebSocketConnected()) {
+        try {
+            await deviceCommands.silenceAlarm();
+        } catch (error) {
+            console.warn('WebSocket silence error:', error);
+        }
+    }
 };
 
 export const testAudioSiren = async () => {
     const sirenPill = document.getElementById('sirenStatusPill');
     if (sirenPill) {
-        sirenPill.textContent = "TESTING SPEAKERS";
+        sirenPill.textContent = "ALARM ACTIVE";
         sirenPill.style.cssText = "background: rgba(239,68,68,0.2); color: #ef4444;";
     }
-    createToast("กำลังทดสอบเสียงแจ้งเตือนผ่านลำโพงจริงและ ESP32…", "info");
+    createToast("🚨 กำลังทดสอบเสียงไซเรนและส่งสัญญาณแจ้งเตือนไปยัง ESP32…", "info");
 
-    // 1. Play real audio chime & Thai voice through browser / device speakers
-    void playAlertTone('official');
-    setTimeout(() => {
-        speakText('นี่คือการทดสอบสัญญาณเสียงแจ้งเตือนและระบบกระจายเสียงฉุกเฉิน ลำโพงทำงานปกติ');
-    }, 600);
-
+    // 1. Play real studio Thai voice for intrusion / siren immediately
     try {
-        await requestEsp32Announcement('ทดสอบเสียงลำโพง ESP32 (GPIO 27)', 'TEST');
-        createToast("ESP32 กำลังส่งเสียงออกลำโพง (GPIO 27) แล้ว", "success");
+        const audio = new Audio('/audio/voices/voice_intrusion.wav');
+        audio.volume = 1.0;
+        audio.play().catch(e => console.log('Siren audio notice:', e));
+    } catch (e) {
+        console.warn('Siren audio error:', e);
+    }
+
+    // 2. Trigger hardware ESP32 PCM5102 & Buzzer siren
+    try {
+        await requestEsp32Announcement('แจ้งเตือน ตรวจพบความเคลื่อนไหวผิดปกติค่ะ', 'SIREN');
+        createToast("ESP32 กำลังส่งเสียงไซเรนและเสียงเตือนภัยแล้ว", "success");
         setTimeout(() => {
             if (sirenPill) {
                 sirenPill.textContent = "NORMAL (SILENT)";
                 sirenPill.style.cssText = "background: rgba(148,163,184,0.1); color: var(--color-fg-muted);";
             }
-        }, 4000);
+        }, 5000);
     } catch (error) {
-        const message = error instanceof Error ? error.message : 'ไม่ทราบสาเหตุ';
-        createToast(`ส่งเสียงไปลำโพง ESP32 ไม่สำเร็จ: ${message}`, "alert");
-        if (sirenPill) {
-            sirenPill.textContent = "ESP32 SPEAKER ERROR";
-            sirenPill.style.cssText = "background: rgba(239,68,68,0.2); color: #ef4444;";
-        }
+        console.warn('Firebase siren error:', error);
     }
 };
 

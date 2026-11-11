@@ -86,6 +86,8 @@ export const VALIDATION_CONFIG = {
  * Retry Configuration for Failed Operations
  */
 export const RETRY_CONFIG = {
+  /** Maximum retry attempts */
+  maxAttempts: 3,
   /** Maximum retry attempts for read operations */
   readMaxAttempts: 3,
   /** Maximum retry attempts for write operations */
@@ -98,7 +100,7 @@ export const RETRY_CONFIG = {
   backoffMultiplier: 2,
   /** Whether to add jitter to retry delays */
   jitter: true,
-} as const;
+};
 
 /**
  * Logging Configuration
@@ -107,7 +109,7 @@ export const LOGGING_CONFIG = {
   /** Enable Firebase operation logging */
   enableLogging: true,
   /** Log level: 'debug', 'info', 'warn', 'error', 'none' */
-  logLevel: 'info' as const,
+  logLevel: 'info' as 'debug' | 'info' | 'warn' | 'error' | 'none',
   /** Log read operations */
   logReads: true,
   /** Log write operations */
@@ -118,7 +120,7 @@ export const LOGGING_CONFIG = {
   logValidationErrors: true,
   /** Maximum log entries to keep in memory */
   maxLogEntries: 100,
-} as const;
+};
 
 /**
  * Performance Monitoring Configuration

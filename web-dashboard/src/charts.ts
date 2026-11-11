@@ -21,6 +21,7 @@ export interface HazardData {
     wind_speed_10m: number;
     precipitation: number;
     river_discharge: number;
+    relative_humidity_2m?: number;
 }
 
 export interface HistoricalDataPoint {
@@ -170,7 +171,7 @@ export const createRadarChart = (canvasId: string, data: HazardData): ChartInsta
                         color: '#e0f2fe',
                         font: {
                             size: 11,
-                            weight: '500'
+                            weight: 500
                         }
                     }
                 }
@@ -188,7 +189,7 @@ export const createRadarChart = (canvasId: string, data: HazardData): ChartInsta
                     padding: 12,
                     callbacks: {
                         label: function(context) {
-                            return `${context.label}: ${context.raw.toFixed(0)}%`;
+                            return `${context.label}: ${Number(context.raw || 0).toFixed(0)}%`;
                         }
                     }
                 }
@@ -328,8 +329,8 @@ export const createTimeSeriesChart = (
             );
             const values = historicalData.map(d => d.data[metric] as number);
             
-            chart.data.labels = labels;
-            chart.data.datasets[0].data = values;
+            chart.data.labels = labels as any;
+            chart.data.datasets[0].data = values as any;
             chart.update('active');
         }
     };
@@ -369,11 +370,11 @@ export const createGaugeChart = (
                     color,
                     'rgba(0, 243, 255, 0.2)'
                 ],
-                borderWidth: 2,
-                cutout: '75%'
+                borderWidth: 2
             }]
         },
         options: {
+            cutout: '75%',
             responsive: true,
             maintainAspectRatio: true,
             rotation: -90,
@@ -400,18 +401,19 @@ export const createGaugeChart = (
                 const ctx = chart.ctx;
                 
                 ctx.restore();
-                const fontSize = (height / 100).toFixed(2);
-                ctx.font = `bold ${fontSize}em Kanit`;
+                const fontSizeNum = height / 100;
+                ctx.font = `bold ${fontSizeNum.toFixed(2)}em Kanit`;
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#e0f2fe';
                 
-                const text = chart.data.datasets[0].data[0].toFixed(1);
+                const val = Number(chart.data.datasets[0]?.data?.[0] || 0);
+                const text = val.toFixed(1);
                 const textX = Math.round((width - ctx.measureText(text).width) / 2);
                 const textY = height / 2;
                 
                 ctx.fillText(text, textX, textY);
                 
-                ctx.font = `${(fontSize * 0.4).toFixed(2)}em Kanit`;
+                ctx.font = `${(fontSizeNum * 0.4).toFixed(2)}em Kanit`;
                 ctx.fillStyle = 'rgba(224, 242, 254, 0.6)';
                 const unitText = unit;
                 const unitX = Math.round((width - ctx.measureText(unitText).width) / 2);

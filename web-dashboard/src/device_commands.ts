@@ -9,14 +9,13 @@
  */
 
 import {
-  WebSocketMessage,
   MessageType,
   CommandType,
   CommandMessage,
   AckMessage,
-  QueuedCommand,
-  WebSocketClient
+  QueuedCommand
 } from './websocket_types';
+import { WebSocketClient } from './websocket_client';
 
 export interface CommandResult {
   success: boolean;

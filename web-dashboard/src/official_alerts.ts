@@ -1,6 +1,6 @@
 import { FIREBASE_CONFIG } from './config';
 import { requestEsp32Announcement } from './firebase_client';
-import { playAlertTone } from './ui_manager';
+import { playAlertTone, createToast, playStudioVoice, speakText } from './ui_manager';
 
 export type OfficialAlert = {
   id: string;
@@ -245,36 +245,154 @@ function safeOfficialUrl(value: string): string {
   return 'https://capportal.apiddpm.com/';
 }
 
+export interface ParsedAlertDetails {
+  cleanTitle: string;
+  guidanceText: string;
+  urgentSpeech: string;
+  guidanceSpeech: string;
+  summarySpeech: string;
+  rainChance: number | null;
+  windSpeed: number | null;
+  voiceKey: string;
+}
+
+export function parseAlertDetails(alert: OfficialAlert): ParsedAlertDetails {
+  let title = (alert.title || '').trim();
+  let summary = (alert.summary || '').trim();
+
+  // 1. Extract quantitative metrics before cleaning
+  const rainMatch = title.match(/(?:โอกาสเกิดฝน|ฝน|precipitation)\s*(\d+)\s*%/i) || summary.match(/(?:โอกาสเกิดฝน|ฝน|precipitation)\s*(\d+)\s*%/i);
+  const rainChance = rainMatch ? parseInt(rainMatch[1], 10) : null;
+
+  const windMatch = title.match(/(?:ลมกระโชก|ลม|wind)\s*([\d.]+)\s*(?:กม\.?\/?ชม\.?|km\/?h)?/i) || summary.match(/(?:ลมกระโชก|ลม|wind)\s*([\d.]+)\s*(?:กม\.?\/?ชม\.?|km\/?h)?/i);
+  const windSpeed = windMatch ? parseFloat(windMatch[1]) : null;
+
+  // 2. Clean Title: strip parenthetical data, brackets, and agency prefixes
+  let cleanTitle = title
+    .replace(/\s*\([^)]*\)/g, '')
+    .replace(/^(กอปภ\.ก\.|ปภ\.|กรมอุตุนิยมวิทยา)\s*(แจ้งเตือน)?\s*[:\-]?\s*/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!cleanTitle) cleanTitle = 'เฝ้าระวังสภาพอากาศแปรปรวน';
+
+  // 3. Clean Guidance: isolate the actual safety instructions and human actions
+  let guidanceText = summary;
+  const reqIndex = guidanceText.indexOf('ขอให้');
+  if (reqIndex >= 0) {
+    guidanceText = guidanceText.substring(reqIndex);
+  } else {
+    guidanceText = guidanceText
+      .replace(/ตรวจพบสภาวะอากาศแปรปรวนจากเครือข่ายสถานีตรวจวัดอุตุนิยมวิทยาแบบ\s*Real-time\s*/gi, '')
+      .replace(/ข้อมูลติดตามสถานการณ์สาธารณภัยและการแจ้งเตือนภัย\s*กรมป้องกันและบรรเทาสาธารณภัย\s*/gi, '');
+  }
+  guidanceText = guidanceText.replace(/\s+/g, ' ').trim();
+  if (!guidanceText) {
+    guidanceText = 'ขอให้ประชาชนในพื้นที่เสี่ยง ติดตามข้อมูลข่าวสารและเตรียมพร้อมรับมือสถานการณ์อย่างใกล้ชิด';
+  }
+
+  // 4. Determine matching ESP32 Studio Voice
+  let voiceKey = 'STATUS';
+  const combined = (title + ' ' + summary).toLowerCase();
+  if (/พายุ|ลม|ลมกระโชก/i.test(combined)) voiceKey = 'STORM';
+  else if (/น้ำท่วม|น้ำป่า|น้ำหลาก/i.test(combined)) voiceKey = 'FLOOD';
+  else if (/ฝน/i.test(combined)) voiceKey = 'RAIN';
+  else if (/ไฟ|ควัน|ความร้อน|อุณหภูมิ/i.test(combined)) voiceKey = 'FIRE';
+  else if (/แดด|ร้อนจัด/i.test(combined)) voiceKey = 'HEAT';
+
+  // 5. Speech scripts: natural, rhythmic, caring spoken Thai
+  // A. การแจ้งเตือนด่วน (Urgent Alert Speech) -> ~3-4 seconds, punchy
+  const urgentSpeech = `แจ้งเตือนภัยด่วน: ${cleanTitle}ค่ะ`;
+
+  // B. การประกาศ & คำแนะนำ (Guidance Speech) -> Clear, instructive
+  const guidanceSpeech = `ประกาศทางการ: ${cleanTitle}ค่ะ ${guidanceText}ค่ะ`;
+
+  // C. การสรุปสภาพอากาศ (Weather & Risk Summary) -> Converted spoken numbers
+  let summaryParts: string[] = [];
+  if (rainChance !== null) summaryParts.push(`มีโอกาสเกิดฝนร้อยละ ${rainChance}`);
+  if (windSpeed !== null) summaryParts.push(`ความเร็วลมกระโชกแรง ${Math.round(windSpeed)} กิโลเมตรต่อชั่วโมง`);
+  const summarySpeech = summaryParts.length > 0
+    ? `สรุปสภาวะอากาศขณะนี้: ${summaryParts.join(' และ')} สภาพอากาศแปรปรวนค่ะ`
+    : `สรุปสภาพอากาศ: อยู่ในเกณฑ์เฝ้าระวัง ขอให้ปฏิบัติตามคำแนะนำค่ะ`;
+
+  return {
+    cleanTitle,
+    guidanceText,
+    urgentSpeech,
+    guidanceSpeech,
+    summarySpeech,
+    rainChance,
+    windSpeed,
+    voiceKey,
+  };
+}
+
+export function playUrgentAlert(alert: OfficialAlert): void {
+  const parsed = parseAlertDetails(alert);
+  void playAlertTone('official');
+
+  // 1. Play high-quality studio Thai voice prompt first in browser
+  if (parsed.voiceKey) {
+    void playStudioVoice(parsed.voiceKey).then(() => {
+      // 2. Speak dynamic emergency speech directly after studio voice completes
+      speakText(parsed.urgentSpeech, 'OFFICIAL', false);
+    });
+    void requestEsp32Announcement(parsed.cleanTitle, parsed.voiceKey);
+  } else {
+    speakText(parsed.urgentSpeech, 'OFFICIAL', true);
+  }
+
+  createToast(`🚨 แจ้งเตือนด่วน: ${parsed.cleanTitle}`, 'alert');
+}
+
+export function playGuidanceAnnouncement(alert: OfficialAlert): void {
+  const parsed = parseAlertDetails(alert);
+  void playAlertTone('official');
+
+  // 1. Play studio Thai voice prompt first in browser
+  if (parsed.voiceKey) {
+    void playStudioVoice(parsed.voiceKey).then(() => {
+      // 2. Speak full official guidance speech directly after studio voice completes
+      speakText(parsed.guidanceSpeech, 'OFFICIAL', false);
+    });
+    void requestEsp32Announcement(parsed.cleanTitle, parsed.voiceKey);
+  } else {
+    speakText(parsed.guidanceSpeech, 'OFFICIAL', true);
+  }
+
+  createToast(`📢 ประกาศทางการ: ${parsed.cleanTitle}`, 'info');
+}
+
+export function playWeatherSummary(alert: OfficialAlert): void {
+  const parsed = parseAlertDetails(alert);
+  void playAlertTone('weather');
+
+  // 1. Play studio Thai voice prompt first in browser
+  if (parsed.voiceKey) {
+    void playStudioVoice(parsed.voiceKey).then(() => {
+      // 2. Speak weather summary speech directly after studio voice completes
+      speakText(parsed.summarySpeech, 'WEATHER', false);
+    });
+    void requestEsp32Announcement(parsed.cleanTitle, parsed.voiceKey);
+  } else {
+    speakText(parsed.summarySpeech, 'WEATHER', true);
+  }
+
+  createToast(`📊 สรุปข้อมูลสภาพอากาศ & ค่าตรวจวัด`, 'info');
+}
+
+export function triggerEsp32Hardware(alert: OfficialAlert): void {
+  const parsed = parseAlertDetails(alert);
+  createToast(`⚡ ส่งสัญญาณไซเรนและเสียงเตือนภัยไปยัง ESP32 แล้ว`, 'success');
+  void requestEsp32Announcement(parsed.cleanTitle, parsed.voiceKey);
+}
+
 function formatSpeech(alert: OfficialAlert): string {
-  const agency = alert.agency ? `จาก ${alert.agency}` : 'จากหน่วยงานราชการ';
-  const date = alert.sourceDate ? ` ข้อมูล ณ วันที่ ${alert.sourceDate}` : '';
-  const summary = alert.summary ? ` ${alert.summary}` : '';
-  return `ประกาศเตือนภัย${agency}${date} ${alert.title}.${summary}`;
+  const parsed = parseAlertDetails(alert);
+  return parsed.guidanceSpeech;
 }
 
 function announceOfficialAlert(alert: OfficialAlert): void {
-  let text = formatSpeech(alert);
-  if (Array.from(text).length > 360) {
-    text = `${Array.from(text).slice(0, 300).join('').replace(/[่้๊๋ัิีึืุู์ํ๎็]+$/u, '')} โปรดติดตามประกาศเพิ่มเติมจากหน่วยงานทางการ`;
-  }
-  if (pnaOfficialStatus) pnaOfficialStatus.textContent = 'กำลังส่งเสียงประกาศเตือนภัยผ่านลำโพง…';
-
-  const button = document.querySelector<HTMLButtonElement>('#pnaRealSpeakBtn');
-  if (button) button.disabled = true;
-
-  // 1. Play official chime tone, then voice through device speakers!
-  void playAlertTone('official');
-  setTimeout(() => {
-    speak?.(text);
-  }, 650);
-
-  // 2. Status confirmation
-  if (pnaOfficialStatus) {
-    pnaOfficialStatus.textContent = 'ส่งสัญญาณเสียงประกาศเรียบร้อย';
-  }
-  if (button?.isConnected) {
-    setTimeout(() => { button.disabled = false; }, 1200);
-  }
+  playGuidanceAnnouncement(alert);
 }
 
 function renderWeatherView() {
@@ -298,10 +416,11 @@ function renderWeatherView() {
   latestElement.replaceChildren();
 
   if (latest) {
+    const parsed = parseAlertDetails(latest);
     const title = document.createElement('h3');
-    title.textContent = latest.title;
+    title.textContent = parsed.cleanTitle;
     const details = document.createElement('p');
-    details.textContent = `${latest.summary} (${latest.sourceDate || 'ไม่ระบุ'})`;
+    details.textContent = `${parsed.guidanceText} (${latest.sourceDate || 'ไม่ระบุ'})`;
     latestElement.append(title, details);
     statusElement.textContent = `${activeAlerts.length
       ? 'ตรวจพบประกาศที่ยังมีผลจากหน่วยงานทางการ'
@@ -390,42 +509,106 @@ function renderPnaView() {
   pnaOfficialLatest.replaceChildren();
 
   if (latest) {
+    const parsed = parseAlertDetails(latest);
     const container = document.createElement('div');
     container.className = 'pna-official-card-body';
     container.innerHTML = `
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
-        <span class="pna-official-agency-badge">${escapeHtml(latest.agency || 'กรมป้องกันและบรรเทาสาธารณภัย (ปภ.)')}</span>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="pna-official-agency-badge">${escapeHtml(latest.agency || 'กรมป้องกันและบรรเทาสาธารณภัย (ปภ.)')}</span>
+          <span class="metric-sticker sticker-wind" style="font-size: 0.72rem; background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); border-radius: 999px; padding: 0.2rem 0.6rem;">
+            ● ประกาศด่วนทางการ
+          </span>
+        </div>
         <span style="font-size: 0.8rem; color: var(--text-muted);">ออกประกาศ: ${escapeHtml(latest.sourceDate || formatThaiDate(latest.dataDate))}</span>
       </div>
-      <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-bright); margin-bottom: 0.5rem; line-height: 1.4;">
-        ${escapeHtml(latest.title)}
-      </h3>
-      <p style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6; margin-bottom: 0.75rem;">
-        ${escapeHtml(latest.summary)}
-      </p>
-      ${latest.effectiveThrough ? `
-        <div style="font-size: 0.82rem; color: var(--yellow-warn); margin-bottom: 0.75rem;">
-          มีผลบังคับใช้ถึงวันที่: <strong>${escapeHtml(formatThaiDate(latest.effectiveThrough))}</strong>
+
+      <!-- SECTION 1: 🚨 การแจ้งเตือนภัยเร่งด่วน -->
+      <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-left: 4px solid #ef4444; border-radius: 12px; padding: 0.85rem 1.15rem; margin-bottom: 0.85rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.3rem;">
+          <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; font-weight: 700; color: #fca5a5; text-transform: uppercase; letter-spacing: 0.06em;">
+            <span>🚨</span> <span>การแจ้งเตือนภัยเร่งด่วน (Urgent Alert)</span>
+          </div>
+          <span style="font-size: 0.7rem; color: rgba(255,255,255,0.45);">สาระสำคัญสั้นกระชับ</span>
         </div>
-      ` : ''}
-      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
-        <button id="pnaRealSpeakBtn" class="btn btn-primary" type="button"
-          title="แปลงข้อความประกาศเป็นเสียงภาษาไทยแล้วเล่นผ่านลำโพง PCM5102 ที่ต่อกับ ESP32">
-          ฟังประกาศผ่านลำโพง ESP32
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #ffffff; line-height: 1.4; margin: 0;">
+          ${escapeHtml(parsed.cleanTitle)}
+        </h3>
+      </div>
+
+      <!-- SECTION 2: 📢 ข้อความประกาศ & คำแนะนำความปลอดภัย -->
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 0.85rem 1.15rem; margin-bottom: 0.85rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; font-weight: 700; color: #fde68a; text-transform: uppercase; letter-spacing: 0.06em;">
+            <span>📢</span> <span>ข้อความประกาศ & คำแนะนำการปฏิบัติตัว (Official Guidance)</span>
+          </div>
+          <span style="font-size: 0.7rem; color: rgba(255,255,255,0.45);">คำแนะนำสำหรับประชาชน</span>
+        </div>
+        <p style="font-size: 0.95rem; color: rgba(255, 255, 255, 0.9); line-height: 1.6; margin: 0;">
+          ${escapeHtml(parsed.guidanceText)}
+        </p>
+      </div>
+
+      <!-- SECTION 3: 📊 สรุปสภาวะอากาศ & ค่าตรวจวัดความเสี่ยง -->
+      <div style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; padding: 0.85rem 1.15rem; margin-bottom: 1.1rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.4rem;">
+          <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; font-weight: 700; color: #7dd3fc; text-transform: uppercase; letter-spacing: 0.06em;">
+            <span>📊</span> <span>สรุปสภาวะอากาศ & ค่าตรวจวัดความเสี่ยง (Weather & Telemetry Summary)</span>
+          </div>
+          <span style="font-size: 0.7rem; color: rgba(255,255,255,0.45);">ข้อมูลสถานีตรวจวัด</span>
+        </div>
+        <div style="display: flex; gap: 1.25rem; flex-wrap: wrap; font-size: 0.88rem; color: #ffffff;">
+          <div style="display: flex; align-items: center; gap: 0.35rem;">
+            <span>🌧️ โอกาสเกิดฝน:</span>
+            <strong style="color: #38bdf8;">${parsed.rainChance !== null ? parsed.rainChance + '%' : 'เฝ้าระวัง'}</strong>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.35rem;">
+            <span>💨 ลมกระโชกแรง:</span>
+            <strong style="color: #f43f5e;">${parsed.windSpeed !== null ? parsed.windSpeed + ' กม./ชม.' : 'ตามเกณฑ์'}</strong>
+          </div>
+          ${latest.effectiveThrough ? `
+          <div style="display: flex; align-items: center; gap: 0.35rem;">
+            <span>📅 มีผลถึงวันที่:</span>
+            <strong style="color: #fbbf24;">${escapeHtml(formatThaiDate(latest.effectiveThrough))}</strong>
+          </div>` : ''}
+        </div>
+      </div>
+
+      <!-- Audio Action Buttons: 3 Specific Spoken Formats + Hardware ESP32 -->
+      <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center;">
+        <button id="pnaUrgentSpeakBtn" class="btn btn-primary" type="button"
+          style="background: rgba(239, 68, 68, 0.25); border: 1px solid rgba(239, 68, 68, 0.5); color: #fca5a5; font-weight: 600; padding: 0.55rem 1rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.4rem;">
+          🚨 ฟังแจ้งเตือนด่วน (สั้น)
         </button>
-        <a class="btn btn-secondary" href="${escapeHtml(safeOfficialUrl(latest.sourceUrl))}" target="_blank" rel="noopener noreferrer">
+        <button id="pnaGuidanceSpeakBtn" class="btn btn-primary" type="button"
+          style="background: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.45); color: #fde68a; font-weight: 600; padding: 0.55rem 1rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.4rem;">
+          📢 ฟังประกาศ & คำแนะนำ
+        </button>
+        <button id="pnaSummarySpeakBtn" class="btn btn-secondary" type="button"
+          style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); color: #7dd3fc; font-weight: 500; padding: 0.55rem 0.95rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.4rem;">
+          📊 ฟังสรุปสภาพอากาศ
+        </button>
+        <button id="pnaRealSpeakBtn" class="btn btn-secondary" type="button"
+          style="background: rgba(191, 90, 242, 0.15); border: 1px solid rgba(191, 90, 242, 0.35); color: #d8b4fe; font-weight: 500; padding: 0.55rem 0.95rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.4rem;"
+          title="ส่งสัญญาณไซเรนและเสียงพูดสังเคราะห์ไปยังลำโพง PCM5102 ของ ESP32">
+          ⚡ ส่งเสียงออก ESP32
+        </button>
+        <a class="btn btn-secondary" href="${escapeHtml(safeOfficialUrl(latest.sourceUrl))}" target="_blank" rel="noopener noreferrer"
+           style="padding: 0.55rem 0.95rem; font-size: 0.82rem; border-radius: 10px; margin-left: auto;">
           ตรวจสอบต้นฉบับทางการ ↗
         </a>
       </div>
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.65rem;">
-        ระบบแปลงข้อความประกาศเป็นเสียงภาษาไทยแล้วส่งไปยังลำโพง ESP32 (ต้องเปิดบริการ TTS และเชื่อม Firebase)
+      <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.65rem;">
+        💡 ระบบสังเคราะห์เสียงภาษาไทยแยกตามประเภท: เสียงแจ้งเตือนด่วน (อ่านสั้นเข้าใจทันที), เสียงอ่านประกาศและคำแนะนำ, และเสียงสรุปค่าตรวจวัดอุตุนิยมวิทยา
       </p>
     `;
 
     pnaOfficialLatest.append(container);
 
-    const speakBtn = container.querySelector('#pnaRealSpeakBtn');
-    speakBtn?.addEventListener('click', () => announceOfficialAlert(latest));
+    container.querySelector('#pnaUrgentSpeakBtn')?.addEventListener('click', () => playUrgentAlert(latest));
+    container.querySelector('#pnaGuidanceSpeakBtn')?.addEventListener('click', () => playGuidanceAnnouncement(latest));
+    container.querySelector('#pnaSummarySpeakBtn')?.addEventListener('click', () => playWeatherSummary(latest));
+    container.querySelector('#pnaRealSpeakBtn')?.addEventListener('click', () => triggerEsp32Hardware(latest));
   } else {
     const source = document.createElement('a');
     source.href = 'https://capportal.apiddpm.com/';
@@ -466,36 +649,39 @@ function renderPnaView() {
 
         const agencyColor = alert.agency?.includes('ปภ') ? '#f59e0b' : '#38bdf8';
         const agencyBg = alert.agency?.includes('ปภ') ? 'rgba(245, 158, 11, 0.15)' : 'rgba(56, 189, 248, 0.15)';
+        const parsedHistory = parseAlertDetails(alert);
 
         item.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.35rem;">
-            <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; line-height: 1.4;">${escapeHtml(alert.title)}</div>
+            <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem; line-height: 1.4;">${escapeHtml(parsedHistory.cleanTitle)}</div>
             <span style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 999px; background: ${agencyBg}; color: ${agencyColor}; border: 1px solid ${agencyColor}44; white-space: nowrap; font-weight: 600;">
               ${escapeHtml(alert.agency || 'ปภ.')}
             </span>
           </div>
-          <div style="font-size: 0.82rem; color: rgba(255, 255, 255, 0.65); line-height: 1.5; margin-bottom: 0.5rem;">
-            ${escapeHtml(alert.summary.slice(0, 160))}${alert.summary.length > 160 ? '...' : ''}
+          <div style="font-size: 0.82rem; color: rgba(255, 255, 255, 0.7); line-height: 1.5; margin-bottom: 0.5rem;">
+            ${escapeHtml(parsedHistory.guidanceText.slice(0, 160))}${parsedHistory.guidanceText.length > 160 ? '...' : ''}
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: rgba(255, 255, 255, 0.45); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.4rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: rgba(255, 255, 255, 0.45); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.4rem; flex-wrap: wrap; gap: 0.4rem;">
             <span>ออกประกาศ: ${escapeHtml(alert.sourceDate || formatThaiDate(alert.dataDate))}</span>
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
-              <button type="button" class="btn btn-secondary history-speak-btn" style="padding: 0.2rem 0.65rem; font-size: 0.75rem; border-radius: 8px;">
-                ฟังเสียง
+            <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary history-urgent-btn" style="padding: 0.25rem 0.6rem; font-size: 0.72rem; border-radius: 8px; background: rgba(239,68,68,0.15); color: #fca5a5; border-color: rgba(239,68,68,0.3);">
+                🚨 เตือนด่วน
               </button>
-              <a href="${escapeHtml(safeOfficialUrl(alert.sourceUrl))}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none; font-weight: 500;">
+              <button type="button" class="btn btn-secondary history-guidance-btn" style="padding: 0.25rem 0.6rem; font-size: 0.72rem; border-radius: 8px; background: rgba(251,191,36,0.15); color: #fde68a; border-color: rgba(251,191,36,0.3);">
+                📢 ประกาศ
+              </button>
+              <button type="button" class="btn btn-secondary history-summary-btn" style="padding: 0.25rem 0.6rem; font-size: 0.72rem; border-radius: 8px; background: rgba(56,189,248,0.15); color: #7dd3fc; border-color: rgba(56,189,248,0.3);">
+                📊 สรุป
+              </button>
+              <a href="${escapeHtml(safeOfficialUrl(alert.sourceUrl))}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none; font-weight: 500; font-size: 0.75rem; margin-left: 0.25rem;">
                 ดูต้นฉบับ ↗
               </a>
             </div>
           </div>
         `;
-        const speakBtn = item.querySelector('.history-speak-btn');
-        speakBtn?.addEventListener('click', () => {
-          void playAlertTone('official');
-          setTimeout(() => {
-            speak?.(formatSpeech(alert));
-          }, 600);
-        });
+        item.querySelector('.history-urgent-btn')?.addEventListener('click', () => playUrgentAlert(alert));
+        item.querySelector('.history-guidance-btn')?.addEventListener('click', () => playGuidanceAnnouncement(alert));
+        item.querySelector('.history-summary-btn')?.addEventListener('click', () => playWeatherSummary(alert));
         list.appendChild(item);
       });
       pnaOfficialHistory.appendChild(list);
@@ -769,7 +955,7 @@ export function initializeOfficialAlerts(speakText: (text: string) => void, spea
   render();
 
   void checkOfficialAlerts();
-  window.setInterval(() => void checkOfficialAlerts(false), POLL_MS);
+  window.setInterval(() => void checkOfficialAlerts(), POLL_MS);
 }
 
 export function setOfficialAlertsProvince(province: string) {

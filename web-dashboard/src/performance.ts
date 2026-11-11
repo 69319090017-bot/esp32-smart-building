@@ -359,7 +359,9 @@ export class MemoryManager {
     // Implement LRU eviction if cache is too large
     if (this.caches.size >= this.maxCacheSize) {
       const firstKey = this.caches.keys().next().value;
-      this.caches.delete(firstKey);
+      if (firstKey !== undefined) {
+        this.caches.delete(firstKey);
+      }
     }
 
     const entry = { value, expires: ttl ? Date.now() + ttl : null };
