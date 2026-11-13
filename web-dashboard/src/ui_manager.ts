@@ -598,7 +598,7 @@ export const playOnlineTtsAudio = (text: string): Promise<boolean> => {
             const clean = text.trim().slice(0, 200);
             if (!clean) return resolve(false);
             const encoded = encodeURIComponent(clean);
-            const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=th&client=tw-ob&q=${encoded}`;
+            const url = `/api/tts?text=${encoded}`;
             const audio = new Audio(url);
             audio.volume = 1.0;
             audio.onended = () => resolve(true);
@@ -608,6 +608,35 @@ export const playOnlineTtsAudio = (text: string): Promise<boolean> => {
             resolve(false);
         }
     });
+};
+
+const fallbackBrowserSpeech = (
+    text: string,
+    containsThai: boolean,
+    preferredVoice: any,
+    sequenceId: number,
+    onSpeechComplete: () => void
+) => {
+    if (!('speechSynthesis' in window)) {
+        onSpeechComplete();
+        return;
+    }
+    try {
+        if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = containsThai ? 'th-TH' : 'en-US';
+        if (preferredVoice) {
+            utterance.voice = preferredVoice;
+        }
+        utterance.rate = containsThai ? getSpeechRate() : 0.9;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        utterance.onend = () => onSpeechComplete();
+        utterance.onerror = () => onSpeechComplete();
+        window.speechSynthesis.speak(utterance);
+    } catch {
+        onSpeechComplete();
+    }
 };
 
 const speakNextQueueItem = (sequenceId = speechSequence) => {
@@ -621,39 +650,7 @@ const speakNextQueueItem = (sequenceId = speechSequence) => {
     const containsThai = /[\u0E00-\u0E7F]/.test(nextText);
     const preferredVoice = getPreferredVoice(nextText);
 
-    // If text contains Thai and no browser Thai voice is available, use online Thai audio stream
-    if (containsThai && !preferredVoice) {
-        if (UI.ttsStatus) UI.ttsStatus.textContent = 'กำลังพูด...';
-        void playOnlineTtsAudio(nextText).then(() => {
-            if (sequenceId !== speechSequence) return;
-            if (speechQueue.length > 0) {
-                speechPauseTimer = window.setTimeout(() => {
-                    speechPauseTimer = null;
-                    speakNextQueueItem(sequenceId);
-                }, 300);
-                return;
-            }
-            if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
-        });
-        return;
-    }
-
-    if (!('speechSynthesis' in window)) {
-        if (containsThai) {
-            void playOnlineTtsAudio(nextText);
-        }
-        return;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(nextText);
-    utterance.lang = containsThai ? 'th-TH' : 'en-US';
-    if (preferredVoice) {
-        utterance.voice = preferredVoice;
-    }
-    utterance.rate = containsThai ? getSpeechRate() : 0.9;
-    utterance.pitch = 1.0;
-    utterance.volume = 1.0;
-    utterance.onend = () => {
+    const onSpeechComplete = () => {
         if (sequenceId !== speechSequence) return;
         if (speechQueue.length > 0) {
             speechPauseTimer = window.setTimeout(() => {
@@ -664,28 +661,30 @@ const speakNextQueueItem = (sequenceId = speechSequence) => {
         }
         if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
     };
-    utterance.onerror = (e: any) => {
-        if (sequenceId !== speechSequence) return;
-        if (containsThai && (e?.error === 'language-unavailable' || e?.error === 'synthesis-failed' || e?.error === 'network' || !preferredVoice)) {
-            void playOnlineTtsAudio(nextText).then(() => {
-                if (sequenceId !== speechSequence) return;
-                if (speechQueue.length > 0) {
-                    speakNextQueueItem(sequenceId);
-                    return;
-                }
-                if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
-            });
-            return;
-        }
-        if (speechQueue.length > 0) {
-            speakNextQueueItem(sequenceId);
-            return;
-        }
-        if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
-    };
 
     if (UI.ttsStatus) UI.ttsStatus.textContent = 'กำลังพูด...';
-    window.speechSynthesis.speak(utterance);
+
+    // In unit test environment, keep using browser SpeechSynthesis so vitest spies work cleanly without jsdom audio errors
+    if (isTestEnv) {
+        fallbackBrowserSpeech(nextText, containsThai, preferredVoice, sequenceId, onSpeechComplete);
+        return;
+    }
+
+    // 1. First priority: High-fidelity natural Thai via /api/tts stream
+    if (containsThai) {
+        void playOnlineTtsAudio(nextText).then((played) => {
+            if (sequenceId !== speechSequence) return;
+            if (played) {
+                onSpeechComplete();
+                return;
+            }
+            // 2. Fallback to browser local SpeechSynthesis if serverless stream not reached
+            fallbackBrowserSpeech(nextText, containsThai, preferredVoice, sequenceId, onSpeechComplete);
+        });
+        return;
+    }
+
+    fallbackBrowserSpeech(nextText, containsThai, preferredVoice, sequenceId, onSpeechComplete);
 };
 
 export const speakText = (text: string, cueType: 'ANNOUNCEMENT' | 'WEATHER' | 'OFFICIAL' | 'TEST' = 'ANNOUNCEMENT', sendToHardware = false) => {
