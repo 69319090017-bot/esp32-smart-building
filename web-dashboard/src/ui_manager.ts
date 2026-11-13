@@ -591,20 +591,48 @@ const splitLongSpeechSegment = (segment: string) => {
     return chunks.length ? chunks : [segment];
 };
 
+let activeTtsAudio: HTMLAudioElement | null = null;
+
 export const playOnlineTtsAudio = (text: string): Promise<boolean> => {
     if (isAudioMuted()) return Promise.resolve(false);
     return new Promise((resolve) => {
         try {
             const clean = text.trim().slice(0, 200);
             if (!clean) return resolve(false);
+            if (activeTtsAudio) {
+                try {
+                    activeTtsAudio.pause();
+                    activeTtsAudio.removeAttribute('src');
+                    activeTtsAudio.load();
+                } catch {}
+                activeTtsAudio = null;
+            }
             const encoded = encodeURIComponent(clean);
             const url = `/api/tts?text=${encoded}`;
             const audio = new Audio(url);
+            activeTtsAudio = audio;
             audio.volume = 1.0;
-            audio.onended = () => resolve(true);
-            audio.onerror = () => resolve(false);
-            audio.play().then(() => resolve(true)).catch(() => resolve(false));
-        } catch {
+            let settled = false;
+            const finish = (result: boolean) => {
+                if (settled) return;
+                settled = true;
+                activeTtsAudio = null;
+                resolve(result);
+            };
+            audio.onended = () => finish(true);
+            audio.onerror = (err) => {
+                console.warn('[AUDIO] Online TTS stream error:', err);
+                finish(false);
+            };
+            const p = audio.play();
+            if (p !== undefined) {
+                p.catch((err) => {
+                    console.warn('[AUDIO] Autoplay play error:', err);
+                    finish(false);
+                });
+            }
+        } catch (err) {
+            console.warn('[AUDIO] TTS exception:', err);
             resolve(false);
         }
     });
