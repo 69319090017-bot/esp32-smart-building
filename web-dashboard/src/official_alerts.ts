@@ -967,3 +967,8 @@ export function repeatLatestOfficialAlert() {
   const latest = activeAlerts[0];
   if (latest) speak?.(formatSpeech(latest));
 }
+
+export function getActiveOfficialAlertForCurrentProvince(): OfficialAlert | null {
+  return activeAlerts[0] || null;
+}
+

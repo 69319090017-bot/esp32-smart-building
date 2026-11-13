@@ -1149,3 +1149,74 @@ input:disabled + .toggle-slider {
     transition: none;
   }
 }
+
+/* ========== AI DEPARTURE & SAFETY ADVISOR ========== */
+.ai-advisor-panel {
+  transition: all 0.3s ease;
+}
+
+.ai-checklist-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-checklist-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.ai-checklist-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ai-checklist-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-checklist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.ai-checklist-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.ai-checklist-reason {
+  font-size: 0.8rem;
+  color: rgba(235, 235, 245, 0.65);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.ai-checklist-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+

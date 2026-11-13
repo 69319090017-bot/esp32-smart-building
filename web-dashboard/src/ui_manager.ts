@@ -4,6 +4,9 @@ import { evaluateHumidityAlert } from './humidity_alert';
 import { assessWeatherHazards } from './hazard_assessment';
 import { buildWeatherNarration as createWeatherNarration, calculateRothfuszHeatIndexC } from './weather_narration';
 import { requestEsp32Announcement } from './firebase_client';
+import { computeAiDepartureAdvice, AiDepartureAssessment } from './ai_departure_advisor';
+import { getActiveOfficialAlertForCurrentProvince } from './official_alerts';
+
 
 export const PROVINCES_MAP: Record<string, { lat: number; lon: number; en: string }> = {
     "กรุงเทพมหานคร": { lat: 13.7563, lon: 100.5018, en: "Bangkok" },
@@ -138,6 +141,14 @@ export const UI = {
     departureActionText: document.getElementById('departureActionText') as HTMLElement,
     outdoorSummaryText: document.getElementById('outdoorSummaryText') as HTMLElement,
     outdoorActionText: document.getElementById('outdoorActionText') as HTMLElement,
+
+    // AI Departure Advisor Elements
+    aiAdvisorStatusPill: document.getElementById('aiAdvisorStatusPill') as HTMLElement,
+    aiAdvisorSummaryText: document.getElementById('aiAdvisorSummaryText') as HTMLElement,
+    aiChecklistContainer: document.getElementById('aiChecklistContainer') as HTMLElement,
+    aiChecklistCount: document.getElementById('aiChecklistCount') as HTMLElement,
+    aiAdvisorSpeakBtn: document.getElementById('aiAdvisorSpeakBtn') as HTMLButtonElement,
+    aiAdvisorTtsStatus: document.getElementById('aiAdvisorTtsStatus') as HTMLElement,
 
     heatValue: document.getElementById('heatValue') as HTMLElement,
     airTempValue: document.getElementById('airTempValue') as HTMLElement,
@@ -815,6 +826,56 @@ const getDepartureReadiness = (tempC: number, humidity: number, rainMm: number, 
     };
 };
 
+let latestAiDepartureAssessment: AiDepartureAssessment | null = null;
+
+export const getLatestAiDepartureAssessment = (): AiDepartureAssessment | null => latestAiDepartureAssessment;
+
+export const speakAiDepartureAdvice = () => {
+    if (!latestAiDepartureAssessment) return;
+    if (UI.aiAdvisorTtsStatus) {
+        UI.aiAdvisorTtsStatus.textContent = '🔊 กำลังอ่านสรุปความพร้อม AI...';
+    }
+    speakText(latestAiDepartureAssessment.spokenText, 'WEATHER');
+    setTimeout(() => {
+        if (UI.aiAdvisorTtsStatus) {
+            UI.aiAdvisorTtsStatus.textContent = 'พร้อมบรรยายเสียง AI';
+        }
+    }, 15000);
+};
+
+export const renderAiDepartureAdvisor = (assessment: AiDepartureAssessment) => {
+    if (UI.aiAdvisorStatusPill) {
+        UI.aiAdvisorStatusPill.textContent = assessment.statusLabel;
+        UI.aiAdvisorStatusPill.style.background = assessment.statusBg;
+        UI.aiAdvisorStatusPill.style.color = assessment.statusColor;
+        UI.aiAdvisorStatusPill.style.borderColor = assessment.statusColor;
+    }
+    if (UI.aiAdvisorSummaryText) {
+        UI.aiAdvisorSummaryText.textContent = assessment.summaryText;
+    }
+    if (UI.aiChecklistCount) {
+        UI.aiChecklistCount.textContent = `${assessment.checklist.length} รายการที่แนะนำ`;
+    }
+    if (UI.aiChecklistContainer) {
+        UI.aiChecklistContainer.innerHTML = assessment.checklist.map(item => `
+            <div class="ai-checklist-card">
+                <div class="ai-checklist-icon" style="background: ${item.tagBg}; color: ${item.tagColor};">
+                    ${item.iconSvg}
+                </div>
+                <div class="ai-checklist-content">
+                    <div class="ai-checklist-header">
+                        <span class="ai-checklist-title">${item.title}</span>
+                        <span class="ai-checklist-tag" style="background: ${item.tagBg}; color: ${item.tagColor}; border: 0.5px solid ${item.tagColor}55;">
+                            ${item.tag}
+                        </span>
+                    </div>
+                    <p class="ai-checklist-reason">${item.reason}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+};
+
 export const updateDashboardUI = (w: any, severity = "NORMAL", province = "กรุงเทพมหานคร", riverDischargeAvailable = false) => {
     if (!w) return;
 
@@ -838,6 +899,24 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
     const adviceText = humidityAlert.advice;
     const readiness = getDepartureReadiness(tempC, humidity, rain, gust, uv, weatherCode);
     const outdoorSummary = buildOutdoorReadinessSummary(tempC, humidity, dewPoint, rain, gust, uv, weatherCode);
+
+    const officialAlert = getActiveOfficialAlertForCurrentProvince();
+    const isDoorLocked = UI.doorStatusPill?.textContent?.includes('LOCKED') ?? true;
+    const aiAdvice = computeAiDepartureAdvice({
+        tempC,
+        relativeHumidity: humidity,
+        apparentTempC: apparent,
+        rainMm: rain,
+        windGustKmh: gust,
+        uvIndex: uv,
+        weatherCode,
+        province,
+        officialAlertTitle: officialAlert?.title ?? null,
+        officialAlertSummary: officialAlert?.summary ?? null,
+        isDoorLocked
+    });
+    latestAiDepartureAssessment = aiAdvice;
+
     const hazardAssessment = assessWeatherHazards(w);
     const finding = (id: string) => hazardAssessment.findings.find(item => item.id === id);
     const coreDataIncomplete = ['heat', 'uv', 'rain', 'storm'].some(id => finding(id)?.band === 'unknown');
@@ -1130,6 +1209,9 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
                 UI.sirenStatusPill.style.cssText = "background: rgba(148,163,184,0.1); color: var(--color-fg-muted);";
             }
         }
+        // Render AI Departure & Safety Advisor
+        renderAiDepartureAdvisor(aiAdvice);
+
         if (UI.alertBanner) {
             const isAlert = severity === 'CRITICAL' || severity === 'WARNING';
             UI.alertBanner.style.display = isAlert ? 'block' : 'none';
@@ -1141,14 +1223,14 @@ export const updateDashboardUI = (w: any, severity = "NORMAL", province = "ก�
             if (UI.alertBannerTitle) {
                 UI.alertBannerTitle.textContent = severity === 'CRITICAL'
                     ? 'พบเกณฑ์อากาศระดับอันตรายจากข้อมูลแบบจำลอง'
-                    : 'พบปัจจัยอากาศที่ควรระวังจากข้อมูลแบบจำลอง';
+                    : 'คำแนะนำสภาวะอากาศและสิ่งที่ควรระวัง';
                 UI.alertBannerTitle.style.color = severity === 'CRITICAL' ? '#ef4444' : '#f59e0b';
             }
 
             if (UI.alertBannerMsg) {
                 UI.alertBannerMsg.textContent = severity === 'CRITICAL'
                     ? `ข้อมูลแบบจำลองใน จ.${province} ถึงเกณฑ์อันตราย โปรดตรวจคำแนะนำและประกาศทางการ`
-                    : `ข้อมูลแบบจำลองใน จ.${province} มีปัจจัยที่ควรระวัง โปรดติดตามประกาศทางการ`;
+                    : aiAdvice.summaryText;
             }
         }
 

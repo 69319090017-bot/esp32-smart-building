@@ -22,6 +22,7 @@ import {
     getSpeechRate,
     setSpeechRate,
     speakWeatherSummary,
+    speakAiDepartureAdvice,
     playStudioVoice,
     getAlertToneVolume,
     setAlertToneVolume,
@@ -329,6 +330,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         speakWeatherSummary();
         eventBus.publish(eventFactory.userAction('weather_summary_repeat'));
     });
+
+    UI.aiAdvisorSpeakBtn?.addEventListener('click', () => {
+        speakAiDepartureAdvice();
+        eventBus.publish(eventFactory.userAction('ai_advisor_speak'));
+    });
+
 
     const speechRateSelect = document.getElementById('speechRateSelect') as HTMLSelectElement | null;
     if (speechRateSelect) {

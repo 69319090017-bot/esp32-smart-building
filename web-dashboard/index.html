@@ -569,7 +569,7 @@
                     </div>
 
                     <!-- Alert Banner (Appears when WARNING or CRITICAL) -->
-                    <div id="alertBanner" class="card" style="display: none; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); margin-bottom: 1.5rem; padding: 1rem 1.25rem;">
+                    <div id="alertBanner" class="card" style="display: none; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); margin-bottom: 1rem; padding: 0.85rem 1.15rem; border-radius: 14px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div style="display: flex; align-items: center; color: #ef4444;"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div>
@@ -581,6 +581,65 @@
                             <button id="speakAlertBtn" class="btn btn-sm btn-secondary" style="font-size: 0.75rem;">ฟังประกาศ</button>
                         </div>
                     </div>
+
+                    <!-- ✨ AI Smart Departure & Safety Advisor Panel -->
+                    <section id="aiDepartureAdvisorCard" class="card card-apple-glass ai-advisor-panel" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(10, 132, 255, 0.04) 50%, rgba(139, 92, 246, 0.05) 100%); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 20px; padding: 1.35rem 1.45rem; box-shadow: 0 10px 32px 0 rgba(0, 0, 0, 0.28); position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, transparent 70%); pointer-events: none; filter: blur(20px);"></div>
+                        
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 0.85rem;">
+                                <div style="width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(10, 132, 255, 0.25) 100%); border: 0.5px solid rgba(139, 92, 246, 0.4); display: flex; align-items: center; justify-content: center; color: #c084fc; box-shadow: 0 0 16px rgba(139, 92, 246, 0.25);">
+                                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.286L13 21l-2.286-6.857L5 12l5.714-2.286L13 3z"/></svg>
+                                </div>
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <h2 style="font-size: 1.15rem; font-weight: 700; color: #ffffff; margin: 0; letter-spacing: -0.02em;">AI Departure & Safety Advisor</h2>
+                                        <span class="label" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(10, 132, 255, 0.2)); color: #c084fc; border: 0.5px solid rgba(139, 92, 246, 0.35); padding: 0.2rem 0.55rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">✨ SMART AI</span>
+                                    </div>
+                                    <p style="font-size: 0.82rem; color: rgba(235, 235, 245, 0.65); margin: 0.15rem 0 0;">คำนวณและประมวลผลสิ่งแวดล้อม 360° แนะนำสิ่งที่ควรเตรียมตัวก่อนออกจากบ้านวันนี้</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span id="aiAdvisorStatusPill" class="label" style="background: rgba(48, 209, 88, 0.15); color: #30d158; border: 0.5px solid rgba(48, 209, 88, 0.3); padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600;">
+                                    🟢 สภาพอากาศพร้อมเดินทาง
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- AI Environmental Synthesis Box -->
+                        <div style="background: rgba(0, 0, 0, 0.25); border: 0.5px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 1.1rem; display: flex; align-items: flex-start; gap: 0.65rem;">
+                            <span style="font-size: 1.1rem; line-height: 1;">💡</span>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #a78bfa; margin-bottom: 0.2rem;">AI WEATHER & SITUATION SYNTHESIS</div>
+                                <p id="aiAdvisorSummaryText" style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.9); margin: 0; line-height: 1.45;">
+                                    กำลังประมวลผลข้อมูลสภาพอากาศ แดด UV ความชื้น และประกาศเตือนภัย...
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 🎒 AI Recommended Departure Checklist -->
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+                                <span style="font-size: 0.82rem; font-weight: 600; color: rgba(235, 235, 245, 0.75); letter-spacing: 0.02em;">🎒 สิ่งที่ AI แนะนำให้เตรียมก่อนออกจากบ้านวันนี้:</span>
+                                <span id="aiChecklistCount" style="font-size: 0.75rem; color: rgba(235, 235, 245, 0.45);">กำลังคำนวณ...</span>
+                            </div>
+                            <div id="aiChecklistContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem;">
+                                <!-- Dynamic Checklist items generated by AI Advisor -->
+                            </div>
+                        </div>
+
+                        <!-- Action Bar: AI Voice Briefing -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.1rem; padding-top: 0.85rem; border-top: 0.5px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap; gap: 0.65rem;">
+                            <div style="display: flex; align-items: center; gap: 0.65rem;">
+                                <button id="aiAdvisorSpeakBtn" type="button" class="btn" style="background: linear-gradient(135deg, #8b5cf6 0%, #0a84ff 100%); color: #ffffff; border: none; padding: 0.45rem 1.1rem; border-radius: 999px; font-weight: 600; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.45rem; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35); cursor: pointer;">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                                    <span>🔊 ฟัง AI สรุปเตรียมตัวก่อนออก</span>
+                                </button>
+                                <span id="aiAdvisorTtsStatus" style="font-size: 0.76rem; color: rgba(235, 235, 245, 0.55);">พร้อมบรรยายเสียง AI</span>
+                            </div>
+                            <span style="font-size: 0.72rem; color: rgba(235, 235, 245, 0.4);">ประมวลผลอ้างอิงเกณฑ์ WHO, กรมอนามัย & กรมอุตุนิยมวิทยา</span>
+                        </div>
+                    </section>
 
                     <section class="card card-apple-glass voice-panel" aria-labelledby="voice-panel-title">
                         <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
