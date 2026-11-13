@@ -666,7 +666,10 @@ export const speakText = (text: string, cueType: 'ANNOUNCEMENT' | 'WEATHER' | 'O
     window.speechSynthesis.cancel();
     speechQueue.length = 0;
 
-    const normalizedSegments = cleanText
+    // Normalize repeated characters (e.g. แม่จ้าาาาาาาาาาาาาา -> แม่จ้าา) so TTS parser handles it cleanly
+    const sanitizedText = cleanText.replace(/([ก-๙])\1{2,}/g, '$1$1');
+
+    const normalizedSegments = sanitizedText
         .replace(/\s+/g, ' ')
         .split(/(?<=[.!?])\s+|\n+/)
         .map(segment => segment.trim())
@@ -674,7 +677,7 @@ export const speakText = (text: string, cueType: 'ANNOUNCEMENT' | 'WEATHER' | 'O
 
     const finalSegments = normalizedSegments.length > 1
         ? normalizedSegments
-        : [cleanText];
+        : [sanitizedText];
 
     const chunks: string[] = [];
     for (const segment of finalSegments) {

@@ -538,14 +538,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             pnaTestAlert.hidden = false;
             pnaTestEmpty.hidden = true;
 
-            // Automatically voice through speakers if newly received or autoVoice requested
-            if (shouldAutoVoice || (rawMsg && rawMsg !== lastRenderedPnaMessage)) {
+            // Automatically voice through speakers only if explicit autoVoice requested (e.g. storage sync)
+            if (shouldAutoVoice) {
                 lastRenderedPnaMessage = rawMsg;
-                void playAlertTone('official');
-                setTimeout(() => {
-                    speakText(`ข้อความแจ้งเตือน: ${rawMsg}`);
-                }, 600);
-                void requestEsp32Announcement(rawMsg);
+                broadcastVoicePrompt(rawMsg);
             }
         } catch {
             pnaTestAlert.hidden = true;
@@ -557,26 +553,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderPnaTestHistory();
 
     const broadcastVoicePrompt = (text: string) => {
+        const cleanText = (text || '').trim();
+        if (!cleanText) return;
+
         let voiceKey: string | null = null;
-        if (/ไฟ|ควัน|อุณหภูมิ/i.test(text)) voiceKey = 'FIRE';
-        else if (/น้ำ|ท่วม/i.test(text)) voiceKey = 'FLOOD';
-        else if (/พายุ|ลม/i.test(text)) voiceKey = 'STORM';
-        else if (/ฝน/i.test(text)) voiceKey = 'RAIN';
-        else if (/ร้อน/i.test(text)) voiceKey = 'HEAT';
-        else if (/ขโมย|บุกรุก|อันตราย|ผู้บุกรุก/i.test(text)) voiceKey = 'INTRUSION';
-        else if (/ไฟเปิด|ทางเดิน|สะดุด/i.test(text)) voiceKey = 'NIGHT_WALK';
-        else if (/ประตูเปิด/i.test(text)) voiceKey = 'DOOR_OPEN';
-        else if (/ประตูปิด/i.test(text)) voiceKey = 'DOOR_LOCKED';
-        else if (/ปกติ|เรียบร้อย|สถานะ/i.test(text)) voiceKey = 'STATUS';
+        if (/ไฟ|ควัน|อุณหภูมิ/i.test(cleanText)) voiceKey = 'FIRE';
+        else if (/น้ำ|ท่วม/i.test(cleanText)) voiceKey = 'FLOOD';
+        else if (/พายุ|ลม/i.test(cleanText)) voiceKey = 'STORM';
+        else if (/ฝน/i.test(cleanText)) voiceKey = 'RAIN';
+        else if (/ร้อน|แดด/i.test(cleanText)) voiceKey = 'HEAT';
+        else if (/ขโมย|บุกรุก|อันตราย|ผู้บุกรุก/i.test(cleanText)) voiceKey = 'INTRUSION';
+        else if (/ไฟเปิด|ทางเดิน|สะดุด/i.test(cleanText)) voiceKey = 'NIGHT_WALK';
+        else if (/ประตูเปิด/i.test(cleanText)) voiceKey = 'DOOR_OPEN';
+        else if (/ประตูปิด/i.test(cleanText)) voiceKey = 'DOOR_LOCKED';
+        else if (/ปกติ|เรียบร้อย|สถานะ/i.test(cleanText)) voiceKey = 'STATUS';
 
         if (voiceKey) {
             void playStudioVoice(voiceKey).then(() => {
-                speakText(text, 'TEST', false);
+                setTimeout(() => {
+                    speakText(cleanText, 'TEST', false);
+                }, 350);
             });
-            void requestEsp32Announcement(text, voiceKey);
+            void requestEsp32Announcement(cleanText, voiceKey);
         } else {
+            // 1. Play official alert chime on browser & ESP32 (~650ms)
             void playAlertTone('official');
-            speakText(text, 'TEST', true);
+            // 2. Speak the exact typed message clearly through speaker right after the chime!
+            setTimeout(() => {
+                speakText(cleanText, 'TEST', true);
+            }, 650);
         }
     };
 
@@ -614,14 +619,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem(PNA_TEST_ALERT_HISTORY_KEY, JSON.stringify(history.slice(-50)));
         renderPnaTestHistory();
 
-        renderPnaTestAlert(JSON.stringify(alert), true);
+        // Render card visually without autoVoice collision
+        renderPnaTestAlert(JSON.stringify(alert), false);
         createToast(`กระจายเสียงแจ้งเตือนออกลำโพงเรียบร้อย`, 'success');
         if (pnaQuickMessageInput) pnaQuickMessageInput.value = '';
 
-        void playAlertTone('official');
-        setTimeout(() => {
-            broadcastVoicePrompt(text);
-        }, 500);
+        // Broadcast voice prompt once cleanly
+        broadcastVoicePrompt(text);
     };
 
     pnaQuickSendBtn?.addEventListener('click', () => triggerQuickAlert());
