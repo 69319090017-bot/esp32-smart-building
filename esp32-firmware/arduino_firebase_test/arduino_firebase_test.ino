@@ -473,6 +473,91 @@ void testBuzzer() {
   playBuzzerTone(BUZZER_TEST_FREQ_HZ, 200);
 }
 
+void playCloudTTS(const String& text) {
+  if (!i2sInitialized || text.length() == 0) return;
+  Serial.printf("[CLOUD TTS] Streaming speech from Cloud for: '%s'...\n", text.c_str());
+
+  WiFiClientSecure client;
+  client.setInsecure(); // Disable TLS certificate verification for speed & memory
+  client.setTimeout(10); // 10 seconds timeout
+
+  // URL Encode the Thai text (UTF-8 bytes -> %XX)
+  String encodedText = "";
+  for (size_t i = 0; i < text.length(); i++) {
+    char c = text[i];
+    if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+      encodedText += c;
+    } else {
+      char buf[4];
+      snprintf(buf, sizeof(buf), "%%%02X", (uint8_t)c);
+      encodedText += buf;
+    }
+  }
+
+  const char* host = "web-dashboard-eta-rust.vercel.app";
+  const int port = 443;
+  String path = "/api/tts?format=pcm&text=" + encodedText;
+
+  if (!client.connect(host, port)) {
+    Serial.println(F("[CLOUD TTS] HTTPS connect failed!"));
+    return;
+  }
+
+  client.printf("GET %s HTTP/1.1\r\nHost: %s\r\nUser-Agent: ESP32-PCM5102\r\nConnection: close\r\n\r\n", path.c_str(), host);
+
+  // Parse HTTP response headers
+  bool is200 = false;
+  while (client.connected()) {
+    String line = client.readStringUntil('\n');
+    if (line.startsWith("HTTP/1.") && line.indexOf("200") >= 0) {
+      is200 = true;
+    }
+    if (line == "\r" || line.length() == 0) {
+      break; // End of headers
+    }
+  }
+
+  if (!is200) {
+    Serial.println(F("[CLOUD TTS] Non-200 response from Vercel!"));
+    client.stop();
+    return;
+  }
+
+  // Stream raw 16kHz 16-bit stereo PCM bytes straight to I2S DAC!
+  constexpr size_t DMA_CHUNK = 512;
+  uint8_t buffer[DMA_CHUNK];
+  size_t bytesWritten = 0;
+  uint32_t totalBytes = 0;
+
+  stopVoicePlayback = false;
+  while (client.connected() || client.available()) {
+    if (stopVoicePlayback) {
+      Serial.println(F("[CLOUD TTS] Playback stopped by user!"));
+      stopVoicePlayback = false;
+      i2s_zero_dma_buffer(I2S_PORT);
+      break;
+    }
+    const size_t avail = client.available();
+    if (avail > 0) {
+      const size_t toRead = min(avail, DMA_CHUNK);
+      const int r = client.read(buffer, toRead);
+      if (r > 0) {
+        i2s_write(I2S_PORT, buffer, r, &bytesWritten, portMAX_DELAY);
+        totalBytes += r;
+      }
+    } else {
+      delay(2);
+    }
+  }
+
+  // Smooth silence ramp
+  int16_t silenceBuf[32 * 2] = {0};
+  i2s_write(I2S_PORT, silenceBuf, sizeof(silenceBuf), &bytesWritten, portMAX_DELAY);
+  client.stop();
+  lastVoicePlayedAt = millis();
+  Serial.printf("[CLOUD TTS] Speech finished! Total %u PCM bytes streamed\n", totalBytes);
+}
+
 void setServoPulseUs(uint32_t pulseUs) {
   const uint32_t duty = (pulseUs * 65535UL) / SERVO_TEST_PERIOD_US;
 #if ESP_ARDUINO_VERSION_MAJOR >= 3
@@ -883,8 +968,14 @@ void pollLedCommand() {
       } else {
         playVoice(VOICE_RAIN_WARN);
       }
-    } else if (trigger.indexOf("TEST") >= 0) {
+    } else if (trigger.indexOf("TEST") >= 0 || trigger.indexOf("TTS") >= 0 || trigger.indexOf("CLOUD") >= 0) {
       playChimeOfficial();
+      if (announcementCommand.length() > 0 && announcementCommand != "OFFICIAL_CHIME" && announcementCommand != "WEATHER_CHIME" && announcementCommand != "TEST") {
+        playCloudTTS(announcementCommand);
+      }
+    } else if (announcementCommand.length() > 0 && announcementCommand != "OFFICIAL_CHIME" && announcementCommand != "WEATHER_CHIME") {
+      playChimeOfficial();
+      playCloudTTS(announcementCommand);
     } else if (trigger.length() > 0) {
       testBuzzer();
     }

@@ -576,9 +576,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             void requestEsp32Announcement(cleanText, voiceKey);
         } else {
-            // 1. Play official alert chime on browser & ESP32 (~650ms)
+            // 1. Play official alert chime on browser (~650ms)
             void playAlertTone('official');
-            // 2. Speak the exact typed message clearly through speaker right after the chime!
+            // 2. Send Cloud TTS command to physical ESP32 speaker
+            void requestEsp32Announcement(cleanText, 'CLOUD_TTS');
+            // 3. Speak the exact typed message clearly through browser speaker
             setTimeout(() => {
                 speakText(cleanText, 'TEST', false);
             }, 650);
