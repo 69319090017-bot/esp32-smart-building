@@ -580,7 +580,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             void playAlertTone('official');
             // 2. Speak the exact typed message clearly through speaker right after the chime!
             setTimeout(() => {
-                speakText(cleanText, 'TEST', true);
+                speakText(cleanText, 'TEST', false);
             }, 650);
         }
     };

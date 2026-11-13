@@ -591,6 +591,25 @@ const splitLongSpeechSegment = (segment: string) => {
     return chunks.length ? chunks : [segment];
 };
 
+export const playOnlineTtsAudio = (text: string): Promise<boolean> => {
+    if (isAudioMuted()) return Promise.resolve(false);
+    return new Promise((resolve) => {
+        try {
+            const clean = text.trim().slice(0, 200);
+            if (!clean) return resolve(false);
+            const encoded = encodeURIComponent(clean);
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=th&client=tw-ob&q=${encoded}`;
+            const audio = new Audio(url);
+            audio.volume = 1.0;
+            audio.onended = () => resolve(true);
+            audio.onerror = () => resolve(false);
+            audio.play().then(() => resolve(true)).catch(() => resolve(false));
+        } catch {
+            resolve(false);
+        }
+    });
+};
+
 const speakNextQueueItem = (sequenceId = speechSequence) => {
     if (sequenceId !== speechSequence) return;
     const nextText = speechQueue.shift();
@@ -599,10 +618,34 @@ const speakNextQueueItem = (sequenceId = speechSequence) => {
         return;
     }
 
-    if (!('speechSynthesis' in window)) return;
-    const utterance = new SpeechSynthesisUtterance(nextText);
     const containsThai = /[\u0E00-\u0E7F]/.test(nextText);
     const preferredVoice = getPreferredVoice(nextText);
+
+    // If text contains Thai and no browser Thai voice is available, use online Thai audio stream
+    if (containsThai && !preferredVoice) {
+        if (UI.ttsStatus) UI.ttsStatus.textContent = 'กำลังพูด...';
+        void playOnlineTtsAudio(nextText).then(() => {
+            if (sequenceId !== speechSequence) return;
+            if (speechQueue.length > 0) {
+                speechPauseTimer = window.setTimeout(() => {
+                    speechPauseTimer = null;
+                    speakNextQueueItem(sequenceId);
+                }, 300);
+                return;
+            }
+            if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
+        });
+        return;
+    }
+
+    if (!('speechSynthesis' in window)) {
+        if (containsThai) {
+            void playOnlineTtsAudio(nextText);
+        }
+        return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(nextText);
     utterance.lang = containsThai ? 'th-TH' : 'en-US';
     if (preferredVoice) {
         utterance.voice = preferredVoice;
@@ -623,15 +666,22 @@ const speakNextQueueItem = (sequenceId = speechSequence) => {
     };
     utterance.onerror = (e: any) => {
         if (sequenceId !== speechSequence) return;
+        if (containsThai && (e?.error === 'language-unavailable' || e?.error === 'synthesis-failed' || e?.error === 'network' || !preferredVoice)) {
+            void playOnlineTtsAudio(nextText).then(() => {
+                if (sequenceId !== speechSequence) return;
+                if (speechQueue.length > 0) {
+                    speakNextQueueItem(sequenceId);
+                    return;
+                }
+                if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
+            });
+            return;
+        }
         if (speechQueue.length > 0) {
             speakNextQueueItem(sequenceId);
             return;
         }
-        if (e?.error === 'not-allowed' || e?.error === 'interrupted') {
-            if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
-        } else {
-            if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
-        }
+        if (UI.ttsStatus) UI.ttsStatus.textContent = 'พร้อมพูด';
     };
 
     if (UI.ttsStatus) UI.ttsStatus.textContent = 'กำลังพูด...';
@@ -649,7 +699,12 @@ export const speakText = (text: string, cueType: 'ANNOUNCEMENT' | 'WEATHER' | 'O
         }).catch(() => undefined);
     }
 
-    if (!('speechSynthesis' in window)) return;
+    if (!('speechSynthesis' in window)) {
+        if (/[\u0E00-\u0E7F]/.test(cleanText)) {
+            void playOnlineTtsAudio(cleanText);
+        }
+        return;
+    }
     if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
     }
@@ -691,8 +746,11 @@ export const speakText = (text: string, cueType: 'ANNOUNCEMENT' | 'WEATHER' | 'O
     if (chunks.length > 0) {
         speechQueue.push(...chunks);
         window.setTimeout(() => {
+            if ('speechSynthesis' in window && window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+            }
             speakNextQueueItem(sequenceId);
-        }, 15);
+        }, 50);
     }
 };
 
